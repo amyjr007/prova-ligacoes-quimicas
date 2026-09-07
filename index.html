@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ligações Químicas · Exercícios</title>
+<meta name="description" content="Exercício interativo de ligações químicas">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   A MESMA PALETA DA AULA.
+   Este arquivo é irmão do da apresentação, e a turma vem de lá:
+   as cores, as fontes e o modo de escrever são os mesmos, para
+   que o exercício não pareça outro material.
+
+   O que muda é o palco. A aula é projetada, e por isso vive num
+   retângulo fixo de 1280x720 que se escala inteiro. Aqui não: o
+   exercício é feito pelo ALUNO, no aparelho dele, e a maioria
+   deles é um telefone em pé. Então a página é fluida — cresce e
+   se reorganiza —, e não uma miniatura do slide.
+   ============================================================ */
+:root{
+  --ink:        #0B1F32;
+  --ink-deep:   #071626;
+  --ink-soft:   #12314B;
+  --aqua:       #45C7B0;
+  --aqua-dim:   rgba(69,199,176,.28);
+  --amber:      #F0B44A;
+  --paper:      #E8F1F5;
+  --paper-dim:  rgba(232,241,245,.62);
+
+  --display: 'Space Grotesk', system-ui, sans-serif;
+  --body:    'IBM Plex Sans', system-ui, sans-serif;
+  --mono:    'IBM Plex Mono', ui-monospace, monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:var(--ink-deep);color:var(--paper);
+  font-family:var(--body);font-weight:300;
+  -webkit-font-smoothing:antialiased;
+  /* respeita a barra do telefone e o entalhe da tela */
+  padding:env(safe-area-inset-top) env(safe-area-inset-right)
+          env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+/* o mesmo fundo da aula: a grade discreta e o brilho que sobe do meio */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 32%,
+      rgba(18,49,75,.85) 0%,rgba(7,22,38,0) 70%),
+    linear-gradient(rgba(69,199,176,.045) 1px,transparent 1px) 0 0/54px 54px,
+    linear-gradient(90deg,rgba(69,199,176,.045) 1px,transparent 1px) 0 0/54px 54px;
+}
+
+/* ---------- a capa ---------- */
+.capa{
+  position:relative;z-index:1;
+  min-height:100dvh;display:flex;flex-direction:column;
+  padding:22px 20px 28px;gap:22px;
+}
+
+/* ---------- O CABEÇALHO DA ESCOLA ----------
+   Fica no alto, separado do resto por um fio: é identificação, não
+   conteúdo. Os campos estão como MARCADORES — quando você me passar
+   os dados da escola, é só trocar o texto de cada um (ver o bloco
+   ESCOLA no fim do arquivo, que é onde eles moram). */
+.escola{
+  flex:none;display:flex;align-items:center;gap:14px;
+  padding-bottom:18px;border-bottom:1px solid rgba(69,199,176,.18);
+}
+.escola .marca{
+  flex:none;width:52px;height:52px;border-radius:8px;
+  display:grid;place-items:center;overflow:hidden;
+  border:1px solid rgba(69,199,176,.3);background:rgba(18,49,75,.5);
+}
+.escola .marca img{width:100%;height:100%;object-fit:contain;display:block}
+/* sem logotipo ainda: fica a inicial, para o espaço já ter a medida certa */
+.escola .marca span{
+  font-family:var(--display);font-weight:600;font-size:22px;color:var(--aqua);
+}
+.escola .quem{min-width:0}
+.escola .nome{
+  font-family:var(--display);font-weight:600;font-size:16px;line-height:1.2;
+  letter-spacing:-.01em;
+}
+.escola .linha{
+  margin-top:3px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--paper-dim);
+}
+
+/* ---------- o miolo ---------- */
+.miolo{
+  flex:1;display:flex;flex-direction:column;justify-content:center;
+  align-items:flex-start;gap:0;padding:8px 0;
+}
+.kicker{
+  font-family:var(--mono);font-size:12px;letter-spacing:.32em;
+  text-transform:uppercase;color:var(--aqua);margin-bottom:18px;
+}
+h1{
+  margin:0;font-family:var(--display);font-weight:700;
+  font-size:clamp(38px,11vw,72px);line-height:.98;letter-spacing:-.03em;
+  max-width:12ch;
+}
+h1 em{font-style:normal;color:var(--amber)}
+
+/* a assinatura do tema: o traço da ligação com o par de elétrons.
+   É a mesma da capa da aula — quem chega aqui reconhece de onde veio. */
+.bond{position:relative;width:168px;height:14px;margin:26px 0 22px;flex:none}
+.bond .line{position:absolute;left:0;right:0;height:2px;background:var(--aqua)}
+.bond .line.a{top:3px}
+.bond .line.b{top:9px;background:var(--aqua-dim)}
+.bond .e{
+  position:absolute;width:9px;height:9px;border-radius:50%;
+  background:var(--amber);top:2.5px;
+  animation:par 3.6s ease-in-out infinite;
+}
+.bond .e.l{left:88px}
+.bond .e.r{left:112px;animation-delay:-1.8s}
+@keyframes par{
+  0%,100%{transform:translateX(-8px)}
+  50%    {transform:translateX(8px)}
+}
+.chamada{
+  margin:0;font-size:clamp(16px,4.4vw,20px);line-height:1.5;
+  color:var(--paper-dim);max-width:34ch;
+}
+
+/* ---------- o botão ---------- */
+.pe{flex:none;display:flex;flex-direction:column;gap:16px;align-items:flex-start}
+#comecar{
+  appearance:none;border:1px solid rgba(69,199,176,.5);
+  background:linear-gradient(180deg,#12414A 0%,#0A2830 100%);
+  color:var(--paper);font-family:var(--mono);
+  font-size:14px;letter-spacing:.18em;text-transform:uppercase;
+  padding:17px 34px;border-radius:999px;cursor:pointer;
+  box-shadow:0 0 26px rgba(69,199,176,.18);
+  transition:border-color .2s,box-shadow .2s,transform .18s,color .2s;
+  /* alvo confortável para o dedo, que é como isto vai ser usado */
+  min-height:54px;
+}
+#comecar:hover{
+  border-color:var(--aqua);color:var(--aqua);
+  box-shadow:0 0 34px rgba(69,199,176,.42);transform:translateY(-1px);
+}
+#comecar:active{transform:translateY(1px)}
+#comecar:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+.rodape{
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:rgba(232,241,245,.34);
+}
+
+/* Numa tela larga a capa deixa de ser uma coluna e passa a ter ar dos
+   dois lados, com o texto à esquerda, como a capa da aula. */
+@media (min-width:820px){
+  .capa{padding:32px 56px 40px}
+  .miolo{max-width:760px}
+  h1{max-width:11ch}
+}
+@media (prefers-reduced-motion:reduce){
+  .bond .e{animation:none}
+}
+</style>
+</head>
+<body>
+
+<main class="capa">
+
+  <!-- ============================================================
+       ESCOLA — os dados de identificação.
+       Troque os três campos abaixo pelos da sua escola. Se houver
+       logotipo, ponha o arquivo em imagens/ e substitua o <span>
+       por: <img src="imagens/logo.png" alt="">
+       ============================================================ -->
+  <header class="escola">
+    <div class="marca"><span>E</span></div>
+    <div class="quem">
+      <div class="nome">Nome da Escola</div>
+      <div class="linha">Química · 1º ano · Prof. Amauri Junior</div>
+    </div>
+  </header>
+
+  <div class="miolo">
+    <div class="kicker">Exercício interativo</div>
+    <h1>Ligações <em>Químicas</em></h1>
+    <div class="bond">
+      <span class="line a"></span><span class="line b"></span>
+      <span class="e l"></span><span class="e r"></span>
+    </div>
+    <p class="chamada">
+      Um conjunto de questões para praticar o que vimos em aula.
+      Responda com calma — dá para voltar e conferir.
+    </p>
+  </div>
+
+  <div class="pe">
+    <button id="comecar" type="button">Começar</button>
+    <div class="rodape">Ligações Químicas · Prof. Amauri Junior</div>
+  </div>
+
+</main>
+
+<script>
+/* ============================================================
+   Por enquanto só a capa. O botão já existe e já responde — as
+   questões entram aqui, uma a uma, conforme montarmos.
+   ============================================================ */
+document.getElementById('comecar').addEventListener('click', () => {
+  /* a montar: daqui em diante entra a primeira questão */
+});
+</script>
+
+</body>
+</html>
