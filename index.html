@@ -909,6 +909,16 @@ h1 em{font-style:normal;color:var(--amber)}
 }
 .placar .n{font-size:clamp(52px,16vw,86px);line-height:1;color:var(--amber)}
 .placar .de{font-size:clamp(17px,4.6vw,23px);color:var(--paper-dim);font-weight:500}
+.placar-sub{
+  margin:8px 0 0;font-size:13.5px;color:var(--paper-dim);
+}
+.placar-sub b{color:var(--paper);font-weight:500}
+/* quanto cada questão rendeu, à direita do título dela */
+.mapa .pontos{
+  float:right;margin-left:12px;
+  font-family:var(--mono);font-size:11.5px;color:var(--paper-far);
+}
+.mapa .selo.parcial{background:rgba(240,180,74,.2);color:var(--amber)}
 .cartao{
   padding:18px;border-radius:18px;
   background:rgba(18,49,75,.5);border:1px solid rgba(69,199,176,.18);
@@ -971,7 +981,8 @@ kbd{
   .capa,.prova,.navegacao,.botao,.regua,#nota-fim{display:none !important}
   .fim{min-height:auto;padding:0;max-width:none}
   .cartao,.mapa li{background:none;border:1px solid #bbb;color:#000}
-  .cartao dt,.placar .de{color:#444}
+  .cartao dt,.placar .de,.placar-sub,.mapa .pontos{color:#444}
+  .placar-sub b{color:#000}
   .mapa .rotulo,.mapa .comentario b{color:#000}
   .mapa .comentario{color:#333}
   .placar .n{color:#000}
@@ -1126,10 +1137,14 @@ kbd{
 <main class="tela fim" id="tela-fim" hidden>
   <div>
     <div class="kicker">Prova entregue</div>
+    <!-- a nota é o que o aluno veio ver: ela é o número grande -->
     <div class="placar">
-      <span class="n" id="fim-acertos">0</span>
-      <span class="de">de <span id="fim-total">0</span> questões</span>
+      <span class="n" id="fim-nota">0,0</span>
+      <span class="de">de <span id="fim-max">10,0</span></span>
     </div>
+    <p class="placar-sub">
+      <b id="fim-acertos">0</b> de <b id="fim-total">0</b> questões inteiramente certas
+    </p>
   </div>
 
   <div class="cartao">
@@ -1958,6 +1973,7 @@ const QUESTOES = [
      QUESTÃO 1 — reconhecer o retrato de G. N. Lewis.
      ========================================================= */
   {
+    valor: 1,          /* questão de alternativa: 1,0 */
     tipo: 'história da química',
     titulo: 'Quem é Lewis?',
     enunciado: 'Um dos maiores expoentes no desenvolvimento do que sabemos hoje ' +
@@ -2013,6 +2029,7 @@ const QUESTOES = [
      do que se observa, e a 3 é a explicação que o postulado pede.
      ========================================================= */
   {
+    valor: 1,          /* questão de alternativa: 1,0 */
     tipo: 'postulado de Dalton',
     titulo: 'Por que os átomos se combinam?',
     enunciado: 'Uma das premissas mais importantes sobre ligações químicas foi proposta ' +
@@ -2066,6 +2083,7 @@ const QUESTOES = [
      turma que não se combina com nada.
      ========================================================= */
   {
+    valor: 1,          /* questão de alternativa: 1,0 */
     tipo: 'história da química',
     titulo: 'Quem é Ramsay?',
     enunciado: 'Um dos cientistas mais brilhantes de sua época, William Ramsay, se mostrou ' +
@@ -2124,6 +2142,7 @@ const QUESTOES = [
      cheio de moléculas, e que só o do gás nobre tem átomo solto.
      ========================================================= */
   {
+    valor: 1,          /* questão de alternativa: 1,0 */
     tipo: 'gases nobres',
     titulo: 'O cilindro de átomos isolados',
     enunciado: 'Ramsay, citado antes, se opôs à ideia de que todas as substâncias são ' +
@@ -2184,6 +2203,7 @@ const QUESTOES = [
      — senão a questão viraria decoreba de nome.
      ========================================================= */
   {
+    valor: 1,          /* questão de alternativa: 1,0 */
     tipo: 'teoria do octeto',
     titulo: 'O segredo dos gases nobres',
     enunciado: 'Os gases nobres vivem sozinhos, um átomo de cada vez, e mesmo assim são ' +
@@ -2256,6 +2276,12 @@ const QUESTOES = [
      gabarito, no fim, comenta átomo por átomo.
      ========================================================= */
   {
+    valor: 2,          /* quatro átomos a 0,5 cada */
+    pontos(respostas){
+      const lista = Array.isArray(respostas) ? respostas : [];
+      const certos = this.atomos.filter((a,k) => lista[k] === a.certa).length;
+      return certos * (this.valor / this.atomos.length);
+    },
     tipo: 'octeto na prática',
     titulo: 'O que cada átomo faz para se estabilizar',
     enunciado: 'Use a Teoria do Octeto: para ficar estável, o átomo precisa de oito ' +
@@ -2330,6 +2356,12 @@ const QUESTOES = [
      pergunta, não a instrução.
      ========================================================= */
   {
+    valor: 3,          /* seis átomos a 0,5 cada */
+    pontos(feitos){
+      const lista = Array.isArray(feitos) ? feitos : [];
+      const certos = this.exemplos.filter((ex,k) => lista[k] === ex.alvo).length;
+      return certos * (this.valor / this.exemplos.length);
+    },
     tipo: 'modelo de Rutherford',
     titulo: 'Estabilize cada átomo',
     enunciado: 'Observe a distribuição eletrônica dos átomos a seguir e acrescente ou ' +
@@ -2441,6 +2473,37 @@ function enviarNota(dados){
   return fetch(ENVIO.url, { method:'POST', mode:'no-cors', body:corpo })
            .then(() => 'enviado')
            .catch(() => 'falhou');
+}
+
+/* ============================================================
+   A NOTA
+
+   A prova vale 10, e o peso segue o trabalho: cada questão de
+   alternativa vale 1,0, e cada átomo das questões de vários itens
+   vale 0,5 — 2,0 na do cubo, que tem quatro, e 3,0 na de
+   Rutherford, que tem seis. Cinco vezes um, mais dois, mais três.
+
+   Nas questões de vários itens a nota é PARTIDA: quem acerta cinco
+   dos seis átomos leva 2,5, e não zero. Era o que faltava para a
+   nota ser justa com quem quase acertou.
+
+   A nota cheia é a SOMA dos pesos, e não um 10 escrito à mão: se
+   um dia entrar outra questão, o total na tela continua verdadeiro
+   sozinho. Para seguir valendo 10, é só manter a soma em 10.
+   ============================================================ */
+const NOTA_CHEIA = QUESTOES.reduce((s, q) => s + (q.valor || 0), 0);
+
+/* quanto esta questão rendeu. Se ela souber repartir o próprio
+   ponto, quem manda é ela; se não, é tudo ou nada. */
+function pontosDe(q, resposta){
+  if (!resposta) return 0;
+  if (typeof q.pontos === 'function') return q.pontos(resposta.resposta);
+  return resposta.acertou ? q.valor : 0;
+}
+
+/* 7 vira "7,0" e 2.5 vira "2,5": vírgula, como se escreve no diário */
+function numero(n){
+  return (Math.round(n * 10) / 10).toFixed(1).replace('.', ',');
 }
 
 /* ---------- estado ---------- */
@@ -2720,9 +2783,13 @@ function entregar(){
 function montarResultado(){
   const total   = QUESTOES.length;
   const acertos = Object.values(estado.respostas).filter(r => r.acertou).length;
+  const ganhos  = QUESTOES.map((q,i) => pontosDe(q, estado.respostas[i]));
+  const nota    = ganhos.reduce((a,b) => a + b, 0);
 
   prepararProva();   /* deixa a revisão pronta para quando ele clicar */
 
+  $('#fim-nota').textContent    = numero(nota);
+  $('#fim-max').textContent     = numero(NOTA_CHEIA);
   $('#fim-acertos').textContent = acertos;
   $('#fim-total').textContent   = total;
   $('#fim-nome').textContent    = estado.aluno.nome;
@@ -2739,14 +2806,21 @@ function montarResultado(){
   const mapa = $('#fim-mapa');
   mapa.innerHTML = '';
   QUESTOES.forEach((q,i) => {
-    const r    = estado.respostas[i];
-    const como = !r ? 'vazio' : (r.acertou ? 'certo' : 'errado');
-    const selo = !r ? '–'     : (r.acertou ? '✓' : '✕');
+    const r  = estado.respostas[i];
+    const pt = ganhos[i];
+    /* três estados, não dois: nas questões de vários itens dá para
+       levar parte do ponto, e o selo precisa dizer isso */
+    const como = !r ? 'vazio' : (pt >= q.valor ? 'certo'
+                              : (pt > 0 ? 'parcial' : 'errado'));
+    const selo = !r ? '–'     : (pt >= q.valor ? '✓' : (pt > 0 ? '½' : '✕'));
     const li = document.createElement('li');
     li.innerHTML = '<span class="selo ' + como + '">' + selo + '</span>' +
-                   '<div class="detalhe"><span class="rotulo"></span></div>';
+                   '<div class="detalhe"><span class="rotulo"></span>' +
+                   '<span class="pontos"></span></div>';
     li.querySelector('.rotulo').textContent =
       (i+1) + '. ' + (q.titulo || '') + (q.tipo ? '  ·  ' + q.tipo : '');
+    li.querySelector('.pontos').textContent =
+      numero(pt) + ' de ' + numero(q.valor);
     if (typeof q.comentario === 'function'){
       const p = document.createElement('p');
       p.className = 'comentario';
@@ -2756,13 +2830,13 @@ function montarResultado(){
     mapa.appendChild(li);
   });
 
-  cuidarDoEnvio(acertos, total);
+  cuidarDoEnvio(nota, acertos, total);
   mostrar('fim');
 }
 
 /* Manda a nota uma vez só. Se falhar, o aluno vê e pode tentar de
    novo — e o PDF continua sendo a saída que não depende de rede. */
-function cuidarDoEnvio(acertos, total){
+function cuidarDoEnvio(nota, acertos, total){
   const linha = $('#envio');
   if (!ENVIO.ativo){ linha.hidden = true; return; }
   linha.hidden = false;
@@ -2773,11 +2847,11 @@ function cuidarDoEnvio(acertos, total){
     return;
   }
 
-  const nota = total ? (acertos * 10 / total) : 0;
-  const detalhe = QUESTOES.map((q,i) => {
-    const r = estado.respostas[i];
-    return (i+1) + (!r ? '–' : (r.acertou ? '✓' : '✕'));
-  }).join(' ');
+  /* o detalhe leva os pontos de cada questão, não só certo e errado:
+     é o que deixa você ver onde a turma tropeçou */
+  const detalhe = QUESTOES.map((q,i) =>
+    (i+1) + ':' + numero(pontosDe(q, estado.respostas[i]))
+  ).join('  ');
 
   linha.className = 'envio indo';
   linha.textContent = 'Enviando ao professor…';
@@ -2786,8 +2860,8 @@ function cuidarDoEnvio(acertos, total){
     nome:    estado.aluno.nome,
     turma:   estado.aluno.turma,
     turno:   estado.aluno.turno,
-    nota:    nota.toFixed(1).replace('.', ','),
-    acertos: acertos + ' de ' + total,
+    nota:    numero(nota),
+    acertos: acertos + ' de ' + total + ' questões inteiras',
     detalhe: detalhe
   }).then(saida => {
     if (saida === 'enviado'){
@@ -2799,7 +2873,7 @@ function cuidarDoEnvio(acertos, total){
       linha.innerHTML = 'Não deu para enviar — o computador parece estar sem internet. ' +
                         'Salve o PDF e mostre ao professor. ' +
                         '<button type="button" class="link" id="reenviar">Tentar de novo</button>';
-      $('#reenviar').addEventListener('click', () => cuidarDoEnvio(acertos, total));
+      $('#reenviar').addEventListener('click', () => cuidarDoEnvio(nota, acertos, total));
     }
   });
 }
