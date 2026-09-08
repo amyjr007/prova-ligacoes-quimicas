@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Ligações Químicas · Exercícios</title>
-<meta name="description" content="Exercício interativo de ligações químicas — Prof. Amauri Junior">
+<title>Ligações Químicas · Prova Digital</title>
+<meta name="description" content="Prova digital de ligações químicas — E.E.E.F.M. Feliz Lusitânia — Prof. Amauri Silva Junior">
 
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0B1F32">
@@ -20,13 +20,25 @@
    A MESMA PALETA DA AULA.
    Este arquivo é irmão do da apresentação, e a turma vem de lá:
    as cores, as fontes e o modo de escrever são os mesmos, para
-   que o exercício não pareça outro material.
+   que a prova não pareça outro material.
 
-   O que muda é o palco. A aula é projetada, e por isso vive num
-   retângulo fixo de 1280x720 que se escala inteiro. Aqui não: o
-   exercício é feito pelo ALUNO, no aparelho dele, e a maioria
-   deles é um telefone em pé. Então a página é fluida — cresce e
-   se reorganiza —, e não uma miniatura do slide.
+   O palco, porém, é outro. A aula é projetada; a prova é feita
+   pelo ALUNO, no CHROMEBOOK da escola. Isso manda em quase tudo
+   o que vem abaixo:
+
+   · a tela é deitada e baixa — 1366x768 viram uns 620px úteis
+     depois da barra de abas e da prateleira. Sobra largura e
+     falta ALTURA. Por isso a capa vira duas colunas e as medidas
+     encolhem quando a janela é baixa: ninguém deve precisar rolar
+     no meio de uma questão para ver as alternativas.
+   · há teclado e trackpad. Setas, Enter e os números respondem
+     e navegam — a mão não precisa sair do teclado.
+   · o aparelho é compartilhado. O que fica salvo aqui é do aluno
+     que está sentado agora, e precisa poder ser apagado para o
+     próximo. Ver 'esquecer()' lá embaixo.
+
+   A página continua fluida, e não a miniatura de um slide: se
+   abrirem no telefone, funciona também.
    ============================================================ */
 :root{
   --ink:        #0B1F32;
@@ -35,8 +47,10 @@
   --aqua:       #45C7B0;
   --aqua-dim:   rgba(69,199,176,.28);
   --amber:      #F0B44A;
+  --coral:      #E8735A;
   --paper:      #E8F1F5;
   --paper-dim:  rgba(232,241,245,.62);
+  --paper-far:  rgba(232,241,245,.38);
 
   --display: 'Space Grotesk', system-ui, sans-serif;
   --body:    'IBM Plex Sans', system-ui, sans-serif;
@@ -48,7 +62,6 @@ body{
   margin:0;background:var(--ink-deep);color:var(--paper);
   font-family:var(--body);font-weight:300;
   -webkit-font-smoothing:antialiased;
-  /* respeita a barra do telefone e o entalhe da tela */
   padding:env(safe-area-inset-top) env(safe-area-inset-right)
           env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
@@ -61,24 +74,26 @@ body::before{
     linear-gradient(rgba(69,199,176,.045) 1px,transparent 1px) 0 0/54px 54px,
     linear-gradient(90deg,rgba(69,199,176,.045) 1px,transparent 1px) 0 0/54px 54px;
 }
+.tela{position:relative;z-index:1}
+[hidden]{display:none !important}
 
-/* ---------- a capa ---------- */
+/* ============================================================
+   1. A CAPA
+   ============================================================ */
 .capa{
-  position:relative;z-index:1;
   min-height:100dvh;display:flex;flex-direction:column;
-  padding:22px 20px 28px;gap:22px;
+  padding:22px 20px 30px;gap:20px;
 }
 
-/* ---------- O CABEÇALHO DA ESCOLA ----------
-   Fica no alto, separado do resto por um fio: é identificação, não
-   conteúdo — por isso discreto, e não um cartaz. O brasão vem do
-   arquivo da própria escola, em icons/. */
+/* ---------- o cabeçalho da escola ----------
+   Fica no alto, separado por um fio: é identificação, não conteúdo.
+   O brasão é o arquivo da própria escola, em icons/. */
 .escola{
   flex:none;display:flex;align-items:center;gap:13px;
   padding-bottom:16px;border-bottom:1px solid rgba(69,199,176,.18);
 }
 .escola .marca{
-  flex:none;width:46px;height:46px;border-radius:50%;
+  flex:none;width:48px;height:48px;border-radius:50%;
   overflow:hidden;background:#0E2A50;
   box-shadow:0 0 0 1px rgba(69,199,176,.28),0 4px 16px rgba(3,12,22,.6);
 }
@@ -94,24 +109,21 @@ body::before{
 }
 
 /* ---------- o miolo ---------- */
-.miolo{
-  flex:1;display:flex;flex-direction:column;justify-content:center;
-  align-items:flex-start;padding:8px 0;
-}
+.miolo{flex:1;display:flex;flex-direction:column;justify-content:center;padding:6px 0}
 .kicker{
   font-family:var(--mono);font-size:12px;letter-spacing:.32em;
-  text-transform:uppercase;color:var(--aqua);margin-bottom:18px;
+  text-transform:uppercase;color:var(--aqua);margin-bottom:16px;
 }
 h1{
   margin:0;font-family:var(--display);font-weight:700;
-  font-size:clamp(38px,11vw,72px);line-height:.98;letter-spacing:-.03em;
+  font-size:clamp(36px,10.5vw,68px);line-height:.98;letter-spacing:-.03em;
   max-width:12ch;
 }
 h1 em{font-style:normal;color:var(--amber)}
 
 /* a assinatura do tema: o traço da ligação com o par de elétrons.
    É a mesma da capa da aula — quem chega aqui reconhece de onde veio. */
-.bond{position:relative;width:168px;height:14px;margin:26px 0 22px;flex:none}
+.bond{position:relative;width:168px;height:14px;margin:24px 0 20px;flex:none}
 .bond .line{position:absolute;left:0;right:0;height:2px;background:var(--aqua)}
 .bond .line.a{top:3px}
 .bond .line.b{top:9px;background:var(--aqua-dim)}
@@ -127,87 +139,954 @@ h1 em{font-style:normal;color:var(--amber)}
   50%    {transform:translateX(8px)}
 }
 .chamada{
-  margin:0;font-size:clamp(16px,4.4vw,20px);line-height:1.5;
-  color:var(--paper-dim);max-width:34ch;
+  margin:0;font-size:clamp(15px,4.2vw,19px);line-height:1.55;
+  color:var(--paper-dim);max-width:38ch;
 }
+/* o aviso que não tem volta fica mais claro que o resto da frase */
+.chamada strong{color:var(--paper);font-weight:500}
+
+/* ---------- quem assina a prova ----------
+   O retrato do professor e o nome da direção. Vem depois da
+   chamada porque é crédito, não manchete. */
+.equipe{
+  display:flex;align-items:center;gap:14px;margin-top:26px;
+  padding:12px 14px 12px 12px;border-radius:16px;
+  background:rgba(18,49,75,.42);
+  border:1px solid rgba(69,199,176,.14);
+  max-width:420px;
+}
+.equipe .retrato{
+  flex:none;width:58px;height:58px;border-radius:14px;overflow:hidden;
+  background:var(--ink-soft);
+  box-shadow:0 0 0 1px rgba(69,199,176,.24),0 6px 18px rgba(3,12,22,.5);
+}
+.equipe .retrato img{
+  width:100%;height:100%;display:block;object-fit:cover;
+  /* a foto é de corpo inteiro num laboratório. Sem esta aproximação
+     o rosto vira um detalhe perdido dentro de 58px de moldura. */
+  object-position:57% 10%;
+  transform:scale(1.55);transform-origin:57% 20%;
+}
+.equipe .creditos{min-width:0;line-height:1.45}
+.equipe .rotulo{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--paper-far);
+}
+.equipe .pessoa{font-size:14px;font-weight:500;color:var(--paper)}
+.equipe .creditos .segundo{margin-top:7px}
+
+/* ---------- a ficha do aluno ----------
+   Este é o único lugar da capa onde o aluno escreve. Por isso é
+   um cartão, destacado do fundo: dá para ver de longe onde tocar. */
+.ficha{
+  flex:none;margin-top:24px;padding:18px;border-radius:18px;
+  background:linear-gradient(180deg,rgba(18,49,75,.72),rgba(11,31,50,.72));
+  border:1px solid rgba(69,199,176,.22);
+  box-shadow:0 10px 34px rgba(3,12,22,.45);
+}
+.ficha .titulo{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--aqua);margin-bottom:14px;padding:0;
+}
+.campo{display:block;margin-bottom:14px}
+.campo:last-child{margin-bottom:0}
+.campo > span{
+  display:block;font-size:12px;letter-spacing:.02em;
+  color:var(--paper-dim);margin-bottom:6px;
+}
+.campo input,.campo select{
+  width:100%;appearance:none;-webkit-appearance:none;
+  background:rgba(7,22,38,.7);color:var(--paper);
+  border:1px solid rgba(69,199,176,.26);border-radius:11px;
+  padding:13px 14px;font-family:var(--body);font-size:16px;font-weight:400;
+  min-height:50px;   /* alvo confortável para o dedo */
+  transition:border-color .18s,box-shadow .18s;
+}
+.campo select{
+  /* a setinha, desenhada aqui para não depender do sistema */
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'><path d='M1 1l6 6 6-6' fill='none' stroke='%2345C7B0' stroke-width='2' stroke-linecap='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 14px center;
+  padding-right:38px;
+}
+.campo input::placeholder{color:rgba(232,241,245,.3)}
+.campo input:focus,.campo select:focus{
+  outline:none;border-color:var(--aqua);
+  box-shadow:0 0 0 3px rgba(69,199,176,.18);
+}
+.campo.erro input,.campo.erro select{border-color:var(--coral)}
+.dupla{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dupla .campo{margin-bottom:0}
+.aviso{margin:12px 0 0;font-size:12.5px;color:var(--coral);line-height:1.4}
+.nota{margin:12px 0 0;font-size:11.5px;line-height:1.5;color:var(--paper-far)}
+.nota strong{color:var(--paper-dim);font-weight:500}
 
 /* ---------- o botão e o pé ---------- */
-.pe{flex:none;display:flex;flex-direction:column;gap:18px;align-items:flex-start}
-#comecar{
+.pe{flex:none;display:flex;flex-direction:column;gap:16px;align-items:flex-start;margin-top:22px}
+.botao{
   appearance:none;border:1px solid rgba(69,199,176,.5);
   background:linear-gradient(180deg,#12414A 0%,#0A2830 100%);
   color:var(--paper);font-family:var(--mono);
   font-size:14px;letter-spacing:.18em;text-transform:uppercase;
   padding:17px 34px;border-radius:999px;cursor:pointer;
   box-shadow:0 0 26px rgba(69,199,176,.18);
-  transition:border-color .2s,box-shadow .2s,transform .18s,color .2s;
-  /* alvo confortável para o dedo, que é como isto vai ser usado */
+  transition:border-color .2s,box-shadow .2s,transform .18s,color .2s,opacity .2s;
   min-height:54px;
 }
-#comecar:hover{
+.botao:hover{
   border-color:var(--aqua);color:var(--aqua);
   box-shadow:0 0 34px rgba(69,199,176,.42);transform:translateY(-1px);
 }
-#comecar:active{transform:translateY(1px)}
-#comecar:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+.botao:active{transform:translateY(1px)}
+.botao:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+.botao.discreto{
+  background:transparent;border-color:rgba(232,241,245,.2);
+  box-shadow:none;color:var(--paper-dim);padding:15px 24px;min-height:48px;
+}
+.botao.discreto:hover{border-color:var(--aqua);color:var(--aqua);box-shadow:none}
+.botao[disabled]{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
+.botao[disabled]:hover{border-color:rgba(232,241,245,.2);color:var(--paper-dim)}
+
+/* o cartão e o botão são uma coisa só: preencheu, começa */
+.coluna-ficha{display:flex;flex-direction:column;gap:16px}
+.acao{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+
+/* ---------- o aviso de retomada ----------
+   O Chromebook passa de mão em mão. Se a prova salva neste
+   aparelho é de outro aluno, ele precisa ver o nome e ter como
+   dizer "não sou eu" ANTES de começar a responder por cima. */
+.retomada{
+  margin:0;font-size:12.5px;line-height:1.5;color:var(--paper-dim);
+  max-width:44ch;
+}
+.retomada b{color:var(--paper);font-weight:500}
+.link{
+  appearance:none;background:none;border:0;padding:0;cursor:pointer;
+  font:inherit;font-size:12.5px;color:var(--aqua);
+  border-bottom:1px solid rgba(69,199,176,.4);
+}
+.link:hover{border-bottom-color:var(--aqua)}
+.link:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
 
 .assina{
   font-family:var(--mono);font-size:11px;letter-spacing:.12em;
-  color:rgba(232,241,245,.38);line-height:1.9;
+  color:var(--paper-far);line-height:1.9;
 }
 .assina a{
   color:rgba(232,241,245,.55);text-decoration:none;
-  border-bottom:1px solid rgba(69,199,176,.25);
-  /* num telefone o endereço é para TOCAR, não para copiar à mão */
-  padding-bottom:1px;
+  border-bottom:1px solid rgba(69,199,176,.25);padding-bottom:1px;
 }
 .assina a:hover{color:var(--aqua);border-bottom-color:var(--aqua)}
 
-/* Numa tela larga a capa deixa de ser uma coluna e ganha ar dos dois
-   lados, com o texto à esquerda, como a capa da aula. */
-@media (min-width:820px){
+/* Numa tela larga a capa deixa de ser uma coluna: o texto fica à
+   esquerda, como na capa da aula, e a ficha ganha a direita. */
+@media (min-width:860px){
   .capa{padding:32px 56px 40px}
-  .miolo{max-width:760px}
+  .miolo{
+    display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,400px);
+    gap:56px;align-items:center;
+  }
+  .miolo .lado-texto{min-width:0}
+  .ficha{margin-top:0;padding:24px}
+  .pe{flex-direction:row;align-items:center;justify-content:space-between;width:100%}
   h1{max-width:11ch}
-  .escola .marca{width:54px;height:54px}
+  .escola .marca{width:56px;height:56px}
   .escola .nome{font-size:17px}
 }
+
+/* A tela do Chromebook é larga mas BAIXA. Quando a altura aperta,
+   o que encolhe é o enfeite — o título, o ar entre as coisas —,
+   nunca os campos, que continuam do tamanho do dedo e do olho.
+   O objetivo é um só: a capa inteira cabe sem rolar. */
+@media (min-width:860px) and (max-height:800px){
+  .capa{padding:20px 48px 24px;gap:14px}
+  .escola{padding-bottom:12px}
+  .escola .marca{width:46px;height:46px}
+  .kicker{margin-bottom:10px}
+  h1{font-size:clamp(34px,4.4vw,54px)}
+  .bond{margin:16px 0 14px}
+  .chamada{font-size:16px}
+  .equipe{margin-top:16px;padding:10px 12px}
+  .equipe .retrato{width:52px;height:52px}
+  .ficha{padding:18px}
+  .miolo{gap:44px}
+  .pe{margin-top:14px}
+  .nota{margin-top:9px}
+}
+
+/* ============================================================
+   2. A PROVA
+   O palco onde as questões vão entrar. Cada questão desenha o que
+   quiser dentro de #palco — o que está aqui é só a moldura:
+   o topo com o andamento, o palco, e a navegação embaixo.
+   ============================================================ */
+.prova{
+  min-height:100dvh;display:flex;flex-direction:column;
+  padding:16px 18px 20px;gap:14px;max-width:840px;margin:0 auto;
+}
+.topo{
+  flex:none;display:flex;align-items:center;gap:12px;
+  padding-bottom:14px;border-bottom:1px solid rgba(69,199,176,.18);
+}
+.topo .marca{
+  flex:none;width:34px;height:34px;border-radius:50%;overflow:hidden;
+  background:#0E2A50;box-shadow:0 0 0 1px rgba(69,199,176,.24);
+}
+.topo .marca img{width:100%;height:100%;object-fit:cover;display:block}
+.topo .identificacao{flex:1;min-width:0;line-height:1.35}
+.topo .nome-aluno{
+  font-size:13px;font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.topo .turma-aluno{
+  font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--paper-far);
+}
+.topo .contador{
+  flex:none;font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+  color:var(--paper-dim);
+}
+.topo .contador b{color:var(--aqua);font-weight:500}
+
+/* a régua de bolinhas: diz onde o aluno está e quanto falta.
+   Não é clicável de propósito — a prova só anda para a frente,
+   e um alvo que parece botão mas não volta atrás seria mentira. */
+.regua{flex:none;display:flex;flex-wrap:wrap;gap:7px}
+.regua span{
+  width:11px;height:11px;border-radius:50%;
+  border:1px solid rgba(69,199,176,.4);background:transparent;
+  transition:background .3s,border-color .3s,transform .3s;
+}
+.regua span.respondida{background:var(--aqua-dim);border-color:var(--aqua)}
+.regua span.atual{background:var(--amber);border-color:var(--amber);transform:scale(1.3)}
+
+#palco{
+  flex:1;display:flex;flex-direction:column;gap:16px;
+  padding:18px 0 6px;animation:entra .32s ease both;
+}
+@keyframes entra{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* o enunciado, escrito uma vez aqui para toda questão herdar */
+.q-cabeca{display:flex;flex-direction:column;gap:10px}
+.q-numero{
+  font-family:var(--mono);font-size:11px;letter-spacing:.28em;
+  text-transform:uppercase;color:var(--aqua);
+}
+.q-titulo{
+  margin:0;font-family:var(--display);font-weight:600;
+  font-size:clamp(21px,5.6vw,29px);line-height:1.18;letter-spacing:-.02em;
+}
+.q-enunciado{
+  margin:0;font-size:clamp(15px,4vw,17px);line-height:1.6;color:var(--paper-dim);
+}
+.q-corpo{flex:1}
+/* o veredito que cada questão pode mostrar depois de respondida */
+.q-retorno{
+  padding:14px 16px;border-radius:14px;font-size:14.5px;line-height:1.55;
+  border:1px solid transparent;animation:entra .25s ease both;
+}
+.q-retorno.certo {background:rgba(69,199,176,.12);border-color:var(--aqua-dim)}
+.q-retorno.errado{background:rgba(232,115,90,.12);border-color:rgba(232,115,90,.35)}
+/* o negrito aqui é ênfase, não veredito: quem diz se acertou é a
+   cor da caixa. Tingir todo negrito de vermelho fazia as linhas
+   CERTAS da questão do cubo parecerem erradas. */
+.q-retorno b{font-weight:600;color:var(--paper)}
+.q-retorno .ok  {color:var(--aqua)}
+.q-retorno .nao {color:var(--coral)}
+
+/* ---------- escolher uma alternativa de texto ----------
+   Durante a prova, escolher não é acertar: a alternativa marcada
+   fica só marcada, e pode trocar até o aluno confirmar. As cores
+   de certo e errado só entram na revisão, depois de entregue. */
+.alternativas{display:flex;flex-direction:column;gap:10px;max-width:72ch}
+.alt{
+  display:flex;align-items:flex-start;gap:14px;width:100%;
+  padding:15px 16px;border-radius:14px;text-align:left;cursor:pointer;
+  background:rgba(18,49,75,.5);border:1px solid rgba(69,199,176,.22);
+  color:inherit;font:inherit;font-size:15.5px;font-weight:300;line-height:1.5;
+  transition:border-color .2s,background .2s,transform .15s;
+}
+.alt:hover{border-color:rgba(69,199,176,.5);transform:translateX(2px)}
+.alt:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+/* a alternativa pode ser uma frase só, ou um nome com a explicação
+   embaixo — quando o que se escolhe é o nome de uma teoria, dizer
+   só o nome seria cobrar decoreba */
+.alt .corpo-alt{display:flex;flex-direction:column;gap:3px;min-width:0}
+.alt .frase{font-weight:500}
+.alt .detalhe{font-size:14px;line-height:1.45;color:var(--paper-dim)}
+.alt .tecla,.gas .tecla{
+  flex:none;width:26px;height:26px;border-radius:8px;
+  display:grid;place-items:center;margin-top:1px;
+  font-family:var(--mono);font-size:12px;
+  border:1px solid rgba(69,199,176,.3);color:var(--paper-dim);
+  background:rgba(7,22,38,.5);
+  transition:background .2s,color .2s,border-color .2s;
+}
+.alt.escolhida,.gas.escolhida{border-color:var(--aqua);background:rgba(69,199,176,.1)}
+.alt.escolhida .tecla,.gas.escolhida .tecla{
+  background:var(--aqua);color:#062018;border-color:var(--aqua);
+}
+.alternativas.revisada .alt{cursor:default}
+.alternativas.revisada .alt:hover{transform:none;border-color:rgba(69,199,176,.22)}
+.alternativas.revisada .alt.certa{
+  border-color:var(--aqua);box-shadow:0 0 0 1px var(--aqua);
+}
+.alternativas.revisada .alt.marcada-errada{
+  border-color:var(--coral);box-shadow:0 0 0 1px var(--coral);
+}
+.alternativas.revisada .alt:not(.certa):not(.marcada-errada){opacity:.5}
+
+/* ---------- a mesa de Lewis ----------
+   O mesmo gesto da aula (slide 7), refeito aqui: puxar o dedo de
+   dentro do símbolo arranca um elétron; segurar no vazio faz um
+   nascer, e soltá-lo em cima do símbolo o incorpora.
+
+   A mesa ocupa a largura toda porque o "fora do átomo" precisa ser
+   um lugar generoso — na aula, o vazio era uma faixa estreita entre
+   os outros elementos, e o gesto parecia falhar. */
+.mesa{
+  position:relative;width:100%;
+  height:clamp(200px,38vh,340px);
+  border-radius:20px;overflow:hidden;
+  background:
+    radial-gradient(ellipse 60% 70% at 50% 45%,rgba(18,49,75,.55),rgba(7,22,38,0) 72%),
+    rgba(11,31,50,.35);
+  border:1px dashed rgba(69,199,176,.22);
+  touch-action:none;            /* o dedo aqui desenha, não rola a página */
+  cursor:crosshair;
+  user-select:none;-webkit-user-select:none;
+}
+.mesa.travada{cursor:default}
+
+/* ---------- o átomo de Rutherford ----------
+   Núcleo no meio, uma camada por nível, e os elétrons distribuídos
+   em volta. É o modelo que a turma já viu, e tem uma vantagem que o
+   símbolo de Lewis não tem: quando um elétron entra ou sai, dá para
+   VER em qual camada isso aconteceu, e a camada some ou nasce
+   inteira quando é o caso. */
+.lw{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:186px;height:186px;
+  cursor:grab;touch-action:none;
+  animation:lwEntra .34s cubic-bezier(.2,1.4,.4,1);
+}
+.mesa.travada .lw{cursor:default}
+@keyframes lwEntra{from{transform:translate(-50%,-50%) scale(.7);opacity:0}
+                   to  {transform:translate(-50%,-50%) scale(1);  opacity:1}}
+
+/* o núcleo: a mesma esfera CPK de antes, agora no centro do átomo */
+.lw-bola{
+  position:absolute;top:50%;left:50%;
+  width:46px;height:46px;margin:-23px 0 0 -23px;
+  border-radius:50%;display:grid;place-items:center;pointer-events:none;
+  box-shadow:0 6px 20px rgba(3,12,22,.6);
+}
+.lw-sim{
+  font-family:var(--mono);font-weight:500;font-size:19px;line-height:1;
+  color:#FFFFFF;text-shadow:0 2px 8px rgba(4,12,20,.8);
+}
+
+/* cada camada é um anel; --d é o diâmetro dela */
+.camada{
+  position:absolute;top:50%;left:50%;
+  width:var(--d);height:var(--d);
+  margin:calc(var(--d) / -2) 0 0 calc(var(--d) / -2);
+  border:1px solid rgba(69,199,176,.3);border-radius:50%;
+  pointer-events:none;animation:camadaEntra .32s ease both;
+}
+@keyframes camadaEntra{from{opacity:0;transform:scale(.85)} to{opacity:1;transform:none}}
+/* o elétron é girado até seu lugar no anel e empurrado até a borda */
+.e-r{
+  position:absolute;top:50%;left:50%;width:11px;height:11px;
+  margin:-5.5px 0 0 -5.5px;border-radius:50%;
+  background:var(--amber);box-shadow:0 0 10px rgba(240,180,74,.85);
+  transform:rotate(var(--a)) translateY(calc(var(--d) / -2));
+  animation:eNasce .26s cubic-bezier(.2,1.5,.4,1);
+}
+/* o último a entrar pisca, para o olho achar onde ele caiu */
+.e-r.novo{animation:eNasce .26s cubic-bezier(.2,1.5,.4,1), eAcende 1s ease-out .26s}
+@keyframes eAcende{
+  0%,100%{box-shadow:0 0 10px rgba(240,180,74,.85)}
+  35%    {box-shadow:0 0 22px 6px rgba(255,235,180,1)}
+}
+
+/* a carga fica na quina de cima, fora das camadas */
+.lw-carga{
+  position:absolute;top:-4px;right:-6px;
+  font-family:var(--mono);font-weight:600;font-size:22px;line-height:1;
+  color:#FFCE72;text-shadow:0 2px 10px rgba(4,12,20,.9);
+  pointer-events:none;animation:cargaBate .42s cubic-bezier(.2,1.5,.4,1);
+}
+.lw-carga.neg{color:#8FD8FF}
+@keyframes cargaBate{
+  0%  {transform:scale(.35);opacity:0}
+  55% {transform:scale(1.22);opacity:1}
+  100%{transform:scale(1);   opacity:1}
+}
+
+/* o elétron que anda com o dedo — o mesmo azul da aula */
+.eletron{
+  position:absolute;z-index:9;width:26px;height:26px;
+  margin:-13px 0 0 -13px;pointer-events:none;
+  animation:eNasce .3s cubic-bezier(.2,1.5,.4,1);
+}
+.eletron b{
+  position:absolute;inset:7px;border-radius:50%;
+  background:radial-gradient(circle at 34% 28%,#FFFFFF 0%,#9CEBFF 45%,#2AA8E0 100%);
+  box-shadow:0 0 14px #6FD8FF,0 0 34px rgba(80,200,255,.75);
+}
+.eletron s{   /* o halo que pulsa, para parecer carga e não bolinha */
+  position:absolute;inset:0;border-radius:50%;text-decoration:none;
+  border:1px solid rgba(140,225,255,.6);
+  animation:ePulsa 1.1s ease-in-out infinite;
+}
+@keyframes eNasce{from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1}}
+@keyframes ePulsa{0%,100%{transform:scale(1);opacity:.75} 50%{transform:scale(1.6);opacity:0}}
+/* entrando, ele corre até o centro do símbolo e mergulha */
+.eletron.entra{animation:eEntra .38s cubic-bezier(.45,0,.8,.45) forwards}
+@keyframes eEntra{
+  0%  {transform:translate(0,0) scale(1);opacity:1}
+  60% {transform:translate(calc(var(--tx,0px) * .72),calc(var(--ty,0px) * .72)) scale(.8);
+       opacity:1;filter:brightness(1.9)}
+  100%{transform:translate(var(--tx,0px),var(--ty,0px)) scale(.06);
+       opacity:0;filter:brightness(3.4)}
+}
+/* largado fora, a carga se desfaz */
+.eletron.some{animation:eSome .44s cubic-bezier(.2,.7,.4,1) forwards}
+@keyframes eSome{
+  0%  {transform:scale(1);   opacity:1;  filter:blur(0)}
+  35% {transform:scale(1.55);opacity:.7}
+  100%{transform:scale(2.3); opacity:0;  filter:blur(5px)}
+}
+/* a esteira: faíscas ficam onde ele esteve, não onde ele está */
+.rastro-e{
+  position:absolute;z-index:8;pointer-events:none;border-radius:50%;
+  width:var(--s,12px);height:var(--s,12px);
+  margin:calc(var(--s,12px) / -2) 0 0 calc(var(--s,12px) / -2);
+  background:radial-gradient(circle,#DFF7FF 0%,rgba(110,215,255,.7) 42%,
+                                    rgba(110,215,255,0) 72%);
+  animation:eRastro .48s ease-out forwards;
+}
+@keyframes eRastro{from{opacity:.85;transform:scale(1)}
+                   to  {opacity:0;  transform:scale(.3)}}
+
+/* ---------- os efeitos que confirmam a ação ----------
+   Sem eles o elétron some e o átomo fica igual: o aluno não sabe se
+   valeu. O anel que sai diz "perdi um"; o que se fecha, "ganhei um".
+   A esfera dá um pulso nos dois casos. */
+.onda{
+  position:absolute;z-index:7;pointer-events:none;
+  width:70px;height:70px;margin:-35px 0 0 -35px;
+  border-radius:50%;border:2px solid;
+}
+.onda.sai{
+  border-color:rgba(240,180,74,.9);
+  box-shadow:0 0 18px rgba(240,180,74,.5);
+  animation:ondaFora .6s cubic-bezier(.2,.7,.4,1) forwards;
+}
+.onda.entra{
+  border-color:rgba(140,225,255,.9);
+  box-shadow:0 0 18px rgba(110,215,255,.55);
+  animation:ondaDentro .55s cubic-bezier(.3,.6,.3,1) forwards;
+}
+@keyframes ondaFora  {0%{transform:scale(.72);opacity:.95} 100%{transform:scale(2.2);opacity:0}}
+@keyframes ondaDentro{0%{transform:scale(2.2);opacity:0} 30%{opacity:.9}
+                      100%{transform:scale(.72);opacity:0}}
+.lw-bola.bate{animation:bolaBate .42s cubic-bezier(.2,1.5,.4,1)}
+@keyframes bolaBate{
+  0%  {transform:scale(1);   filter:brightness(1)}
+  40% {transform:scale(1.09);filter:brightness(1.55)}
+  100%{transform:scale(1);   filter:brightness(1)}
+}
+/* o átomo recusa: quatro elétrons para cada lado é o limite */
+.lw.nega{animation:lwNega .3s ease}
+@keyframes lwNega{
+  0%,100%{transform:translate(-50%,-50%)}
+  25%    {transform:translate(calc(-50% - 6px),-50%)}
+  75%    {transform:translate(calc(-50% + 6px),-50%)}
+}
+
+.mesa .instrucao{
+  position:absolute;top:0;left:0;right:0;padding:12px 14px;
+  font-size:11.5px;line-height:1.5;color:var(--paper-far);
+  text-align:center;pointer-events:none;
+}
+
+/* na revisão a mesa mostra o alvo e some com o convite ao toque */
+.mesa.travada .instrucao{display:none}
+.mesa.certa  {border-style:solid;border-color:var(--aqua-dim)}
+.mesa.errada {border-style:solid;border-color:rgba(232,115,90,.35)}
+
+/* ---------- o cubo dos átomos ----------
+   Uma questão com quatro perguntas iguais, uma para cada átomo.
+   Em vez de repetir o enunciado quatro vezes, o átomo vem numa
+   face do cubo e o cubo gira a cada confirmação — o aluno vê que
+   é a mesma pergunta mudando de sujeito.
+
+   No Chromebook o cubo fica à esquerda e as alternativas à
+   direita: é largura que sobra, e assim tudo cabe numa tela. */
+.comportamento{
+  display:grid;grid-template-columns:auto minmax(0,1fr);
+  gap:14px 28px;align-items:start;
+}
+.lado-cubo{
+  --cubo:86px;    /* o lado do cubo mora aqui: a profundidade das
+                     faces é calculada a partir dele, e numa janela
+                     baixa basta mudar este número */
+  display:flex;flex-direction:column;align-items:center;gap:10px;width:200px;
+}
+.cena{perspective:900px;width:var(--cubo);height:var(--cubo)}
+.cubo{
+  position:relative;width:100%;height:100%;transform-style:preserve-3d;
+  transition:transform .75s cubic-bezier(.36,.06,.16,1);
+}
+.cubo .face{
+  position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;
+  background:linear-gradient(150deg,rgba(31,77,101,.97),rgba(11,31,50,.97));
+  box-shadow:inset 0 0 0 1px rgba(69,199,176,.32),0 12px 30px rgba(3,12,22,.5);
+}
+/* as quatro laterais do cubo, cada uma empurrada meio lado para fora */
+.face.f0{transform:rotateY(0deg)   translateZ(calc(var(--cubo)/2))}
+.face.f1{transform:rotateY(90deg)  translateZ(calc(var(--cubo)/2))}
+.face.f2{transform:rotateY(180deg) translateZ(calc(var(--cubo)/2))}
+.face.f3{transform:rotateY(270deg) translateZ(calc(var(--cubo)/2))}
+.face .letra{
+  position:absolute;top:6px;left:8px;z-index:1;
+  font-family:var(--mono);font-size:9.5px;color:var(--paper-far);
+}
+.face .atomo{
+  width:100%;height:100%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:0;
+  background:none;border:0;border-radius:16px;color:inherit;font:inherit;cursor:pointer;
+}
+.face .z{font-family:var(--mono);font-size:9.5px;color:var(--paper-far)}
+.face .simbolo{
+  font-family:var(--display);font-weight:700;font-size:30px;line-height:1.1;
+  letter-spacing:-.02em;color:var(--paper);transition:color .2s;
+}
+.face .atomo:hover .simbolo{color:var(--aqua)}
+.face .atomo:focus-visible{outline:2px solid var(--amber);outline-offset:-5px}
+
+/* na questão de Lewis a face não mostra o átomo — ele está na mesa,
+   grande e mexível. Aqui só o número do exemplo. */
+.face-ex{
+  width:100%;height:100%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;
+}
+.ex-r{
+  font-family:var(--mono);font-size:8px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--paper-far);
+}
+.ex-n{
+  font-family:var(--display);font-weight:700;font-size:30px;line-height:1;
+  color:var(--paper);
+}
+
+/* as quatro letras embaixo do cubo: dizem onde ele está e deixam
+   voltar a um átomo já respondido sem ter de dar a volta toda */
+.passos{display:flex;gap:8px}
+.passos button{
+  width:26px;height:26px;border-radius:8px;padding:0;
+  font-family:var(--mono);font-size:11px;
+  background:transparent;border:1px solid rgba(69,199,176,.28);color:var(--paper-far);
+  transition:background .2s,border-color .2s,color .2s;
+}
+.passos button:disabled{cursor:default;opacity:1}   /* indicador, não botão */
+.passos button:not(:disabled){cursor:pointer}
+.passos button.feito{background:rgba(69,199,176,.14);border-color:var(--aqua);color:var(--aqua)}
+.passos button.atual{background:var(--amber);border-color:var(--amber);color:#2A1C04}
+.passos button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.obs{
+  margin:0;max-width:200px;text-align:center;
+  font-size:11.5px;line-height:1.45;color:var(--paper-far);
+}
+
+/* ---------- a distribuição em subníveis ----------
+   O mesmo cartãozinho serve ao átomo e ao gás nobre: o símbolo à
+   esquerda, e a distribuição de Linus Pauling ao lado. Aparece e
+   some no mesmo toque, sem tapar nada da questão. */
+.subniveis{
+  display:flex;align-items:baseline;gap:10px;
+  padding:9px 13px;border-radius:12px;
+  background:rgba(7,22,38,.66);border:1px solid rgba(69,199,176,.28);
+  animation:entra .22s ease both;
+}
+.subniveis .s{
+  font-family:var(--display);font-weight:700;font-size:17px;line-height:1;
+  color:var(--amber);flex:none;
+}
+.subniveis .p{
+  font-family:var(--mono);font-size:13px;letter-spacing:.02em;color:var(--paper);
+}
+.subniveis.lado{margin-right:12px}
+
+.rodape-q{grid-column:1 / -1;display:flex;justify-content:flex-end;align-items:center}
+.botao.pequeno{padding:11px 20px;min-height:42px;font-size:12px;letter-spacing:.14em}
+
+@media (max-width:760px){
+  .comportamento{grid-template-columns:1fr;justify-items:center}
+  .rodape-q{justify-content:center}
+}
+
+/* ---------- escolher um cilindro de gás ----------
+   Quatro cilindros desenhados aqui mesmo, sem foto: um corpo com
+   ombro arredondado, o colarinho e a válvula em cima. Todos
+   idênticos de propósito — se um fosse verde e o outro azul, o
+   aluno escolheria pela cor, e a pergunta é sobre o que está
+   escrito neles.
+
+   Dentro vai o símbolo grande e o número atômico; o nome fica
+   embaixo, fora do cilindro, como no rótulo de verdade. */
+.gases{display:flex;flex-wrap:wrap;gap:14px}
+.gas{
+  position:relative;flex:1 1 132px;max-width:190px;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  padding:16px 10px 14px;border-radius:16px;cursor:pointer;
+  background:rgba(18,49,75,.4);border:1px solid rgba(69,199,176,.18);
+  color:inherit;font:inherit;
+  transition:border-color .2s,background .2s,transform .15s,box-shadow .2s;
+}
+.gas:hover{border-color:rgba(69,199,176,.5);transform:translateY(-2px)}
+.gas:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.gas .tecla{position:absolute;top:9px;left:9px;margin:0}
+
+.cilindro{
+  position:relative;width:78px;
+  height:clamp(118px,19vh,164px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;margin-top:14px;
+  border-radius:30px 30px 10px 10px;
+  /* a luz de um lado e a sombra do outro é o que faz um retângulo
+     virar um cilindro aos olhos */
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.16) 0 10%,
+                          rgba(255,255,255,0) 36%,
+                          rgba(0,0,0,.20) 80%,rgba(0,0,0,.30) 100%),
+    linear-gradient(180deg,#1D4E64,#123449);
+  box-shadow:inset 0 0 0 1px rgba(69,199,176,.25),0 8px 20px rgba(3,12,22,.45);
+}
+.cilindro::before{   /* a válvula */
+  content:'';position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+  width:15px;height:16px;border-radius:4px 4px 0 0;
+  background:linear-gradient(180deg,#40707F,#22485C);
+}
+.cilindro::after{    /* o colarinho */
+  content:'';position:absolute;top:-5px;left:50%;transform:translateX(-50%);
+  width:36px;height:8px;border-radius:3px;
+  background:linear-gradient(180deg,#31647A,#1B4258);
+  box-shadow:inset 0 0 0 1px rgba(69,199,176,.22);
+}
+.gas .z{
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--paper-far);
+}
+.gas .simbolo{
+  font-family:var(--display);font-weight:700;letter-spacing:-.02em;
+  font-size:clamp(30px,4vw,40px);line-height:1;color:var(--paper);
+}
+.gas .nome{font-size:13.5px;line-height:1.3;color:var(--paper-dim);text-align:center}
+.gas.escolhida .cilindro{
+  box-shadow:inset 0 0 0 1px var(--aqua),0 0 26px rgba(69,199,176,.3);
+}
+.gases.revisada .gas{cursor:default}
+.gases.revisada .gas:hover{transform:none;border-color:rgba(69,199,176,.18)}
+.gases.revisada .gas.certa{border-color:var(--aqua);box-shadow:0 0 0 1px var(--aqua)}
+.gases.revisada .gas.marcada-errada{
+  border-color:var(--coral);box-shadow:0 0 0 1px var(--coral);
+}
+.gases.revisada .gas:not(.certa):not(.marcada-errada){opacity:.5}
+
+/* ---------- escolher um retrato ----------
+   As figuras entram sem nome: quem escolhe é o olho, não a legenda.
+   Só depois da resposta cada uma se apresenta.
+
+   No Chromebook os três ficam lado a lado, e a altura de cada um
+   é medida em vh: assim os rostos crescem o quanto a janela deixa
+   e a questão inteira — enunciado, retratos e botões — cabe numa
+   tela só. Numa janela estreita eles empilham. */
+.retratos{display:grid;gap:12px;grid-template-columns:1fr}
+.retrato-op{
+  position:relative;display:block;width:100%;padding:0;overflow:hidden;
+  background:rgba(18,49,75,.5);border:1px solid rgba(69,199,176,.22);
+  border-radius:16px;cursor:pointer;color:inherit;font:inherit;
+  transition:border-color .2s,box-shadow .2s,transform .18s;
+}
+.retrato-op:hover{border-color:rgba(69,199,176,.5);transform:translateY(-2px)}
+.retrato-op:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.retrato-op img{
+  display:block;width:100%;aspect-ratio:5/4;object-fit:cover;
+  /* o Rutherford é colorizado e os outros dois são preto e branco.
+     Sem isto, a cor entregaria a resposta antes do rosto. */
+  filter:grayscale(1) contrast(1.04);
+  transition:filter .4s ease;
+}
+.retrato-op .legenda{
+  display:block;padding:11px 14px;font-family:var(--mono);
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--paper-dim);text-align:left;
+  border-top:1px solid rgba(69,199,176,.14);
+  transition:color .2s;
+}
+/* o selo do veredito, no canto de cima */
+.retrato-op .selo-q{
+  position:absolute;top:10px;right:10px;width:28px;height:28px;
+  border-radius:50%;display:none;place-items:center;
+  font-size:15px;font-weight:600;backdrop-filter:blur(4px);
+}
+.retrato-op.escolhida{border-color:var(--aqua)}
+/* depois de respondida ninguém mais se mexe: a mão sai, o rosto fica */
+.retratos.travada .retrato-op{cursor:default;transform:none}
+.retratos.travada .retrato-op img{filter:none}
+.retratos.travada .retrato-op .legenda{color:var(--paper)}
+.retrato-op.certa{
+  border-color:var(--aqua);box-shadow:0 0 0 1px var(--aqua),0 0 28px rgba(69,199,176,.28);
+}
+.retrato-op.certa .selo-q{display:grid;background:rgba(69,199,176,.9);color:#062018}
+.retrato-op.marcada-errada{border-color:var(--coral)}
+.retrato-op.marcada-errada .selo-q{display:grid;background:rgba(232,115,90,.9);color:#2a0c06}
+.retratos.travada .retrato-op:not(.certa):not(.marcada-errada){opacity:.55}
+
+/* a tecla que responde este cartão, no canto de cima à esquerda */
+.retrato-op .tecla{
+  position:absolute;top:10px;left:10px;
+  font-family:var(--mono);font-size:11px;line-height:1;
+  padding:5px 8px;border-radius:7px;
+  background:rgba(7,22,38,.72);color:var(--paper-dim);
+  border:1px solid rgba(69,199,176,.3);backdrop-filter:blur(3px);
+}
+.retratos.travada .retrato-op .tecla{display:none}
+
+@media (min-width:560px){
+  .retratos{grid-template-columns:repeat(3,1fr);gap:14px}
+  /* altura em vh, não proporção: o rosto usa a altura que a janela
+     tiver, e a questão não empurra os botões para fora da tela */
+  .retrato-op img{aspect-ratio:auto;height:clamp(150px,30vh,300px)}
+}
+
+/* O rodapé da prova tem uma coisa só: confirmar. Sem "anterior",
+   sem "pular", sem atalhos escritos — porque não há para onde ir
+   além de para a frente, e só se vai tendo escolhido algo. O
+   botão nem existe na tela até haver uma resposta marcada. */
+.navegacao{
+  flex:none;display:flex;justify-content:flex-end;align-items:center;
+  min-height:56px;padding-top:14px;border-top:1px solid rgba(69,199,176,.14);
+}
+
+/* A mesma economia da capa, aplicada à prova: numa janela baixa
+   os respiros encolhem para a questão inteira caber de uma vez.
+   O texto não encolhe — quem perde altura é o vazio. */
+@media (max-height:800px){
+  .prova{padding:12px 18px 14px;gap:10px}
+  #palco{padding:12px 0 4px;gap:12px}
+  .q-cabeca{gap:8px}
+  .q-titulo{font-size:clamp(20px,4.2vw,26px)}
+  .navegacao{padding-top:10px}
+  .topo{padding-bottom:11px}
+  /* a questão de quatro alternativas longas é a mais alta da prova:
+     é ela que decide estas medidas */
+  .alternativas{gap:7px}
+  .alt{padding:11px 15px}
+  /* a do cubo tem cinco alternativas, e ainda o cubo e o botão do
+     gás nobre: aperta um pouco mais, só ela */
+  .comportamento{gap:10px 26px}
+  .comportamento .alt{padding:9px 14px;font-size:15px}
+  .comportamento .alternativas{gap:6px}
+  .lado-cubo{gap:8px}   /* o cubo já é pequeno; aqui só o respiro */
+  .obs{font-size:11px}
+}
+
+/* ============================================================
+   3. O FECHAMENTO
+   ============================================================ */
+.fim{
+  min-height:100dvh;display:flex;flex-direction:column;
+  /* 'safe' porque agora o gabarito comentado pode passar da tela:
+     centralizar sem ele cortaria o topo, fora do alcance da rolagem */
+  justify-content:safe center;
+  padding:28px 20px 34px;gap:20px;max-width:760px;margin:0 auto;
+}
+.placar{
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+  font-family:var(--display);font-weight:700;letter-spacing:-.03em;
+}
+.placar .n{font-size:clamp(52px,16vw,86px);line-height:1;color:var(--amber)}
+.placar .de{font-size:clamp(17px,4.6vw,23px);color:var(--paper-dim);font-weight:500}
+.cartao{
+  padding:18px;border-radius:18px;
+  background:rgba(18,49,75,.5);border:1px solid rgba(69,199,176,.18);
+}
+.cartao dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:9px 16px;font-size:14px}
+.cartao dt{
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--paper-far);align-self:center;
+}
+.cartao dd{margin:0;font-weight:500}
+.mapa{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.mapa li{
+  display:flex;align-items:flex-start;gap:12px;font-size:14px;
+  padding:13px 15px;border-radius:12px;background:rgba(18,49,75,.4);
+  border:1px solid rgba(69,199,176,.12);
+}
+/* o aviso de que a nota foi (ou não foi) para o professor */
+.envio{
+  margin:0;padding:12px 16px;border-radius:12px;
+  font-size:13.5px;line-height:1.5;border:1px solid transparent;
+}
+.envio.indo   {background:rgba(18,49,75,.5);border-color:rgba(69,199,176,.2);color:var(--paper-dim)}
+.envio.ok     {background:rgba(69,199,176,.12);border-color:var(--aqua-dim);color:var(--paper)}
+.envio.falhou {background:rgba(232,115,90,.12);border-color:rgba(232,115,90,.35);color:var(--paper)}
+
+.mapa .detalhe{flex:1;min-width:0}
+.mapa .comentario{
+  margin:7px 0 0;font-size:13px;line-height:1.55;color:var(--paper-dim);
+  max-width:74ch;
+}
+.mapa .comentario b{color:var(--paper);font-weight:500}
+.mapa .selo{
+  flex:none;width:24px;height:24px;border-radius:50%;margin-top:1px;
+  display:grid;place-items:center;font-size:13px;font-weight:600;
+}
+.mapa .selo.certo {background:rgba(69,199,176,.2); color:var(--aqua)}
+.mapa .selo.errado{background:rgba(232,115,90,.18);color:var(--coral)}
+.mapa .selo.vazio {background:rgba(232,241,245,.08);color:var(--paper-far)}
+.mapa .rotulo{display:block;color:var(--paper);font-weight:500}
+/* três botões no fim: ficam lado a lado, não espalhados nas pontas */
+.fim .pe{flex-direction:row;flex-wrap:wrap;gap:12px;justify-content:flex-start}
+#nota-fim{max-width:60ch}
+kbd{
+  font-family:var(--mono);font-size:.92em;
+  border:1px solid rgba(232,241,245,.2);border-radius:5px;
+  padding:2px 5px;margin:0 1px;color:var(--paper-dim);
+}
+
 @media (prefers-reduced-motion:reduce){
   .bond .e{animation:none}
+  #palco,.q-retorno{animation:none}
+}
+
+/* ---------- no papel ----------
+   O fechamento precisa virar comprovante: o aluno imprime ou salva
+   em PDF e entrega. Some tudo o que é tela e vira tinta preta. */
+@media print{
+  body{background:#fff;color:#000;padding:0}
+  body::before{display:none}
+  .capa,.prova,.navegacao,.botao,.regua,#nota-fim{display:none !important}
+  .fim{min-height:auto;padding:0;max-width:none}
+  .cartao,.mapa li{background:none;border:1px solid #bbb;color:#000}
+  .cartao dt,.placar .de{color:#444}
+  .mapa .rotulo,.mapa .comentario b{color:#000}
+  .mapa .comentario{color:#333}
+  .placar .n{color:#000}
+  .mapa .selo{border:1px solid #999;color:#000 !important;background:none !important}
+  .kicker{color:#000}
 }
 </style>
 </head>
 <body>
 
-<main class="capa">
+<!-- ============================================================
+     1. CAPA
+     ============================================================ -->
+<main class="tela capa" id="tela-capa">
 
   <header class="escola">
     <div class="marca">
       <img src="icons/icon-192.png" alt="Brasão da E.E.E.F.M. Feliz Lusitânia">
     </div>
     <div class="quem">
-      <div class="nome">E.E.E.F.M. Feliz Lusitânia</div>
+      <div class="nome">Escola Estadual &ldquo;Feliz Lusitânia&rdquo;</div>
       <div class="linha">SEDUC · Pará &nbsp;·&nbsp; Química</div>
     </div>
   </header>
 
   <div class="miolo">
-    <div class="kicker">Exercício interativo</div>
-    <h1>Ligações <em>Químicas</em></h1>
-    <div class="bond">
-      <span class="line a"></span><span class="line b"></span>
-      <span class="e l"></span><span class="e r"></span>
+
+    <div class="lado-texto">
+      <div class="kicker">Prova digital</div>
+      <h1>Ligações <em>Químicas</em></h1>
+      <div class="bond">
+        <span class="line a"></span><span class="line b"></span>
+        <span class="e l"></span><span class="e r"></span>
+      </div>
+      <!-- a regra da prova é dita aqui, antes de começar: a partir
+           do primeiro Confirmar ela não tem volta, e ninguém deve
+           descobrir isso só depois de errar -->
+      <p class="chamada">
+        Cada questão trabalha um tipo de interação diferente.
+        Leia com calma: <strong>depois que confirmar, não será
+        possível mudar a resposta</strong>.
+      </p>
+
+      <div class="equipe">
+        <div class="retrato">
+          <img src="imagens/amauri_jr.jpg" alt="Professor Amauri Silva Junior">
+        </div>
+        <div class="creditos">
+          <div class="rotulo">Professor</div>
+          <div class="pessoa">Amauri Silva Junior</div>
+          <div class="segundo">
+            <div class="rotulo">Diretora</div>
+            <div class="pessoa">Carla Nilce</div>
+          </div>
+        </div>
+      </div>
     </div>
-    <p class="chamada">
-      Um conjunto de questões para praticar o que vimos em aula.
-      Responda com calma — dá para voltar e conferir.
-    </p>
+
+    <!-- a ficha: o único lugar da capa onde o aluno escreve -->
+    <div class="coluna-ficha">
+    <form class="ficha" id="ficha" novalidate>
+      <div class="titulo">Identificação</div>
+
+      <label class="campo" id="campo-nome">
+        <span>Nome completo do aluno</span>
+        <input id="nome" name="nome" type="text" autocomplete="name"
+               placeholder="Escreva seu nome" required>
+      </label>
+
+      <div class="dupla">
+        <label class="campo" id="campo-turma">
+          <span>Turma</span>
+          <select id="turma" name="turma" required>
+            <option value="" selected disabled>—</option>
+            <option value="901M">901M</option>
+            <option value="902M">902M</option>
+            <option value="901T">901T</option>
+            <option value="902T">902T</option>
+          </select>
+        </label>
+
+        <label class="campo" id="campo-turno">
+          <span>Turno</span>
+          <select id="turno" name="turno" required>
+            <option value="" selected disabled>—</option>
+            <option value="Manhã">Manhã</option>
+            <option value="Tarde">Tarde</option>
+          </select>
+        </label>
+      </div>
+
+      <p class="aviso" id="aviso" role="alert"></p>
+      <p class="nota">
+        O turno se preenche sozinho ao escolher a turma —
+        <strong>M</strong> de manhã, <strong>T</strong> de tarde.
+      </p>
+      </form>
+
+      <!-- o botão fica logo abaixo do cartão: é o passo seguinte de
+           quem acabou de preencher, e não um comando do rodapé -->
+      <div class="acao">
+        <button id="comecar" class="botao" type="button">Começar</button>
+        <p class="retomada" id="retomada" hidden>
+          Este computador tem a prova de <b id="retomada-nome"></b>
+          <span id="retomada-situacao">em andamento</span>.
+          <button type="button" class="link" id="outro-aluno">Não sou eu — começar do zero</button>
+        </p>
+      </div>
+    </div>
+
   </div>
 
   <div class="pe">
-    <button id="comecar" type="button">Começar</button>
     <div class="assina">
-      Prof. Amauri Junior<br>
+      Prof. Amauri Silva Junior<br>
       <a href="mailto:amauri.junior@escola.seduc.pa.gov.br"
          >amauri.junior@escola.seduc.pa.gov.br</a>
     </div>
@@ -215,14 +1094,1792 @@ h1 em{font-style:normal;color:var(--amber)}
 
 </main>
 
+<!-- ============================================================
+     2. PROVA — a moldura. O conteúdo entra em #palco.
+     ============================================================ -->
+<main class="tela prova" id="tela-prova" hidden>
+
+  <header class="topo">
+    <div class="marca"><img src="icons/icon-192.png" alt=""></div>
+    <div class="identificacao">
+      <div class="nome-aluno" id="topo-nome"></div>
+      <div class="turma-aluno" id="topo-turma"></div>
+    </div>
+    <div class="contador"><b id="topo-atual">1</b> / <span id="topo-total">0</span></div>
+  </header>
+
+  <!-- só mostra por onde a prova anda; não é para clicar, porque
+       daqui não se volta -->
+  <div class="regua" id="regua" aria-hidden="true"></div>
+
+  <section id="palco" aria-live="polite"></section>
+
+  <div class="navegacao">
+    <button id="avancar" class="botao" type="button" hidden>Confirmar</button>
+  </div>
+
+</main>
+
+<!-- ============================================================
+     3. FECHAMENTO
+     ============================================================ -->
+<main class="tela fim" id="tela-fim" hidden>
+  <div>
+    <div class="kicker">Prova entregue</div>
+    <div class="placar">
+      <span class="n" id="fim-acertos">0</span>
+      <span class="de">de <span id="fim-total">0</span> questões</span>
+    </div>
+  </div>
+
+  <div class="cartao">
+    <dl>
+      <dt>Aluno</dt>   <dd id="fim-nome"></dd>
+      <dt>Turma</dt>   <dd id="fim-turma"></dd>
+      <dt>Turno</dt>   <dd id="fim-turno"></dd>
+      <dt>Entrega</dt> <dd id="fim-data"></dd>
+    </dl>
+  </div>
+
+  <p class="envio" id="envio" hidden></p>
+
+  <ul class="mapa" id="fim-mapa"></ul>
+
+  <div class="pe">
+    <button id="imprimir" class="botao" type="button">Salvar / imprimir</button>
+    <button id="revisar"  class="botao discreto" type="button">Revisar respostas</button>
+    <button id="encerrar" class="botao discreto" type="button">Encerrar neste computador</button>
+  </div>
+
+  <p class="nota" id="nota-fim">
+    Salve como PDF (<kbd>Ctrl</kbd>+<kbd>P</kbd> → Salvar no Google Drive) e entregue ao professor.
+    Depois, <strong>encerre</strong> para liberar o computador para o próximo aluno.
+  </p>
+</main>
+
 <script>
 /* ============================================================
-   Por enquanto só a capa. O botão já existe e já responde — as
-   questões entram aqui, uma a uma, conforme montarmos.
+   O MOTOR DA PROVA
+
+   A ideia aqui é uma só: o motor não sabe nada de química. Ele
+   cuida da moldura — quem é o aluno, em que questão estamos, o
+   que já foi respondido, e o fechamento. Cada questão é um objeto
+   independente dentro de QUESTOES, e desenha o que quiser.
+
+   Como uma questão é escrita
+   --------------------------
+   {
+     tipo: 'iônica',                     // etiqueta, aparece no mapa final
+     titulo: 'Sódio e cloro',            // a manchete da questão
+     enunciado: 'O que acontece ...',    // uma linha de contexto
+     montar(corpo, api){ ... },          // aqui você desenha
+     comentario(resposta){ ... }         // o gabarito, só no fim
+   }
+
+   Dentro de montar você recebe:
+     corpo   → a <div class="q-corpo"> vazia, sua para preencher
+     api.responder(resposta, acertou)   grava a resposta
+     api.resposta()                     o que já foi respondido (ou null)
+     api.respondida()                   true se o aluno já respondeu
+     api.entregue()                     true só DEPOIS de entregue
+     api.retorno(html, acertou)         mostra o comentário embaixo
+     api.indice / api.aluno             se precisar
+
+   A REGRA QUE MANDA EM TUDO: a prova não corrige na hora.
+   Enquanto api.entregue() for false, escolher é só escolher — o
+   aluno marca, pode trocar de ideia, confirma e segue. Nada de
+   verde, de vermelho, de "certo!". A questão só se revela — cores,
+   nomes, comentário — quando api.entregue() vira true, o que
+   acontece na revisão, depois da entrega.
+
+   Como o aluno pode voltar numa questão já feita, montar() é
+   chamada de novo a cada visita: comece sempre olhando
+   api.resposta() para reconstruir o que já estava na tela.
+
+   Se a questão for de escolher entre itens — três retratos, três
+   frases —, provavelmente não é preciso escrever montar() nenhuma:
+   use escolherRetrato() ou escolherAlternativa(), logo abaixo.
+
+   Cada tipo de interação — arrastar, ligar pontos, escolher,
+   completar, montar a fórmula — é escrito dentro da sua própria
+   questão. Nada precisa mudar no motor abaixo.
    ============================================================ */
-document.getElementById('comecar').addEventListener('click', () => {
-  /* a montar: daqui em diante entra a primeira questão */
+
+/* ------------------------------------------------------------
+   PEÇAS REAPROVEITÁVEIS
+
+   Duas questões já pedem a mesma coisa — reconhecer um rosto —, e
+   uma terceira pede a irmã dela, escolher uma frase. O desenho de
+   cada uma mora aqui; a questão traz só o conteúdo.
+
+   Ambas seguem a mesma regra: durante a prova, escolher é apenas
+   escolher. Certo e errado só aparecem na revisão.
+   ------------------------------------------------------------ */
+
+/* três retratos sem nome; os nomes entram na revisão */
+function escolherRetrato(corpo, api, q){
+  const retratos = q.retratos;
+  const grade = document.createElement('div');
+  grade.className = 'retratos';
+  const cartoes = [];
+
+  retratos.forEach((r, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'retrato-op';
+    b.setAttribute('aria-label', 'Imagem ' + (i+1));
+    /* o motor liga a tecla sozinho: ver "O TECLADO", lá embaixo */
+    b.dataset.tecla = String(i+1);
+    b.innerHTML =
+      '<span class="tecla" aria-hidden="true">' + (i+1) + '</span>' +
+      '<span class="selo-q" aria-hidden="true"></span>' +
+      '<img alt="Retrato do cientista da imagem ' + (i+1) + '">' +
+      '<span class="legenda"></span>';
+    const img = b.querySelector('img');
+    img.src = r.arquivo;
+    img.style.objectPosition = r.foco;
+    b.querySelector('.legenda').textContent = 'Imagem ' + (i+1);
+    b.addEventListener('click', () => {
+      if (api.entregue()) return;          // entregue, não se mexe mais
+      api.responder(i, r.certa);
+      marcar(i);
+    });
+    cartoes.push(b);
+    grade.appendChild(b);
+  });
+  corpo.appendChild(grade);
+
+  function marcar(escolhida){
+    cartoes.forEach((b,i) => b.classList.toggle('escolhida', i === escolhida));
+  }
+
+  const escolhida = api.resposta();
+  if (escolhida !== null) marcar(escolhida);
+
+  if (api.entregue()){
+    grade.classList.add('travada');
+    cartoes.forEach((b, i) => {
+      b.querySelector('.legenda').textContent = retratos[i].nome;
+      if (retratos[i].certa){
+        b.classList.add('certa');
+        b.querySelector('.selo-q').textContent = '✓';
+      } else if (i === escolhida){
+        b.classList.add('marcada-errada');
+        b.querySelector('.selo-q').textContent = '✕';
+      }
+    });
+    api.retorno(q.comentario(escolhida),
+                escolhida !== null && retratos[escolhida].certa);
+  }
+}
+
+/* alternativas de texto, mesma lógica */
+function escolherAlternativa(corpo, api, q){
+  const opcoes = q.opcoes;
+  const lista = document.createElement('div');
+  lista.className = 'alternativas';
+  const botoes = [];
+
+  opcoes.forEach((o, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'alt';
+    b.dataset.tecla = String(i+1);
+    b.innerHTML = '<span class="tecla" aria-hidden="true">' + (i+1) + '</span>' +
+                  '<span class="corpo-alt"><span class="frase"></span>' +
+                  (o.detalhe ? '<span class="detalhe"></span>' : '') + '</span>';
+    b.querySelector('.frase').textContent = o.texto;
+    if (o.detalhe) b.querySelector('.detalhe').textContent = o.detalhe;
+    b.addEventListener('click', () => {
+      if (api.entregue()) return;
+      api.responder(i, o.certa);
+      marcar(i);
+    });
+    botoes.push(b);
+    lista.appendChild(b);
+  });
+  corpo.appendChild(lista);
+
+  function marcar(escolhida){
+    botoes.forEach((b,i) => b.classList.toggle('escolhida', i === escolhida));
+  }
+
+  const escolhida = api.resposta();
+  if (escolhida !== null) marcar(escolhida);
+
+  if (api.entregue()){
+    lista.classList.add('revisada');
+    botoes.forEach((b,i) => {
+      if (opcoes[i].certa) b.classList.add('certa');
+      else if (i === escolhida) b.classList.add('marcada-errada');
+    });
+    api.retorno(q.comentario(escolhida),
+                escolhida !== null && opcoes[escolhida].certa);
+  }
+}
+
+/* cilindros de gás: símbolo grande e número atômico dentro,
+   nome embaixo. O desenho do cilindro é todo CSS — ver .gases */
+function escolherGas(corpo, api, q){
+  const gases = q.gases;
+  const grade = document.createElement('div');
+  grade.className = 'gases';
+  const cartoes = [];
+
+  gases.forEach((g, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'gas';
+    b.dataset.tecla = String(i+1);
+    b.setAttribute('aria-label',
+      'Cilindro de ' + g.nome + ', símbolo ' + g.simbolo + ', número atômico ' + g.z);
+    b.innerHTML =
+      '<span class="tecla" aria-hidden="true">' + (i+1) + '</span>' +
+      '<span class="cilindro" aria-hidden="true">' +
+        '<span class="z"></span><span class="simbolo"></span>' +
+      '</span>' +
+      '<span class="nome"></span>';
+    b.querySelector('.z').textContent       = g.z;
+    b.querySelector('.simbolo').textContent = g.simbolo;
+    b.querySelector('.nome').textContent    = g.nome;
+    b.addEventListener('click', () => {
+      if (api.entregue()) return;
+      api.responder(i, g.certa);
+      marcar(i);
+    });
+    cartoes.push(b);
+    grade.appendChild(b);
+  });
+  corpo.appendChild(grade);
+
+  function marcar(escolhida){
+    cartoes.forEach((b,i) => b.classList.toggle('escolhida', i === escolhida));
+  }
+
+  const escolhida = api.resposta();
+  if (escolhida !== null) marcar(escolhida);
+
+  if (api.entregue()){
+    grade.classList.add('revisada');
+    cartoes.forEach((b,i) => {
+      if (gases[i].certa) b.classList.add('certa');
+      else if (i === escolhida) b.classList.add('marcada-errada');
+    });
+    api.retorno(q.comentario(escolhida),
+                escolhida !== null && gases[escolhida].certa);
+  }
+}
+
+/* ------------------------------------------------------------
+   O CUBO: quatro átomos, a mesma pergunta.
+
+   Uma questão só, com quatro respostas guardadas numa lista. A
+   nota é do conjunto: acerta quem acerta os quatro. O gabarito,
+   no fim, comenta um por um.
+
+   O cubo tem quatro faces laterais — se um dia a questão tiver
+   mais de quatro átomos, isto aqui precisa virar outra coisa.
+   ------------------------------------------------------------ */
+function escolherComportamento(corpo, api, q){
+  const atomos = q.atomos;
+  const guardadas = api.resposta();
+  const respostas = Array.isArray(guardadas) ? guardadas.slice()
+                                             : atomos.map(() => null);
+  const letras = ['a','b','c','d'];
+
+  /* abre no primeiro átomo ainda em branco; se não há nenhum,
+     abre no último — quem já respondeu tudo e só está de passagem
+     sai com um clique, em vez de dar a volta no cubo inteiro */
+  let face = respostas.findIndex(r => r === null);
+  if (face < 0) face = atomos.length - 1;
+  let giro = -90 * face;
+
+  const bloco = document.createElement('div');
+  bloco.className = 'comportamento';
+  bloco.innerHTML =
+    '<div class="lado-cubo">' +
+      '<div class="cena"><div class="cubo"></div></div>' +
+      '<div class="passos" role="group" aria-label="Átomo da vez"></div>' +
+      '<p class="obs">Toque no símbolo do elemento para ver sua ' +
+      'distribuição eletrônica.</p>' +
+      '<div class="subniveis" id="sub-atomo" hidden></div>' +
+    '</div>' +
+    '<div class="alternativas"></div>' +
+    '<div class="rodape-q">' +
+      '<div class="subniveis lado" id="sub-nobre" hidden></div>' +
+      '<button type="button" class="botao discreto pequeno nobre">Gás nobre</button>' +
+    '</div>';
+  corpo.appendChild(bloco);
+
+  const cubo    = bloco.querySelector('.cubo');
+  const passos  = bloco.querySelector('.passos');
+  const lista   = bloco.querySelector('.alternativas');
+  const subAtomo = bloco.querySelector('#sub-atomo');
+  const subNobre = bloco.querySelector('#sub-nobre');
+
+  /* o mesmo cartãozinho serve para o átomo e para o gás nobre:
+     o símbolo, e ao lado a distribuição em subníveis */
+  function escreverSub(caixa, simbolo, z, pauling){
+    caixa.innerHTML = '<span class="s"></span><span class="p"></span>';
+    caixa.querySelector('.s').textContent = simbolo;
+    caixa.querySelector('.p').textContent = pauling;
+    caixa.title = simbolo + ' (Z = ' + z + ')';
+  }
+  /* aberto fecha, fechado abre — o mesmo toque nos dois sentidos */
+  function alternar(caixa, montar){
+    if (!caixa.hidden){ caixa.hidden = true; return; }
+    montar();
+    caixa.hidden = false;
+  }
+
+  /* as faces */
+  atomos.forEach((a, i) => {
+    const f = document.createElement('div');
+    f.className = 'face f' + i;      /* a posição da face é do CSS */
+    f.innerHTML =
+      '<span class="letra">' + letras[i] + ')</span>' +
+      '<button type="button" class="atomo">' +
+        '<span class="simbolo"></span><span class="z"></span>' +
+      '</button>';
+    f.querySelector('.z').textContent       = 'Z = ' + a.z;
+    f.querySelector('.simbolo').textContent = a.simbolo;
+    f.querySelector('.atomo').setAttribute('aria-label',
+      'Ver a distribuição eletrônica do ' + a.nome);
+    f.querySelector('.atomo').addEventListener('click', () => {
+      alternar(subAtomo, () => escreverSub(subAtomo, a.simbolo, a.z, a.pauling));
+    });
+    cubo.appendChild(f);
+  });
+
+  /* as letras embaixo do cubo dizem em qual átomo estamos e
+     quantos faltam. Durante a prova elas não clicam: átomo
+     confirmado é átomo fechado, como toda questão daqui. Na
+     revisão voltam a andar, que é quando rever faz sentido. */
+  atomos.forEach((a, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = letras[i];
+    b.disabled = !api.entregue();
+    b.setAttribute('aria-label', 'Átomo ' + letras[i] + ', ' + a.nome);
+    b.addEventListener('click', () => irPara(i));
+    passos.appendChild(b);
+  });
+
+  /* As três alternativas são refeitas a cada átomo: o número de
+     elétrons muda de um para o outro, e quem escolhe entre
+     "ganha 1" e "perde 1" está decidindo a direção, que é o que
+     a regra do octeto realmente pergunta. */
+  const botoes = [];
+  function montarAlternativas(){
+    lista.innerHTML = '';
+    botoes.length = 0;
+    atomos[face].opcoes.forEach((texto, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'alt';
+      b.dataset.tecla = String(i+1);
+      b.innerHTML = '<span class="tecla" aria-hidden="true">' + (i+1) + '</span>' +
+                    '<span class="corpo-alt"><span class="frase"></span></span>';
+      b.querySelector('.frase').textContent = texto;
+      b.addEventListener('click', () => {
+        if (api.entregue()) return;
+        respostas[face] = i;
+        api.responder(respostas.slice(), respostas.every((r,k) => r === atomos[k].certa));
+        pintar();
+      });
+      botoes.push(b);
+      lista.appendChild(b);
+    });
+    lista.classList.toggle('revisada', api.entregue());
+  }
+
+  /* o gás nobre mais próximo: o alvo que o átomo está tentando
+     alcançar. Aparece ao lado do botão, e o mesmo botão fecha. */
+  bloco.querySelector('.nobre').addEventListener('click', () => {
+    const n = q.nobres[atomos[face].nobre];
+    alternar(subNobre, () => escreverSub(subNobre, n.simbolo, n.z, n.pauling));
+  });
+
+  function irPara(n){
+    giro += (n - face) * -90;
+    face = n;
+    cubo.style.transform = 'rotateY(' + giro + 'deg)';
+    /* o que estava aberto era do átomo anterior */
+    subAtomo.hidden = subNobre.hidden = true;
+    montarAlternativas();
+    pintar();
+  }
+
+  function pintar(){
+    [...passos.children].forEach((b,i) => {
+      b.classList.toggle('feito', respostas[i] !== null);
+      b.classList.toggle('atual', i === face);
+    });
+    botoes.forEach((b,i) => {
+      b.classList.toggle('escolhida', !api.entregue() && respostas[face] === i);
+      b.classList.remove('certa','marcada-errada');
+      if (api.entregue()){
+        if (i === atomos[face].certa) b.classList.add('certa');
+        else if (i === respostas[face]) b.classList.add('marcada-errada');
+      }
+    });
+    api.atualizarBotao();
+  }
+
+
+  cubo.style.transform = 'rotateY(' + giro + 'deg)';
+  montarAlternativas();
+
+  if (api.entregue()){
+    api.retorno(q.comentario(respostas),
+                respostas.every((r,k) => r === atomos[k].certa));
+  } else {
+    /* o "Confirmar" gira o cubo enquanto houver átomo; só no
+       último ele volta a ser o botão de sair da questão */
+    api.aoAvancar(
+      () => {
+        if (face < atomos.length - 1){ irPara(face + 1); return true; }
+        return false;
+      },
+      () => {
+        if (respostas[face] === null) return false;   // sem escolha, sem botão
+        if (face < atomos.length - 1)  return 'Confirmar';
+        return null;                                  // a prova que decida
+      }
+    );
+  }
+
+  pintar();   /* depois do registro acima, para o botão já nascer certo */
+}
+
+/* ------------------------------------------------------------
+   A MESA DE LEWIS — arrancar e entregar elétrons
+
+   O mesmo gesto do slide 7 da aula, refeito para viver aqui:
+
+   · dedo NO símbolo e puxa  → arranca um elétron de dentro;
+   · dedo FORA e segura      → nasce um elétron sob o dedo;
+     arrastá-lo até o símbolo e soltar ali → ele entra;
+   · soltar o elétron no vazio → ele se desfaz.
+
+   A prova não corrige na hora, então a mesa não festeja nem treme:
+   ela só mostra o que o aluno desenhou — quantos elétrons de
+   valência há e que íon aquilo virou. Ler o próprio desenho não é
+   receber a resposta.
+   ------------------------------------------------------------ */
+/* A regra de camadas da escola: 2, 8, 8, e daí em diante. Serve
+   para todos os exemplos desta prova, e é a que a turma aprendeu. */
+const CAPACIDADE = [2, 8, 8, 18, 18, 32];
+
+/* De quantos elétrons o átomo tem, para como eles se arrumam.
+   Com zero elétrons devolve lista vazia — sobra só o núcleo, que
+   é exatamente o que um H⁺ é. */
+function camadasDe(total){
+  const c = [];
+  let resto = Math.max(0, total);
+  for (let i = 0; i < CAPACIDADE.length && resto > 0; i++){
+    const n = Math.min(resto, CAPACIDADE[i]);
+    c.push(n);
+    resto -= n;
+  }
+  return c;
+}
+
+/* O símbolo escrito em cima da esfera: branco não serve para todo
+   mundo — o hidrogênio é branco no padrão CPK, e branco sobre
+   branco não se lê. A conta é o brilho percebido da cor. */
+function corDoTexto(hex){
+  const n = parseInt(hex.slice(1), 16);
+  const brilho = .299 * ((n >> 16) & 255) + .587 * ((n >> 8) & 255) + .114 * (n & 255);
+  return brilho > 150 ? '#0B1F32' : '#FFFFFF';
+}
+
+/* a esfera do elemento: luz no canto de cima à esquerda, cor CPK */
+function esferaBg(hex){
+  const n = parseInt(hex.slice(1), 16);
+  const rgb = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  const tom = f => 'rgb(' + rgb.map(v =>
+    Math.round(f > 0 ? v + (255 - v) * f : v * (1 + f))).join(',') + ')';
+  return 'radial-gradient(circle at 33% 27%,rgba(255,255,255,.95) 0%,' +
+         'rgba(255,255,255,.55) 5%,rgba(255,255,255,0) 22%),' +
+         'radial-gradient(circle at 36% 30%,' + tom(.4) + ' 0%,' + hex + ' 30%,' +
+         tom(-.62) + ' 62%,' + tom(-.28) + ' 100%)';
+}
+
+
+function escolherLewis(corpo, api, q){
+  const exemplos = q.exemplos;
+  const guardadas = api.resposta();
+  const letras = ['a','b','c','d','e','f','g','h'];
+  /* o que se guarda é quantos elétrons de valência o aluno deixou
+     em cada exemplo; null é "ainda não mexeu nem confirmou" */
+  const feitos = Array.isArray(guardadas) ? guardadas.slice()
+                                          : exemplos.map(() => null);
+
+  let face = feitos.findIndex(r => r === null);
+  if (face < 0) face = exemplos.length - 1;
+  /* quantos elétrons estão desenhados agora */
+  let atual = feitos[face] !== null ? feitos[face] : exemplos[face].z;
+
+  /* Mesma moldura da questão do octeto: o cubo guarda os exemplos à
+     esquerda e gira a cada confirmação; a mesa, à direita, é onde o
+     átomo vive. É a divisão da aula — lá o cubo também só dizia
+     "Exemplo 01" e o átomo ficava fora dele. */
+  const bloco = document.createElement('div');
+  bloco.className = 'comportamento';
+  bloco.innerHTML =
+    '<div class="lado-cubo">' +
+      '<div class="cena"><div class="cubo"></div></div>' +
+      '<div class="passos" role="group" aria-label="Exemplo da vez"></div>' +
+      '<p class="obs">Segure o dedo no átomo e arraste para fora para tirar ' +
+      'elétrons. Para acrescentar, segure fora do átomo até o elétron ' +
+      'aparecer e solte em cima dele.</p>' +
+    '</div>' +
+    '<div class="mesa">' +
+      '<div class="lw"><div class="lw-bola"><span class="lw-sim"></span></div></div>' +
+    '</div>';
+  corpo.appendChild(bloco);
+
+  const cubo   = bloco.querySelector('.cubo');
+  const mesa   = bloco.querySelector('.mesa');
+  const lw     = bloco.querySelector('.lw');
+  const bola   = bloco.querySelector('.lw-bola');
+  const passos = bloco.querySelector('.passos');
+  let giro = -90 * face;
+
+  /* Quanto o aluno pode mexer: até quatro elétrons para cada lado,
+     a partir do átomo neutro — e o desenho de Lewis nunca passa de
+     oito nem desce de zero. */
+  const PASSO_MAX = 4;
+  const minDe = ex => Math.max(0, ex.z - PASSO_MAX);
+  const maxDe = ex => ex.z + PASSO_MAX;
+
+  /* As faces só numeram o exemplo: o átomo está na mesa, e repeti-lo
+     aqui seria dizer a mesma coisa duas vezes.
+
+     O cubo tem quatro lados e os exemplos podem ser cinco — então
+     ele é um carrossel, não uma caixa: a face que vai entrar recebe
+     o número do próximo exemplo pouco antes de girar. De fora, o
+     cubo parece ter tantas faces quantos forem os exemplos. */
+  const faces = [];
+  for (let i = 0; i < 4; i++){
+    const f = document.createElement('div');
+    f.className = 'face f' + i;
+    f.innerHTML = '<span class="letra"></span>' +
+                  '<div class="face-ex"><span class="ex-r">Exemplo</span>' +
+                  '<span class="ex-n"></span></div>';
+    faces.push(f);
+    cubo.appendChild(f);
+  }
+  const faceFisica = n => ((n % 4) + 4) % 4;
+  function escreveFace(n){
+    const f = faces[faceFisica(n)];
+    f.querySelector('.letra').textContent = letras[n] + ')';
+    f.querySelector('.ex-n').textContent  = n + 1;
+  }
+  escreveFace(face);
+  cubo.style.transform = 'rotateY(' + giro + 'deg)';
+
+  exemplos.forEach((ex, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = letras[i];
+    b.disabled = !api.entregue();
+    b.setAttribute('aria-label', 'Exemplo ' + letras[i] + ', ' + ex.nome);
+    b.addEventListener('click', () => irPara(i));
+    passos.appendChild(b);
+  });
+
+  /* ---------- desenhar ---------- */
+  /* os diâmetros dos anéis, do de dentro para fora */
+  const DIAMETROS = [78, 132, 184, 184];
+
+  function desenhaAtomo(ultimoEntrou){
+    const ex = exemplos[face];
+    bola.style.background = esferaBg(ex.cor);
+    const sim = bloco.querySelector('.lw-sim');
+    sim.textContent = ex.simbolo;
+    sim.style.color = corDoTexto(ex.cor);
+    sim.style.textShadow = corDoTexto(ex.cor) === '#FFFFFF'
+      ? '0 2px 8px rgba(4,12,20,.8)' : 'none';
+
+    lw.querySelectorAll('.camada, .lw-carga').forEach(x => x.remove());
+
+    /* uma camada por nível, os elétrons repartidos em volta dela.
+       Como o desenho é refeito a cada mudança, a camada que ganha
+       ou perde o elétron muda na hora, à vista do aluno. */
+    const camadas = camadasDe(atual);
+    camadas.forEach((quantos, i) => {
+      const d = DIAMETROS[i] || DIAMETROS[DIAMETROS.length - 1];
+      const anel = document.createElement('span');
+      anel.className = 'camada';
+      anel.style.setProperty('--d', d + 'px');
+      for (let k = 0; k < quantos; k++){
+        const e = document.createElement('i');
+        e.className = 'e-r';
+        /* começa no topo e distribui a volta inteira por igual */
+        e.style.setProperty('--a', (-90 + k * 360 / quantos).toFixed(1) + 'deg');
+        /* o que acabou de chegar é o último da camada de fora */
+        if (ultimoEntrou && i === camadas.length - 1 && k === quantos - 1){
+          e.classList.add('novo');
+        }
+        anel.appendChild(e);
+      }
+      lw.appendChild(anel);
+    });
+
+    /* a carga não conta elétrons: diz o que o átomo virou, e é o
+       que se escreve à mão no caderno */
+    const carga = ex.z - atual;             /* saiu elétron = carga positiva */
+    if (carga !== 0){
+      const c = document.createElement('span');
+      c.className = 'lw-carga' + (carga < 0 ? ' neg' : '');
+      const n = Math.abs(carga);
+      c.textContent = (n > 1 ? n : '') + (carga > 0 ? '+' : '−');
+      lw.appendChild(c);
+    }
+  }
+
+  /* o efeito que confirma que a ação valeu: um anel que sai do átomo
+     quando o elétron escapa, e outro que se fecha nele quando entra —
+     mais a esfera dando um pulso */
+  function onda(tipo){
+    const o = document.createElement('i');
+    o.className = 'onda ' + tipo;
+    const r = lw.getBoundingClientRect(), rm = mesa.getBoundingClientRect();
+    o.style.left = (r.left + r.width/2 - rm.left).toFixed(0) + 'px';
+    o.style.top  = (r.top  + r.height/2 - rm.top ).toFixed(0) + 'px';
+    mesa.appendChild(o);
+    setTimeout(() => o.remove(), 640);
+    bola.classList.remove('bate');
+    void bola.offsetWidth;             /* reinicia a animação */
+    bola.classList.add('bate');
+  }
+  /* o átomo nega o gesto quando já está no limite */
+  function nega(){
+    lw.classList.remove('nega');
+    void lw.offsetWidth;
+    lw.classList.add('nega');
+  }
+
+  function mudar(n, efeito){
+    const ex = exemplos[face];
+    atual = Math.max(minDe(ex), Math.min(maxDe(ex), n));
+    feitos[face] = atual;
+    api.responder(feitos.slice(),
+                  feitos.every((r,k) => r === exemplos[k].alvo));
+    desenhaAtomo(efeito === 'entra');   /* acende o recém-chegado */
+    if (efeito) onda(efeito);
+    pintar();
+  }
+
+  function pintar(){
+    [...passos.children].forEach((b,i) => {
+      b.classList.toggle('feito', feitos[i] !== null);
+      b.classList.toggle('atual', i === face);
+    });
+    api.atualizarBotao();
+  }
+
+  function irPara(n){
+    escreveFace(n);                    /* a face que entra já vem certa */
+    giro += (n - face) * -90;
+    cubo.style.transform = 'rotateY(' + giro + 'deg)';
+    face = n;
+    atual = feitos[n] !== null ? feitos[n] : exemplos[n].z;
+    desenhaAtomo();
+    marcarRevisao();
+    pintar();
+  }
+
+  /* ---------- o gesto ----------
+     Tudo aqui é medido a partir da MESA, e não do bloco da questão:
+     é ela que tem position:relative, então é o canto dela que os
+     elétrons usam como origem. Medir num elemento e desenhar em
+     outro era o que fazia o elétron nascer longe do dedo. */
+  const ponto = e => {
+    const r = mesa.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  };
+  /* o centro do átomo, também em coordenadas da mesa */
+  const centroAtomo = () => {
+    const r = lw.getBoundingClientRect(), rm = mesa.getBoundingClientRect();
+    return { x: r.left + r.width/2 - rm.left, y: r.top + r.height/2 - rm.top };
+  };
+  const noAtomo = e => {
+    const r = lw.getBoundingClientRect();
+    const cx = r.left + r.width/2, cy = r.top + r.height/2;
+    return Math.hypot(e.clientX - cx, e.clientY - cy) < r.width/2;
+  };
+  function criaEletron(x, y){
+    const el = document.createElement('i');
+    el.className = 'eletron';
+    el.style.left = x.toFixed(0) + 'px';
+    el.style.top  = y.toFixed(0) + 'px';
+    el.innerHTML = '<b></b><s></s>';
+    mesa.appendChild(el);
+    return el;
+  }
+  function faisca(x, y, v){
+    const t = document.createElement('i');
+    t.className = 'rastro-e';
+    t.style.setProperty('--s', (8 + Math.min(12, v * .5)).toFixed(0) + 'px');
+    t.style.left = x.toFixed(0) + 'px';
+    t.style.top  = y.toFixed(0) + 'px';
+    mesa.appendChild(t);
+    setTimeout(() => t.remove(), 480);
+  }
+
+  let g = null;   /* o que o dedo está segurando */
+
+  mesa.addEventListener('pointerdown', e => {
+    if (api.entregue() || g) return;
+
+    if (noAtomo(e)){
+      /* dedo no símbolo: puxar arranca. Só vira elétron depois do
+         puxão — um toque seco não deve tirar nada sem querer. */
+      g = { id:e.pointerId, modo:'tira', el:null, x:e.clientX, y:e.clientY };
+    } else {
+      /* no teto: o átomo nega o gesto em vez de ignorá-lo em
+         silêncio, senão parece que a mesa travou */
+      if (atual >= maxDe(exemplos[face])){ nega(); return; }
+      const p = ponto(e);
+      g = { id:e.pointerId, modo:'traz', el:null,
+            x:e.clientX, y:e.clientY, px:p.x, py:p.y };
+      g.t = setTimeout(() => {
+        if (g && g.modo === 'traz' && !g.el) g.el = criaEletron(g.px, g.py);
+      }, 260);
+    }
+    try { mesa.setPointerCapture(e.pointerId); } catch(_){}
+    e.preventDefault();
+  });
+
+  mesa.addEventListener('pointermove', e => {
+    if (!g || e.pointerId !== g.id) return;
+    const p = ponto(e);
+
+    if (g.modo === 'traz' && !g.el){
+      /* o dedo treme; só um movimento claro desiste do elétron */
+      g.px = p.x; g.py = p.y;
+      if (Math.hypot(e.clientX - g.x, e.clientY - g.y) > 24){
+        clearTimeout(g.t); g = null;
+      }
+      return;
+    }
+    if (g.modo === 'tira' && !g.el){
+      if (Math.hypot(e.clientX - g.x, e.clientY - g.y) < 18) return;
+      /* no fundo do poço: não sai mais nada, e o puxão deixa de ser gesto */
+      if (atual <= minDe(exemplos[face])){ g.modo = 'nada'; nega(); return; }
+      const c = centroAtomo();
+      g.el = criaEletron(c.x, c.y);
+      g.tirou = true;
+      mudar(atual - 1, 'sai');
+    }
+    if (!g.el) return;
+
+    /* a faísca fica onde ele estava, não onde ele está: é isso que
+       dá a sensação de esteira, e não de borrão em volta */
+    if (g.lx !== undefined){
+      const v = Math.hypot(p.x - g.lx, p.y - g.ly);
+      if (v > 6){ faisca(g.lx, g.ly, v); g.lx = p.x; g.ly = p.y; }
+    } else { g.lx = p.x; g.ly = p.y; }
+    g.el.style.left = p.x.toFixed(0) + 'px';
+    g.el.style.top  = p.y.toFixed(0) + 'px';
+  });
+
+  function solta(e){
+    if (!g || (e && e.pointerId !== g.id)) return;
+    const h = g; g = null;
+    clearTimeout(h.t);
+    if (!h.el) return;                       /* toque seco: nada aconteceu */
+
+    const entra = e && noAtomo(e) && atual < maxDe(exemplos[face]);
+    if (entra){
+      mudar(atual + 1, 'entra');
+      /* mede o caminho que falta até o centro, para ele mergulhar lá */
+      const c = centroAtomo();
+      h.el.style.setProperty('--tx',
+        (c.x - parseFloat(h.el.style.left)).toFixed(0) + 'px');
+      h.el.style.setProperty('--ty',
+        (c.y - parseFloat(h.el.style.top)).toFixed(0) + 'px');
+      h.el.classList.add('entra');
+    } else {
+      if (e && noAtomo(e)) nega();     /* chegou no átomo, mas não cabe */
+      h.el.classList.add('some');
+    }
+    setTimeout(() => h.el.remove(), 460);
+  }
+  mesa.addEventListener('pointerup', solta);
+  mesa.addEventListener('pointercancel', solta);
+
+  /* na revisão a mesa fica quieta e diz se aquele átomo ficou certo */
+  function marcarRevisao(){
+    if (!api.entregue()) return;
+    mesa.classList.add('travada');
+    const ok = feitos[face] === exemplos[face].alvo;
+    mesa.classList.toggle('certa', ok);
+    mesa.classList.toggle('errada', !ok);
+  }
+
+  desenhaAtomo();
+  marcarRevisao();
+
+  if (api.entregue()){
+    api.retorno(q.comentario(feitos),
+                feitos.every((r,k) => r === exemplos[k].alvo));
+  } else {
+    api.aoAvancar(
+      () => {
+        /* confirmar guarda o desenho como está — inclusive o do gás
+           nobre, em que o certo é não ter mexido em nada */
+        if (feitos[face] === null) mudar(atual);
+        if (face < exemplos.length - 1){ irPara(face + 1); return true; }
+        return false;
+      },
+      /* aqui o botão está sempre à vista: no gás nobre, não fazer
+         nada É a resposta, e sem botão não haveria como dizê-la */
+      () => face < exemplos.length - 1 ? 'Confirmar' : null
+    );
+  }
+
+  pintar();
+}
+
+/* o comentário do gabarito, quando a questão é de escolher entre
+   itens: cada item explica a si mesmo, e o branco tem sua linha */
+function comentarioDeEscolha(itens, resposta, emBranco){
+  if (resposta === null || resposta === undefined) return emBranco;
+  return itens[resposta].texto_gabarito;
+}
+
+const QUESTOES = [
+
+  /* =========================================================
+     QUESTÃO 1 — reconhecer o retrato de G. N. Lewis.
+     ========================================================= */
+  {
+    tipo: 'história da química',
+    titulo: 'Quem é Lewis?',
+    enunciado: 'Um dos maiores expoentes no desenvolvimento do que sabemos hoje ' +
+               'sobre ligações químicas foi G. N. Lewis. Qual destas imagens ' +
+               'representa esse grande cientista?',
+
+    retratos: [
+      {
+        arquivo: 'imagens/lewis.jpg',
+        foco: '55% 34%',
+        nome: 'G. N. Lewis',
+        certa: true,
+        texto_gabarito:
+          'Isso. <b>Gilbert Newton Lewis</b> (1875–1946). Foi ele quem, em 1916, propôs que ' +
+          'a ligação nasce de um <b>par de elétrons compartilhado</b> — e quem passou a ' +
+          'desenhar os elétrons de valência como pontinhos em volta do símbolo, do jeito ' +
+          'que usamos até hoje.'
+      },
+      {
+        arquivo: 'imagens/Dalton.jpg',
+        foco: '50% 26%',
+        nome: 'John Dalton',
+        certa: false,
+        texto_gabarito:
+          'Esse é <b>John Dalton</b>, um século antes: o átomo como esfera maciça e ' +
+          'indivisível, sem elétron nenhum para compartilhar. Lewis é a <b>imagem 1</b>.'
+      },
+      {
+        arquivo: 'imagens/rutherford.jpg',
+        foco: '48% 28%',
+        nome: 'Ernest Rutherford',
+        certa: false,
+        texto_gabarito:
+          'Esse é <b>Ernest Rutherford</b>, o do núcleo — ele mostrou onde fica a carga ' +
+          'positiva, mas quem explicou a ligação pelo par de elétrons foi Lewis, a ' +
+          '<b>imagem 1</b>.'
+      }
+    ],
+
+    montar(corpo, api){ escolherRetrato(corpo, api, this); },
+    comentario(resposta){
+      return comentarioDeEscolha(this.retratos, resposta,
+        'Ficou em branco. Lewis é a <b>imagem 1</b> — foi ele quem, em 1916, propôs a ' +
+        'ligação como um par de elétrons compartilhado.');
+    }
+  },
+
+  /* =========================================================
+     QUESTÃO 2 — o postulado de Dalton, e o porquê dele.
+
+     As três frases são parecidas de propósito: a 1 é verdadeira
+     quase sempre mas não responde à pergunta, a 2 é o contrário
+     do que se observa, e a 3 é a explicação que o postulado pede.
+     ========================================================= */
+  {
+    tipo: 'postulado de Dalton',
+    titulo: 'Por que os átomos se combinam?',
+    enunciado: 'Uma das premissas mais importantes sobre ligações químicas foi proposta ' +
+               'por John Dalton no livro “Um Novo Sistema de Filosofia Química”, de 1808: ' +
+               'toda substância química seria formada por átomos combinados. Hoje, apesar ' +
+               'de sabermos que há exceções, qual é a explicação mais simples para esse ' +
+               'postulado?',
+
+    opcoes: [
+      {
+        texto: 'Os átomos isolados são instáveis.',
+        certa: false,
+        texto_gabarito:
+          'Quase — e é por isso que essa engana. A frase descreve o ponto de partida, mas não ' +
+          'explica o postulado: Dalton fala do que os átomos <b>fazem</b> (combinam-se) e do ' +
+          'que ganham com isso. E nem todo átomo isolado é instável — os gases nobres estão ' +
+          'aí, inteiros e sozinhos. A resposta é a <b>3</b>.'
+      },
+      {
+        texto: 'A maioria dos átomos consegue existir isoladamente.',
+        certa: false,
+        texto_gabarito:
+          'É o contrário do que se observa. Se a maioria vivesse bem sozinha, não haveria ' +
+          'substância composta nenhuma — e é justamente disso que o livro de Dalton trata. ' +
+          'Isolados na natureza, só mesmo os gases nobres. A resposta é a <b>3</b>.'
+      },
+      {
+        texto: 'Átomos se combinam para atingir a estabilidade.',
+        certa: true,
+        texto_gabarito:
+          'Isso. Combinado, o conjunto fica num arranjo de <b>menor energia</b> — mais estável ' +
+          'do que os átomos separados. É a mesma ideia que Lewis detalharia um século depois, ' +
+          'ao explicar <b>como</b> essa estabilidade se alcança: compartilhando ou ' +
+          'transferindo elétrons.'
+      }
+    ],
+
+    montar(corpo, api){ escolherAlternativa(corpo, api, this); },
+    comentario(resposta){
+      return comentarioDeEscolha(this.opcoes, resposta,
+        'Ficou em branco. A resposta é a <b>3</b>: combinados, os átomos chegam a um arranjo ' +
+        'de menor energia — mais estável do que separados.');
+    }
+  },
+
+  /* =========================================================
+     QUESTÃO 3 — quem era Ramsay.
+
+     Fecha o arco das duas anteriores: Dalton disse que tudo se
+     combina (Q2), e foi Ramsay quem trouxe do laboratório a
+     turma que não se combina com nada.
+     ========================================================= */
+  {
+    tipo: 'história da química',
+    titulo: 'Quem é Ramsay?',
+    enunciado: 'Um dos cientistas mais brilhantes de sua época, William Ramsay, se mostrou ' +
+               'prontamente contra a ideia de que todas as substâncias químicas são formadas ' +
+               'pela combinação de átomos. Qual destes cientistas é Ramsay?',
+
+    retratos: [
+      {
+        arquivo: 'imagens/thomson_joseph_john_1.webp',
+        foco: '50% 24%',
+        nome: 'J. J. Thomson',
+        certa: false,
+        texto_gabarito:
+          'Esse é <b>J. J. Thomson</b>, o do elétron (1897) e do modelo do pudim de passas. ' +
+          'Ele não foi contra Dalton — pelo contrário: ao mostrar que o átomo tinha peças ' +
+          'dentro, deu a Lewis a peça que faltava para explicar a ligação. Ramsay é a ' +
+          '<b>imagem 3</b>, o de barba.'
+      },
+      {
+        arquivo: 'imagens/Richard-Feynman.webp',
+        foco: '48% 30%',
+        nome: 'Richard Feynman',
+        certa: false,
+        texto_gabarito:
+          'Esse é <b>Richard Feynman</b>, físico americano — e de outro tempo: ele nasceu em ' +
+          '1918, dois anos <b>depois</b> da morte de Ramsay. Ramsay é a <b>imagem 3</b>.'
+      },
+      {
+        arquivo: 'imagens/William_Ramsay.jpg',
+        foco: '50% 28%',
+        nome: 'William Ramsay',
+        certa: true,
+        texto_gabarito:
+          'Isso. <b>William Ramsay</b> (1852–1916) foi quem tirou do ar, entre 1894 e 1898, o ' +
+          'argônio, o neônio, o criptônio e o xenônio — e achou o hélio na Terra. Gases que ' +
+          'não se combinam com nada e andam sozinhos, um átomo de cada vez: são eles as ' +
+          '<b>exceções</b> ao postulado de Dalton da questão anterior. Rendeu-lhe o Nobel de ' +
+          'Química de 1904.'
+      }
+    ],
+
+    montar(corpo, api){ escolherRetrato(corpo, api, this); },
+    comentario(resposta){
+      return comentarioDeEscolha(this.retratos, resposta,
+        'Ficou em branco. Ramsay é a <b>imagem 3</b> — o descobridor dos gases nobres, ' +
+        'os átomos que não se combinam com nada.');
+    }
+  },
+
+  /* =========================================================
+     QUESTÃO 4 — qual cilindro tem átomos isolados.
+
+     Os quatro são gases de cilindro, os quatro são elementos, e
+     os quatro mostram só o símbolo do ELEMENTO — nunca H₂ ou O₂.
+     É essa a pergunta: saber que o cilindro de oxigênio está
+     cheio de moléculas, e que só o do gás nobre tem átomo solto.
+     ========================================================= */
+  {
+    tipo: 'gases nobres',
+    titulo: 'O cilindro de átomos isolados',
+    enunciado: 'Ramsay, citado antes, se opôs à ideia de que todas as substâncias são ' +
+               'formadas por átomos combinados porque tinha no laboratório substâncias ' +
+               'formadas por átomos isolados. Qual destes gases é uma dessas substâncias?',
+
+    gases: [
+      {
+        simbolo:'H', z:1, nome:'Hidrogênio', certa:false,
+        texto_gabarito:
+          'Nesse cilindro não há átomos soltos: há moléculas de <b>H<sub>2</sub></b>, dois ' +
+          'átomos ligados um ao outro. Com um único elétron de valência, o hidrogênio não ' +
+          'fica sozinho. O gás de átomos isolados é o <b>criptônio</b>.'
+      },
+      {
+        simbolo:'N', z:7, nome:'Nitrogênio', certa:false,
+        texto_gabarito:
+          'O ar que você respira é quase todo nitrogênio — mas na forma de ' +
+          '<b>N<sub>2</sub></b>, e esse “2” é o problema: são dois átomos presos por uma ' +
+          'ligação tripla, das mais fortes que existem. Nada de átomo isolado. A resposta ' +
+          'é o <b>criptônio</b>.'
+      },
+      {
+        simbolo:'O', z:8, nome:'Oxigênio', certa:false,
+        texto_gabarito:
+          'O oxigênio do cilindro é <b>O<sub>2</sub></b>, dois átomos ligados — e é ' +
+          'justamente por se combinar com quase tudo que ele enferruja o prego e queima o ' +
+          'papel. O contrário de um átomo isolado. A resposta é o <b>criptônio</b>.'
+      },
+      {
+        simbolo:'Kr', z:36, nome:'Criptônio', certa:true,
+        texto_gabarito:
+          'Isso. O <b>criptônio</b> é um dos gases nobres que o próprio Ramsay descobriu, em ' +
+          '1898. Dentro desse cilindro há átomos de Kr avulsos, um a um: com a camada de ' +
+          'valência completa, não têm o que ganhar se combinando. Foi essa turma que abriu ' +
+          'a exceção ao postulado de Dalton.'
+      }
+    ],
+
+    montar(corpo, api){ escolherGas(corpo, api, this); },
+    comentario(resposta){
+      return comentarioDeEscolha(this.gases, resposta,
+        'Ficou em branco. É o <b>criptônio</b>: gás nobre, camada de valência completa, ' +
+        'átomos avulsos dentro do cilindro. Os outros três estão lá como moléculas — ' +
+        'H<sub>2</sub>, N<sub>2</sub> e O<sub>2</sub>.');
+    }
+  },
+
+  /* =========================================================
+     QUESTÃO 5 — a teoria que saiu dos gases nobres.
+
+     As três alternativas erradas são teorias de verdade, e das
+     que a turma já ouviu falar. Nomes inventados seriam fáceis
+     de descartar por estranheza; assim o aluno precisa saber
+     do que cada uma trata, que é o que a questão cobra.
+
+     Cada alternativa traz o nome e, embaixo, o que a teoria diz
+     — senão a questão viraria decoreba de nome.
+     ========================================================= */
+  {
+    tipo: 'teoria do octeto',
+    titulo: 'O segredo dos gases nobres',
+    enunciado: 'Os gases nobres vivem sozinhos, um átomo de cada vez, e mesmo assim são ' +
+               'estáveis. O que eles têm que os outros não têm? Dessa pergunta nasceu a ' +
+               'teoria que explica as ligações.',
+
+    opcoes: [
+      {
+        texto: 'Teoria Atômica de Dalton',
+        detalhe: 'Toda matéria é feita de átomos: bolinhas maciças, que não se pode dividir.',
+        certa: false,
+        texto_gabarito:
+          'Essa é a teoria da <b>questão 2</b> — ela diz <b>do que</b> a matéria é feita, não ' +
+          '<b>por que</b> os átomos se ligam. E, para Dalton, o átomo era maciço e sem ' +
+          'elétrons: nem havia como explicar a estabilidade por eles. A resposta é a <b>2</b>.'
+      },
+      {
+        texto: 'Teoria do Octeto',
+        detalhe: 'Um átomo fica estável com oito elétrons na última camada — o que os gases ' +
+                 'nobres já têm.',
+        certa: true,
+        texto_gabarito:
+          'Isso. A <b>Teoria do Octeto</b>: o átomo fica estável quando completa <b>oito ' +
+          'elétrons na última camada</b>, exatamente o que os gases nobres já têm sem ' +
+          'precisar de ninguém. Todos os outros correm atrás desse oito — doando, recebendo ' +
+          'ou compartilhando elétrons —, e é por isso que se ligam. Quem organizou a ideia ' +
+          'foi Lewis, em 1916, o mesmo da questão 1. (Há exceções: o hidrogênio, por ' +
+          'exemplo, se contenta com dois.)'
+      },
+      {
+        texto: 'Modelo Atômico de Rutherford',
+        detalhe: 'O átomo tem um núcleo pequeno e pesado, com os elétrons girando em volta.',
+        certa: false,
+        texto_gabarito:
+          'Rutherford mostrou <b>onde ficam</b> o núcleo e os elétrons — a planta do átomo, ' +
+          'não a explicação da estabilidade. Foi um degrau necessário, mas quem responde à ' +
+          'pergunta é a <b>Teoria do Octeto</b>, alternativa <b>2</b>.'
+      },
+      {
+        texto: 'Lei da Conservação das Massas',
+        detalhe: 'Numa reação química, a massa no fim é igual à massa do começo.',
+        certa: false,
+        texto_gabarito:
+          'Essa é a lei de Lavoisier, sobre a <b>massa</b> nas reações: o que entra é igual ao ' +
+          'que sai. Verdadeira, mas de outro assunto — não fala de elétrons nem de ' +
+          'estabilidade. A resposta é a <b>2</b>.'
+      }
+    ],
+
+    montar(corpo, api){ escolherAlternativa(corpo, api, this); },
+    comentario(resposta){
+      return comentarioDeEscolha(this.opcoes, resposta,
+        'Ficou em branco. É a <b>Teoria do Octeto</b>, alternativa 2: o átomo fica estável ' +
+        'com oito elétrons na última camada — o que os gases nobres já têm de nascença.');
+    }
+  },
+
+  /* =========================================================
+     QUESTÃO 6 — o octeto aplicado, quatro vezes.
+
+     Aqui a teoria da questão 5 vira ferramenta. São quatro
+     perguntas iguais, uma por átomo, e por isso um cubo: a
+     pergunta fica parada e o sujeito é que gira.
+
+     A quinta alternativa — "já está estável" — nunca é a certa
+     nestes quatro. Ela existe porque é a resposta dos gases
+     nobres, e o aluno precisa saber quando NÃO usar.
+
+     A nota é do conjunto: acerta quem acerta os quatro. O
+     gabarito, no fim, comenta átomo por átomo.
+     ========================================================= */
+  {
+    tipo: 'octeto na prática',
+    titulo: 'O que cada átomo faz para se estabilizar',
+    enunciado: 'Use a Teoria do Octeto: para ficar estável, o átomo precisa de oito ' +
+               'elétrons na última camada. O que cada um destes faz para chegar lá?',
+
+    /* Três alternativas por átomo, e não as mesmas para todos: o
+       número de elétrons muda de um para o outro. O que se cobra
+       é a DIREÇÃO — ganhar ou perder —, mais a recusa da terceira,
+       que é a resposta dos gases nobres e nunca serve aqui.
+       A certa muda de posição de propósito. */
+    atomos: [
+      { simbolo:'Na', z:11, nome:'Sódio',    camadas:[2,8,1], nobre:'Ne',
+        pauling:'1s² 2s² 2p⁶ 3s¹', certa:1,
+        opcoes:['Ganha 1 elétron','Perde 1 elétron','Não ganha nem perde: já está estável'] },
+
+      { simbolo:'Mg', z:12, nome:'Magnésio', camadas:[2,8,2], nobre:'Ne',
+        pauling:'1s² 2s² 2p⁶ 3s²', certa:0,
+        opcoes:['Perde 2 elétrons','Ganha 2 elétrons','Não ganha nem perde: já está estável'] },
+
+      { simbolo:'O',  z:8,  nome:'Oxigênio', camadas:[2,6],   nobre:'Ne',
+        pauling:'1s² 2s² 2p⁴', certa:1,
+        opcoes:['Perde 2 elétrons','Ganha 2 elétrons','Não ganha nem perde: já está estável'] },
+
+      { simbolo:'Cl', z:17, nome:'Cloro',    camadas:[2,8,7], nobre:'Ar',
+        pauling:'1s² 2s² 2p⁶ 3s² 3p⁵', certa:0,
+        opcoes:['Ganha 1 elétron','Perde 1 elétron','Não ganha nem perde: já está estável'] }
+    ],
+
+    nobres: {
+      Ne: { simbolo:'Ne', z:10, nome:'Neônio',  pauling:'1s² 2s² 2p⁶' },
+      Ar: { simbolo:'Ar', z:18, nome:'Argônio', pauling:'1s² 2s² 2p⁶ 3s² 3p⁶' }
+    },
+
+    montar(corpo, api){ escolherComportamento(corpo, api, this); },
+
+    comentario(respostas){
+      const letras = ['a','b','c','d'];
+      const porque = [
+        'o <b>sódio</b> tem 1 elétron sozinho na última camada. Perder esse um é bem mais ' +
+        'fácil do que buscar outros sete — e sem ele o sódio fica igualzinho ao neônio (2, 8)',
+        'o <b>magnésio</b> tem 2 na última camada. Solta os dois e vira 2, 8 — o neônio de novo',
+        'o <b>oxigênio</b> tem 6 na última camada e está a 2 de fechar o octeto. Puxa dois ' +
+        'e fica 2, 8',
+        'o <b>cloro</b> tem 7 e falta só 1. Pega esse um e fecha em 2, 8, 8 — o argônio'
+      ];
+      const lista = (Array.isArray(respostas) ? respostas : [null,null,null,null]);
+      const linhas = this.atomos.map((a,k) => {
+        const dada  = lista[k];
+        const marca = dada === null || dada === undefined ? '<span class="nao">–</span>'
+                    : (dada === a.certa ? '<span class="ok">✓</span>'
+                                        : '<span class="nao">✕</span>');
+        return '<br>' + marca + ' <b>' + letras[k] + ') ' + a.simbolo + '</b> — ' +
+               a.opcoes[a.certa].toLowerCase() + ': ' + porque[k] + '.';
+      }).join('');
+      const acertos = this.atomos.filter((a,k) => lista[k] === a.certa).length;
+      return 'Você acertou <b>' + acertos + ' de 4</b> átomos.' + linhas +
+             '<br><br>A alternativa “já está estável” não servia para nenhum deles: essa é a ' +
+             'resposta dos gases nobres, que já nascem com a camada cheia.';
+    }
+  },
+
+  /* =========================================================
+     QUESTÃO 7 — desenhar a estabilidade, elétron por elétron.
+
+     A questão 6 pedia para DIZER o que o átomo faz. Esta pede
+     para FAZER: arrancar e entregar elétrons no símbolo de Lewis,
+     com o mesmo gesto do slide 7 da aula.
+
+     O quarto exemplo é um gás nobre, e nele o certo é não mexer
+     em nada — só confirmar. Isso não está escrito em lugar nenhum
+     de propósito: perceber que ali não há o que fazer é a
+     pergunta, não a instrução.
+     ========================================================= */
+  {
+    tipo: 'modelo de Rutherford',
+    titulo: 'Estabilize cada átomo',
+    enunciado: 'Observe a distribuição eletrônica dos átomos a seguir e acrescente ou ' +
+               'retire elétrons a fim de estabilizar o átomo.',
+
+    /* z = quantos elétrons o átomo neutro tem, e é com esses que ele
+       nasce na tela; alvo = com quantos ele fica estável, ou seja, o
+       total do gás nobre mais próximo. Como agora o desenho é de
+       camadas, o que se conta é o total, não só a última camada. */
+    exemplos: [
+      { simbolo:'Li', nome:'Lítio',      z:3,  cor:'#CC80FF', alvo:2,  nobre:'hélio'   },
+      { simbolo:'F',  nome:'Flúor',      z:9,  cor:'#90E050', alvo:10, nobre:'neônio'  },
+      { simbolo:'S',  nome:'Enxofre',    z:16, cor:'#FFFF30', alvo:18, nobre:'argônio' },
+      { simbolo:'H',  nome:'Hidrogênio', z:1,  cor:'#FFFFFF', alvo:2,  nobre:'hélio'   },
+      { simbolo:'Al', nome:'Alumínio',   z:13, cor:'#BFA6A6', alvo:10, nobre:'neônio'  },
+      { simbolo:'N',  nome:'Nitrogênio', z:7,  cor:'#3050F8', alvo:10, nobre:'neônio'  }
+    ],
+
+    montar(corpo, api){ escolherLewis(corpo, api, this); },
+
+    comentario(feitos){
+      const letras = ['a','b','c','d','e','f'];
+      const porque = [
+        'tem 3 elétrons (2, 1). Solta o único da camada de fora e sobram 2 — a camada K ' +
+        'cheia, que é o <b>hélio</b>. Vira Li⁺',
+        'tem 9 (2, 7) e falta 1 para fechar o octeto. Puxa um e chega a 10 (2, 8) — o ' +
+        '<b>neônio</b>. Vira F⁻',
+        'tem 16 (2, 8, 6) e faltam 2. Puxa dois e chega a 18 (2, 8, 8) — o <b>argônio</b>. ' +
+        'Vira S²⁻',
+        'é a exceção: com uma camada só, ele se estabiliza com <b>2</b> elétrons, e não com ' +
+        'oito. Puxa um e fica igual ao <b>hélio</b>. Vira H⁻',
+        'tem 13 (2, 8, 3). Solta os três de fora e sobram 10 (2, 8) — o <b>neônio</b>. ' +
+        'Vira Al³⁺',
+        'tem 7 (2, 5) e faltam 3. Puxa três e chega a 10 (2, 8) — o <b>neônio</b>. Vira N³⁻'
+      ];
+      const lista = Array.isArray(feitos) ? feitos : this.exemplos.map(() => null);
+      const linhas = this.exemplos.map((ex,k) => {
+        const dado = lista[k];
+        const marca = dado === null || dado === undefined ? '<span class="nao">–</span>'
+                    : (dado === ex.alvo ? '<span class="ok">✓</span>'
+                                        : '<span class="nao">✕</span>');
+        return '<br>' + marca + ' <b>' + letras[k] + ') ' + ex.simbolo + '</b> — ' +
+               'devia ficar com <b>' + ex.alvo + ' elétrons</b>: o ' +
+               ex.nome.toLowerCase() + ' ' + porque[k] + '.';
+      }).join('');
+      const acertos = this.exemplos.filter((ex,k) => lista[k] === ex.alvo).length;
+      return 'Você acertou <b>' + acertos + ' de ' + this.exemplos.length +
+             '</b> átomos.' + linhas;
+    }
+  }
+
+];
+
+/* ============================================================
+   A NOTA CHEGA AO PROFESSOR
+
+   Quando o aluno entrega, a prova manda o resultado para um
+   FORMULÁRIO GOOGLE seu, e as respostas caem numa planilha que
+   só você vê. Não precisa de servidor nem de conta paga.
+
+   PARA LIGAR — cinco minutos, uma vez só:
+
+   1. Crie um Formulário Google com SEIS perguntas de "resposta
+      curta", nesta ordem e sem obrigatoriedade:
+         Nome · Turma · Turno · Nota · Acertos · Detalhe
+   2. No formulário, menu ⋮ → "Obter link preenchido previamente".
+      Escreva qualquer coisa em cada campo e clique em "Obter link".
+   3. O link copiado tem trechos assim:
+         entry.1234567890=teste&entry.9876543210=teste2...
+      Cada 'entry.NÚMERO' é uma pergunta, na ordem em que você as
+      criou. Copie os seis números para os campos abaixo.
+   4. Troque a parte final do endereço: onde termina em
+      '/viewform', use '/formResponse'. Cole em 'url'.
+   5. Ponha 'ativo: true'.
+
+   O QUE ESPERAR, com honestidade:
+   · precisa de internet NA HORA da entrega. Sem rede, a prova
+     avisa o aluno e o PDF continua valendo como comprovante;
+   · o navegador não deixa a página ler a resposta do Google, então
+     ela sabe que enviou, mas não recebe confirmação de volta. Por
+     isso o comprovante impresso continua ali;
+   · isto roda no computador do aluno. Um aluno que entenda de
+     navegador consegue forjar a nota. Para uma prova em sala, com
+     você na sala, isso costuma bastar — se um dia precisar de algo
+     à prova de fraude, aí sim é caso de servidor.
+   ============================================================ */
+const ENVIO = {
+  ativo: true,
+  url: 'https://docs.google.com/forms/d/e/' +
+       '1FAIpQLSerpi9JTqpfRMGlgOuP2gWS7B2oMsIeIt3Adm7aCk_B2Cu6Hw/formResponse',
+  campos: {
+    nome:    'entry.1743318295',
+    turma:   'entry.1351245089',
+    turno:   'entry.191858940',
+    nota:    'entry.2016560989',
+    acertos: 'entry.780945658',
+    detalhe: 'entry.252197904'
+  }
+};
+
+function enviarNota(dados){
+  if (!ENVIO.ativo || !ENVIO.url) return Promise.resolve('desligado');
+  const corpo = new URLSearchParams();
+  Object.keys(ENVIO.campos).forEach(k => {
+    if (dados[k] !== undefined) corpo.append(ENVIO.campos[k], dados[k]);
+  });
+  /* 'no-cors' é o preço de mandar direto para o Google sem
+     servidor: o envio acontece, mas a resposta vem lacrada */
+  return fetch(ENVIO.url, { method:'POST', mode:'no-cors', body:corpo })
+           .then(() => 'enviado')
+           .catch(() => 'falhou');
+}
+
+/* ---------- estado ---------- */
+const CHAVE = 'prova-ligacoes-v1';
+const estado = {
+  aluno: { nome:'', turma:'', turno:'' },
+  indice: 0,
+  respostas: {},          // indice → { resposta, acertou }
+  entregue: false
+};
+
+/* Quatro horas: mais que uma aula, menos que um dia. Passou disso,
+   o que está salvo é de outra turma e não serve para ninguém. */
+const VALIDADE = 4 * 60 * 60 * 1000;
+
+function salvar(){
+  estado.quando = Date.now();
+  try { localStorage.setItem(CHAVE, JSON.stringify(estado)); } catch(e){}
+}
+function recuperar(){
+  try {
+    const bruto = localStorage.getItem(CHAVE);
+    if (!bruto) return null;
+    const dado = JSON.parse(bruto);
+    if (dado.quando && Date.now() - dado.quando > VALIDADE) { esquecer(); return null; }
+    return dado;
+  } catch(e){ return null; }
+}
+/* O Chromebook não é de ninguém: sai um aluno, entra outro. Isto
+   apaga o rastro do anterior — chamado pelo "não sou eu" da capa
+   e pelo "encerrar" do fim. */
+function esquecer(){
+  try { localStorage.removeItem(CHAVE); } catch(e){}
+}
+
+/* ---------- atalhos ---------- */
+const $ = s => document.querySelector(s);
+const telas = { capa:$('#tela-capa'), prova:$('#tela-prova'), fim:$('#tela-fim') };
+function mostrar(qual){
+  Object.entries(telas).forEach(([k,el]) => { el.hidden = (k !== qual); });
+  window.scrollTo(0,0);
+}
+
+/* ============================================================
+   A CAPA: a ficha do aluno
+   ============================================================ */
+const ficha = { nome:$('#nome'), turma:$('#turma'), turno:$('#turno') };
+const aviso = $('#aviso');
+
+/* O turno já está escrito na turma — 901M é manhã, 902T é tarde.
+   Perguntar de novo é pedir ao aluno que repita o que acabou de
+   dizer, então preenchemos por ele. O campo continua aberto. */
+ficha.turma.addEventListener('change', () => {
+  const t = ficha.turma.value;
+  if (t.endsWith('M')) ficha.turno.value = 'Manhã';
+  if (t.endsWith('T')) ficha.turno.value = 'Tarde';
+  limparErros();
 });
+ficha.nome.addEventListener('input', limparErros);
+ficha.turno.addEventListener('change', limparErros);
+
+function limparErros(){
+  aviso.textContent = '';
+  ['#campo-nome','#campo-turma','#campo-turno']
+    .forEach(s => $(s).classList.remove('erro'));
+}
+
+function validarFicha(){
+  limparErros();
+  const faltas = [];
+  if (ficha.nome.value.trim().length < 3){ $('#campo-nome').classList.add('erro');  faltas.push('seu nome'); }
+  if (!ficha.turma.value)                { $('#campo-turma').classList.add('erro'); faltas.push('a turma');  }
+  if (!ficha.turno.value)                { $('#campo-turno').classList.add('erro'); faltas.push('o turno');  }
+  if (faltas.length){
+    aviso.textContent = 'Antes de começar, preencha ' + faltas.join(', ') + '.';
+    return false;
+  }
+  return true;
+}
+
+$('#comecar').addEventListener('click', () => {
+  if (!validarFicha()) return;
+  estado.aluno = {
+    nome:  ficha.nome.value.trim(),
+    turma: ficha.turma.value,
+    turno: ficha.turno.value
+  };
+  salvar();
+  /* quem já entregou e voltou não recomeça a prova: vê o resultado */
+  if (estado.entregue) montarResultado();
+  else abrirProva();
+});
+
+/* ============================================================
+   A PROVA
+   ============================================================ */
+const palco = $('#palco');
+const regua = $('#regua');
+
+/* Uma questão pode ter etapas dentro dela — o cubo da questão 6
+   tem quatro átomos. Enquanto ela quiser ficar com o comando do
+   "Confirmar", guarda aqui a função que decide, e outra que diz
+   o que o botão deve escrever. Zerados a cada questão desenhada,
+   para não vazarem de uma para a outra. */
+let interceptaAvanco = null;
+let interceptaRotulo = null;
+
+/* O cabeçalho e a régua. Fica separado porque quem entrega, sai e
+   volta para revisar chega ao resultado sem passar pela prova —
+   e a moldura precisa estar montada do mesmo jeito. */
+function prepararProva(){
+  $('#topo-nome').textContent  = estado.aluno.nome;
+  $('#topo-turma').textContent = estado.aluno.turma + ' · ' + estado.aluno.turno;
+  $('#topo-total').textContent = QUESTOES.length;
+  montarRegua();
+}
+
+function abrirProva(){
+  prepararProva();
+
+  if (!QUESTOES.length){
+    mostrar('prova');
+    palco.innerHTML =
+      '<div class="q-cabeca">' +
+        '<div class="q-numero">Em construção</div>' +
+        '<h2 class="q-titulo">As questões ainda não entraram</h2>' +
+        '<p class="q-enunciado">A capa está pronta. As questões serão montadas ' +
+        'uma a uma dentro da lista <b>QUESTOES</b>, no início do script.</p>' +
+      '</div>';
+    $('#avancar').hidden = true;
+    return;
+  }
+  if (estado.indice >= QUESTOES.length) estado.indice = 0;
+  mostrar('prova');
+  desenhar();
+}
+
+function montarRegua(){
+  regua.innerHTML = '';
+  QUESTOES.forEach(() => regua.appendChild(document.createElement('span')));
+}
+
+function atualizarRegua(){
+  [...regua.children].forEach((b,i) => {
+    b.classList.toggle('respondida', i in estado.respostas);
+    b.classList.toggle('atual', i === estado.indice);
+  });
+}
+
+function desenhar(){
+  const i = estado.indice;
+  const q = QUESTOES[i];
+
+  palco.innerHTML = '';
+  interceptaAvanco = interceptaRotulo = null;
+
+  /* o cabeçalho é sempre igual — a questão cuida só do miolo */
+  const cabeca = document.createElement('div');
+  cabeca.className = 'q-cabeca';
+  cabeca.innerHTML =
+    '<div class="q-numero"></div><h2 class="q-titulo"></h2>' +
+    (q.enunciado ? '<p class="q-enunciado"></p>' : '');
+  cabeca.querySelector('.q-numero').textContent =
+    'Questão ' + (i+1) + (q.tipo ? ' · ' + q.tipo : '');
+  cabeca.querySelector('.q-titulo').textContent = q.titulo || '';
+  if (q.enunciado) cabeca.querySelector('.q-enunciado').textContent = q.enunciado;
+  palco.appendChild(cabeca);
+
+  const corpo = document.createElement('div');
+  corpo.className = 'q-corpo';
+  palco.appendChild(corpo);
+
+  const caixaRetorno = document.createElement('div');
+  palco.appendChild(caixaRetorno);
+
+  /* o contrato que a questão recebe */
+  const api = {
+    responder(resposta, acertou){
+      estado.respostas[i] = { resposta, acertou: !!acertou };
+      salvar();
+      atualizarRegua();
+      atualizarNavegacao();   /* "Pular" vira "Confirmar" */
+    },
+    resposta(){
+      return (i in estado.respostas) ? estado.respostas[i].resposta : null;
+    },
+    respondida(){ return i in estado.respostas; },
+    entregue(){  return !!estado.entregue; },   /* true só na revisão */
+    /* para questões com etapas internas: 'fn' devolve true se
+       tratou o "Confirmar" sozinha, e aí a prova não sai daqui;
+       'rotulo' devolve o que o botão deve dizer (ou null para
+       deixar a prova decidir) */
+    aoAvancar(fn, rotulo){ interceptaAvanco = fn; interceptaRotulo = rotulo || null; },
+    atualizarBotao(){ atualizarNavegacao(); },
+    retorno(html, acertou){
+      caixaRetorno.innerHTML = '';
+      const d = document.createElement('div');
+      d.className = 'q-retorno ' + (acertou ? 'certo' : 'errado');
+      d.innerHTML = html;
+      caixaRetorno.appendChild(d);
+    },
+    indice: i,
+    aluno: estado.aluno
+  };
+
+  q.montar(corpo, api);
+
+  $('#topo-atual').textContent = i + 1;
+  atualizarRegua();
+  atualizarNavegacao();
+}
+
+/* O único botão da prova. Some enquanto não há resposta marcada:
+   assim ele nunca é um jeito de escapar da questão, só o passo
+   seguinte de quem já decidiu. E confirmar é definitivo — daqui
+   não se volta. */
+function atualizarNavegacao(){
+  const i = estado.indice;
+  const ultima     = i === QUESTOES.length - 1;
+  const respondida = i in estado.respostas;
+  const av = $('#avancar');
+
+  /* A questão tem a primeira palavra. Ela pode devolver um texto,
+     ou false para esconder o botão (o cubo faz isso enquanto o
+     átomo da vez está sem resposta), ou null para deixar a prova
+     decidir. */
+  const pedido = interceptaRotulo ? interceptaRotulo() : null;
+  let rotulo, mostrar;
+
+  if (pedido === false){
+    rotulo = 'Confirmar'; mostrar = false;
+  } else if (pedido){
+    rotulo = pedido;      mostrar = true;
+  } else if (estado.entregue){
+    rotulo = ultima ? 'Voltar ao resultado' : 'Próxima'; mostrar = true;
+  } else {
+    rotulo = ultima ? 'Entregar' : 'Confirmar';          mostrar = respondida;
+  }
+
+  av.textContent = rotulo;
+  av.hidden = !mostrar;
+}
+
+$('#avancar').addEventListener('click', () => {
+  /* a questão atual pode querer o clique para si */
+  if (interceptaAvanco && interceptaAvanco()) return;
+  if (estado.indice < QUESTOES.length - 1){
+    estado.indice++; salvar(); desenhar();
+  } else if (estado.entregue){
+    mostrar('fim');            /* já entregou: o fim da revisão volta ao resultado */
+  } else {
+    entregar();
+  }
+});
+
+/* ============================================================
+   O FECHAMENTO
+   ============================================================ */
+function entregar(){
+  const total  = QUESTOES.length;
+  const faltam = total - Object.keys(estado.respostas).length;
+
+  if (faltam > 0){
+    const pergunta = faltam === 1
+      ? 'Falta 1 questão sem resposta. Entregar mesmo assim?'
+      : 'Faltam ' + faltam + ' questões sem resposta. Entregar mesmo assim?';
+    if (!confirm(pergunta)) return;
+  }
+
+  estado.entregue = true;
+  salvar();
+  montarResultado();
+}
+
+/* separado de entregar() porque também é por aqui que se volta ao
+   resultado depois — recarregando a página, ou saindo da revisão */
+function montarResultado(){
+  const total   = QUESTOES.length;
+  const acertos = Object.values(estado.respostas).filter(r => r.acertou).length;
+
+  prepararProva();   /* deixa a revisão pronta para quando ele clicar */
+
+  $('#fim-acertos').textContent = acertos;
+  $('#fim-total').textContent   = total;
+  $('#fim-nome').textContent    = estado.aluno.nome;
+  $('#fim-turma').textContent   = estado.aluno.turma;
+  $('#fim-turno').textContent   = estado.aluno.turno;
+  $('#fim-data').textContent    = new Date().toLocaleString('pt-BR', {
+    day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'
+  });
+
+  /* O gabarito mora aqui, e só aqui: durante a prova ninguém
+     soube de nada. Cada questão explica a própria resposta —
+     inclusive a errada que o aluno escolheu, que costuma ser a
+     parte que ensina. */
+  const mapa = $('#fim-mapa');
+  mapa.innerHTML = '';
+  QUESTOES.forEach((q,i) => {
+    const r    = estado.respostas[i];
+    const como = !r ? 'vazio' : (r.acertou ? 'certo' : 'errado');
+    const selo = !r ? '–'     : (r.acertou ? '✓' : '✕');
+    const li = document.createElement('li');
+    li.innerHTML = '<span class="selo ' + como + '">' + selo + '</span>' +
+                   '<div class="detalhe"><span class="rotulo"></span></div>';
+    li.querySelector('.rotulo').textContent =
+      (i+1) + '. ' + (q.titulo || '') + (q.tipo ? '  ·  ' + q.tipo : '');
+    if (typeof q.comentario === 'function'){
+      const p = document.createElement('p');
+      p.className = 'comentario';
+      p.innerHTML = q.comentario(r ? r.resposta : null);
+      li.querySelector('.detalhe').appendChild(p);
+    }
+    mapa.appendChild(li);
+  });
+
+  cuidarDoEnvio(acertos, total);
+  mostrar('fim');
+}
+
+/* Manda a nota uma vez só. Se falhar, o aluno vê e pode tentar de
+   novo — e o PDF continua sendo a saída que não depende de rede. */
+function cuidarDoEnvio(acertos, total){
+  const linha = $('#envio');
+  if (!ENVIO.ativo){ linha.hidden = true; return; }
+  linha.hidden = false;
+
+  if (estado.enviado){
+    linha.className = 'envio ok';
+    linha.textContent = 'Nota enviada ao professor.';
+    return;
+  }
+
+  const nota = total ? (acertos * 10 / total) : 0;
+  const detalhe = QUESTOES.map((q,i) => {
+    const r = estado.respostas[i];
+    return (i+1) + (!r ? '–' : (r.acertou ? '✓' : '✕'));
+  }).join(' ');
+
+  linha.className = 'envio indo';
+  linha.textContent = 'Enviando ao professor…';
+
+  enviarNota({
+    nome:    estado.aluno.nome,
+    turma:   estado.aluno.turma,
+    turno:   estado.aluno.turno,
+    nota:    nota.toFixed(1).replace('.', ','),
+    acertos: acertos + ' de ' + total,
+    detalhe: detalhe
+  }).then(saida => {
+    if (saida === 'enviado'){
+      estado.enviado = true; salvar();
+      linha.className = 'envio ok';
+      linha.textContent = 'Nota enviada ao professor.';
+    } else {
+      linha.className = 'envio falhou';
+      linha.innerHTML = 'Não deu para enviar — o computador parece estar sem internet. ' +
+                        'Salve o PDF e mostre ao professor. ' +
+                        '<button type="button" class="link" id="reenviar">Tentar de novo</button>';
+      $('#reenviar').addEventListener('click', () => cuidarDoEnvio(acertos, total));
+    }
+  });
+}
+
+$('#imprimir').addEventListener('click', () => window.print());
+$('#revisar').addEventListener('click',  () => {
+  if (!QUESTOES.length) return;
+  mostrar('prova');
+  desenhar();
+});
+$('#encerrar').addEventListener('click', () => {
+  if (!confirm('Isto apaga suas respostas deste computador e libera para o próximo aluno. ' +
+               'Você já salvou ou imprimiu o resultado?')) return;
+  esquecer();
+  location.reload();
+});
+
+/* ============================================================
+   O TECLADO
+   Os números marcam a alternativa — qualquer questão que ponha
+   data-tecla="1", "2"… nas suas opções ganha isso de graça.
+
+   As setas não fazem nada, de propósito: navegar pela prova não
+   é uma coisa que exista. E o Enter só repete o que o botão
+   visível faria — se ele está escondido, o Enter também não anda.
+   ============================================================ */
+document.addEventListener('keydown', e => {
+  if (telas.prova.hidden) return;
+  if (e.ctrlKey || e.altKey || e.metaKey) return;
+  /* se o aluno está escrevendo numa resposta, o teclado é dele */
+  const alvo = e.target;
+  if (alvo && (alvo.tagName === 'INPUT' || alvo.tagName === 'TEXTAREA' ||
+               alvo.tagName === 'SELECT' || alvo.isContentEditable)) return;
+
+  if (e.key === 'Enter'){
+    if (alvo && alvo.tagName === 'BUTTON') return;   /* o foco já resolve */
+    const av = $('#avancar');
+    if (!av.hidden){ e.preventDefault(); av.click(); }
+  } else if (/^[1-9]$/.test(e.key)){
+    const escolha = palco.querySelector('[data-tecla="' + e.key + '"]');
+    if (escolha){ e.preventDefault(); escolha.click(); }
+  }
+});
+
+/* ============================================================
+   AO ABRIR
+   Se havia uma prova em andamento neste Chromebook, a ficha volta
+   preenchida — uma aba fechada sem querer, ou a tela bloqueando,
+   não pode custar a prova inteira.
+
+   Mas o aparelho é da escola: pode ser o MESMO aluno voltando ou
+   o PRÓXIMO sentando. Por isso a retomada nunca é silenciosa —
+   diz de quem é a prova e oferece a saída.
+   ============================================================ */
+$('#outro-aluno').addEventListener('click', () => {
+  esquecer();
+  location.reload();
+});
+
+(function inicio(){
+  const antigo = recuperar();
+  if (!antigo || !antigo.aluno || !antigo.aluno.nome) return;
+
+  ficha.nome.value  = antigo.aluno.nome;
+  ficha.turma.value = antigo.aluno.turma || '';
+  ficha.turno.value = antigo.aluno.turno || '';
+  estado.aluno     = antigo.aluno;
+  estado.respostas = antigo.respostas || {};
+  estado.indice    = antigo.indice || 0;
+
+  estado.entregue  = !!antigo.entregue;
+
+  if (Object.keys(estado.respostas).length){
+    $('#comecar').textContent = estado.entregue ? 'Ver o resultado' : 'Continuar';
+    $('#retomada-nome').textContent = antigo.aluno.nome;
+    $('#retomada-situacao').textContent =
+      estado.entregue ? 'já entregue' : 'em andamento';
+    $('#retomada').hidden = false;
+  }
+})();
 </script>
 
 </body>
