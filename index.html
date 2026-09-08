@@ -450,6 +450,10 @@ h1 em{font-style:normal;color:var(--amber)}
      questão 7) ou o par lado a lado (a 8), sem cada uma inventar
      o próprio jeito de se colocar no meio */
   display:flex;align-items:center;justify-content:center;gap:clamp(20px,5vw,64px);
+  /* a folga embaixo é onde mora a legenda com o símbolo e a
+     família: sem ela o centro fica no meio do átomo e a legenda
+     cai fora da mesa, que corta o que passa da borda */
+  padding-bottom:38px;
   border-radius:20px;overflow:hidden;
   background:
     radial-gradient(ellipse 60% 70% at 50% 45%,rgba(18,49,75,.55),rgba(7,22,38,0) 72%),
@@ -476,43 +480,77 @@ h1 em{font-style:normal;color:var(--amber)}
 /* no par os dois átomos são um pouco menores, para caberem lado a
    lado com folga de sobra entre eles — é por essa folga que o
    elétron viaja */
-.mesa.par .lw{--atomo:164px}
+.mesa.par .lw{--atomo:180px}
 .mesa.travada .lw{cursor:default}
 @keyframes lwEntra{from{transform:scale(.7);opacity:0}
                    to  {transform:scale(1);  opacity:1}}
 
 /* o núcleo: a mesma esfera CPK de antes, agora no centro do átomo */
-/* núcleo e símbolo acompanham o tamanho do átomo, para o desenho
-   ficar igual quer ele esteja sozinho, quer em par */
+/* ---------- o núcleo, feito de núcleons ----------
+   Um punhado de esferinhas amontoadas, como no material da aula.
+   São treze sempre: o desenho é um símbolo de núcleo, não a conta
+   dos prótons — vinte e sete esferas num círculo de 46px viram
+   mingau, e o número de núcleons não é o que esta prova pergunta. */
 .lw-bola{
   position:absolute;top:50%;left:50%;
-  width:calc(var(--atomo,186px) * .247);height:calc(var(--atomo,186px) * .247);
-  margin:calc(var(--atomo,186px) * -.1235) 0 0 calc(var(--atomo,186px) * -.1235);
-  border-radius:50%;display:grid;place-items:center;pointer-events:none;
-  box-shadow:0 6px 20px rgba(3,12,22,.6);
+  width:calc(var(--atomo,186px) * .27);height:calc(var(--atomo,186px) * .27);
+  margin:calc(var(--atomo,186px) * -.135) 0 0 calc(var(--atomo,186px) * -.135);
+  pointer-events:none;
+  filter:drop-shadow(0 4px 14px rgba(3,12,22,.6));
 }
-.lw-sim{
+.nucleon{
+  position:absolute;top:50%;left:50%;border-radius:50%;
+  width:var(--nd);height:var(--nd);
+  margin:calc(var(--nd) / -2) 0 0 calc(var(--nd) / -2);
+  background:radial-gradient(circle at 34% 28%,#FFD9B0 0%,#E08A47 42%,#A9541F 100%);
+}
+.nucleon.n{   /* o nêutron, mais pálido que o próton */
+  background:radial-gradient(circle at 34% 28%,#E8E2DA 0%,#B2A79C 45%,#6E655C 100%);
+}
+/* O símbolo sai de dentro do núcleo e vira legenda embaixo do
+   átomo — em cima das esferinhas ele não se leria. Debaixo dele, a
+   família, que é o que diz de quantos elétrons aquele átomo
+   precisa: quem é da 7A quer um, quem é da 2A quer soltar dois. */
+.lw-nome{
+  position:absolute;left:50%;top:100%;transform:translate(-50%,5px);
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  white-space:nowrap;pointer-events:none;
+}
+.lw-nome .sim{
   font-family:var(--mono);font-weight:500;line-height:1;
-  font-size:calc(var(--atomo,186px) * .102);
-  color:#FFFFFF;text-shadow:0 2px 8px rgba(4,12,20,.8);
+  font-size:calc(var(--atomo,186px) * .092);
+}
+.lw-nome .fam{
+  font-style:normal;font-family:var(--mono);line-height:1;
+  font-size:calc(var(--atomo,186px) * .058);
+  letter-spacing:.08em;color:var(--paper-far);
 }
 
-/* cada camada é um anel; --d é o diâmetro dela */
+/* cada camada é um anel pontilhado; --d é o diâmetro dela */
 .camada{
   position:absolute;top:50%;left:50%;
   width:var(--d);height:var(--d);
   margin:calc(var(--d) / -2) 0 0 calc(var(--d) / -2);
-  border:1px solid rgba(69,199,176,.3);border-radius:50%;
+  border:2px dotted rgba(232,241,245,.34);border-radius:50%;
   pointer-events:none;animation:camadaEntra .32s ease both;
 }
 @keyframes camadaEntra{from{opacity:0;transform:scale(.85)} to{opacity:1;transform:none}}
 /* o elétron é girado até seu lugar no anel e empurrado até a borda */
 .e-r{
-  position:absolute;top:50%;left:50%;width:11px;height:11px;
-  margin:-5.5px 0 0 -5.5px;border-radius:50%;
-  background:var(--amber);box-shadow:0 0 10px rgba(240,180,74,.85);
+  position:absolute;top:50%;left:50%;
+  width:calc(var(--atomo,186px) * .057);height:calc(var(--atomo,186px) * .057);
+  margin:calc(var(--atomo,186px) * -.0285) 0 0 calc(var(--atomo,186px) * -.0285);
+  border-radius:50%;
+  background:radial-gradient(circle at 34% 30%,#FFE9A8 0%,#F0B44A 45%,#C98A22 100%);
+  box-shadow:0 0 12px rgba(240,180,74,.9);
   transform:rotate(var(--a)) translateY(calc(var(--d) / -2));
   animation:eNasceAnel .26s cubic-bezier(.2,1.5,.4,1);
+}
+/* Os das camadas de dentro ficam apagados. Quem faz ligação é a
+   camada de fora, e é para ela que o olho tem de ir sozinho. */
+.e-r.interno{
+  background:radial-gradient(circle at 34% 30%,#D6E2EC 0%,#94A9BC 45%,#5C6B7A 100%);
+  box-shadow:0 0 8px rgba(148,169,188,.5);
 }
 /* O nascimento precisa repetir o rotate e o translate: um keyframe
    que só diga scale() substitui o transform inteiro, e o elétron
@@ -1622,14 +1660,6 @@ function camadasDe(total){
   return c;
 }
 
-/* O símbolo escrito em cima da esfera: branco não serve para todo
-   mundo — o hidrogênio é branco no padrão CPK, e branco sobre
-   branco não se lê. A conta é o brilho percebido da cor. */
-function corDoTexto(hex){
-  const n = parseInt(hex.slice(1), 16);
-  const brilho = .299 * ((n >> 16) & 255) + .587 * ((n >> 8) & 255) + .114 * (n & 255);
-  return brilho > 150 ? '#0B1F32' : '#FFFFFF';
-}
 
 /* ------------------------------------------------------------
    O ÁTOMO DE RUTHERFORD, DESENHADO
@@ -1640,17 +1670,40 @@ function corDoTexto(hex){
    (um átomo só) e menor (o par lado a lado).
    ------------------------------------------------------------ */
 const TAMANHO_ATOMO = 186;      /* o átomo sozinho */
-const TAMANHO_PAR   = 164;      /* cada um do par */
-const FRACOES = [.42, .71, .99, .99];
+const TAMANHO_PAR   = 180;      /* cada um do par */
+/* Diâmetro de cada camada, em fração da caixa. A primeira precisa
+   passar bem longe do núcleo: encostada nele, os dois elétrons da
+   camada K viravam parte do amontoado. */
+const FRACOES = [.46, .72, .98, .98];
+
+/* O amontoado do núcleo: um ponto no meio, seis em volta e mais
+   seis nas quinas — treze esferinhas numa colmeia. As posições são
+   fixas, para o núcleo não tremer a cada redesenho. */
+const NUCLEONS = [
+  [0,0],
+  [1,0],[.5,.866],[-.5,.866],[-1,0],[-.5,-.866],[.5,-.866],
+  [1.5,.866],[0,1.732],[-1.5,.866],[-1.5,-.866],[0,-1.732],[1.5,-.866]
+];
 
 function desenhaRutherford(lw, ex, total, novo, tamanho){
   const bola = lw.querySelector('.lw-bola');
-  const sim  = lw.querySelector('.lw-sim');
-  bola.style.background = esferaBg(ex.cor);
+  if (!bola.dataset.pronto){
+    const nd = tamanho * .059;                    /* lado da esferinha */
+    bola.style.setProperty('--nd', nd.toFixed(1) + 'px');
+    NUCLEONS.forEach(([x,y], i) => {
+      const n = document.createElement('i');
+      n.className = 'nucleon' + (i % 3 === 1 ? ' n' : '');
+      n.style.marginLeft = (x * nd * .95 - nd/2).toFixed(1) + 'px';
+      n.style.marginTop  = (y * nd * .95 - nd/2).toFixed(1) + 'px';
+      bola.appendChild(n);
+    });
+    bola.dataset.pronto = '1';
+  }
+
+  const sim = lw.querySelector('.lw-nome .sim');
   sim.textContent = ex.simbolo;
-  sim.style.color = corDoTexto(ex.cor);
-  sim.style.textShadow = corDoTexto(ex.cor) === '#FFFFFF'
-    ? '0 2px 8px rgba(4,12,20,.8)' : 'none';
+  sim.style.color = ex.cor;
+  lw.querySelector('.lw-nome .fam').textContent = 'família ' + ex.familia;
 
   lw.querySelectorAll('.camada, .lw-carga').forEach(x => x.remove());
 
@@ -1663,15 +1716,21 @@ function desenhaRutherford(lw, ex, total, novo, tamanho){
     const anel = document.createElement('span');
     anel.className = 'camada';
     anel.style.setProperty('--d', d.toFixed(1) + 'px');
+    const deFora = i === camadas.length - 1;
     for (let k = 0; k < quantos; k++){
       const e = document.createElement('i');
-      e.className = 'e-r';
-      /* começa no topo e distribui a volta inteira por igual */
-      e.style.setProperty('--a', (-90 + k * 360 / quantos).toFixed(1) + 'deg');
+      /* só a camada de fora acende: é a que faz ligação */
+      e.className = 'e-r' + (deFora ? '' : ' interno');
+      /* Começa no topo e distribui a volta por igual. Zero grau é o
+         topo porque o rotate gira antes do translateY: quem sai do
+         zero anda para cima, e não para o lado.
+
+         Cada camada entra girada 22° em relação à de dentro: sem
+         isso os elétrons se empilham numa coluna vertical e o
+         desenho vira uma grade, não um átomo. */
+      e.style.setProperty('--a', (i * 22 + k * 360 / quantos).toFixed(1) + 'deg');
       /* o que acabou de chegar é o último da camada de fora */
-      if (novo && i === camadas.length - 1 && k === quantos - 1){
-        e.classList.add('novo');
-      }
+      if (novo && deFora && k === quantos - 1) e.classList.add('novo');
       anel.appendChild(e);
     }
     lw.appendChild(anel);
@@ -1697,18 +1756,6 @@ function desenhaRutherford(lw, ex, total, novo, tamanho){
     c.style.top  = (tamanho / 2 - r).toFixed(0) + 'px';
     lw.appendChild(c);
   }
-}
-
-/* a esfera do elemento: luz no canto de cima à esquerda, cor CPK */
-function esferaBg(hex){
-  const n = parseInt(hex.slice(1), 16);
-  const rgb = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-  const tom = f => 'rgb(' + rgb.map(v =>
-    Math.round(f > 0 ? v + (255 - v) * f : v * (1 + f))).join(',') + ')';
-  return 'radial-gradient(circle at 33% 27%,rgba(255,255,255,.95) 0%,' +
-         'rgba(255,255,255,.55) 5%,rgba(255,255,255,0) 22%),' +
-         'radial-gradient(circle at 36% 30%,' + tom(.4) + ' 0%,' + hex + ' 30%,' +
-         tom(-.62) + ' 62%,' + tom(-.28) + ' 100%)';
 }
 
 
@@ -1741,7 +1788,7 @@ function escolherLewis(corpo, api, q){
       'aparecer e solte em cima dele.</p>' +
     '</div>' +
     '<div class="mesa">' +
-      '<div class="lw"><div class="lw-bola"><span class="lw-sim"></span></div></div>' +
+      '<div class="lw"><div class="lw-bola"></div><span class="lw-nome"><b class="sim"></b><i class="fam"></i></span></div>' +
     '</div>';
   corpo.appendChild(bloco);
 
@@ -2041,8 +2088,8 @@ function escolherTransferencia(corpo, api, q){
       'precisa ganhar. Solte fora dos átomos para devolvê-lo.</p>' +
     '</div>' +
     '<div class="mesa par">' +
-      '<div class="lw esq"><div class="lw-bola"><span class="lw-sim"></span></div></div>' +
-      '<div class="lw dir"><div class="lw-bola"><span class="lw-sim"></span></div></div>' +
+      '<div class="lw esq"><div class="lw-bola"></div><span class="lw-nome"><b class="sim"></b><i class="fam"></i></span></div>' +
+      '<div class="lw dir"><div class="lw-bola"></div><span class="lw-nome"><b class="sim"></b><i class="fam"></i></span></div>' +
     '</div>';
   corpo.appendChild(bloco);
 
@@ -2689,12 +2736,12 @@ const QUESTOES = [
        total do gás nobre mais próximo. Como agora o desenho é de
        camadas, o que se conta é o total, não só a última camada. */
     exemplos: [
-      { simbolo:'Li', nome:'Lítio',      z:3,  cor:'#CC80FF', alvo:2,  nobre:'hélio'   },
-      { simbolo:'F',  nome:'Flúor',      z:9,  cor:'#90E050', alvo:10, nobre:'neônio'  },
-      { simbolo:'S',  nome:'Enxofre',    z:16, cor:'#FFFF30', alvo:18, nobre:'argônio' },
-      { simbolo:'H',  nome:'Hidrogênio', z:1,  cor:'#FFFFFF', alvo:2,  nobre:'hélio'   },
-      { simbolo:'Al', nome:'Alumínio',   z:13, cor:'#BFA6A6', alvo:10, nobre:'neônio'  },
-      { simbolo:'N',  nome:'Nitrogênio', z:7,  cor:'#3050F8', alvo:10, nobre:'neônio'  }
+      { simbolo:'Li', nome:'Lítio',      z:3,  cor:'#CC80FF', alvo:2,  familia:'1A', nobre:'hélio'   },
+      { simbolo:'F',  nome:'Flúor',      z:9,  cor:'#90E050', alvo:10, familia:'7A', nobre:'neônio'  },
+      { simbolo:'S',  nome:'Enxofre',    z:16, cor:'#FFFF30', alvo:18, familia:'6A', nobre:'argônio' },
+      { simbolo:'H',  nome:'Hidrogênio', z:1,  cor:'#FFFFFF', alvo:2,  familia:'1A', nobre:'hélio'   },
+      { simbolo:'Al', nome:'Alumínio',   z:13, cor:'#BFA6A6', alvo:10, familia:'3A', nobre:'neônio'  },
+      { simbolo:'N',  nome:'Nitrogênio', z:7,  cor:'#3050F8', alvo:10, familia:'5A', nobre:'neônio'  }
     ],
 
     montar(corpo, api){ escolherLewis(corpo, api, this); },
@@ -2759,16 +2806,16 @@ const QUESTOES = [
     /* z = elétrons do átomo neutro; alvo = os do gás nobre mais
        próximo. O da esquerda é sempre quem doa. */
     pares: [
-      [ { simbolo:'Na', nome:'Sódio',     z:11, alvo:10, cor:'#AB5CF2' },
-        { simbolo:'Cl', nome:'Cloro',     z:17, alvo:18, cor:'#26D926' } ],
-      [ { simbolo:'Mg', nome:'Magnésio',  z:12, alvo:10, cor:'#8AFF00' },
-        { simbolo:'O',  nome:'Oxigênio',  z:8,  alvo:10, cor:'#FF0D0D' } ],
-      [ { simbolo:'Ca', nome:'Cálcio',    z:20, alvo:18, cor:'#3DFF00' },
-        { simbolo:'S',  nome:'Enxofre',   z:16, alvo:18, cor:'#FFFF30' } ],
-      [ { simbolo:'K',  nome:'Potássio',  z:19, alvo:18, cor:'#8F40D4' },
-        { simbolo:'F',  nome:'Flúor',     z:9,  alvo:10, cor:'#90E050' } ],
-      [ { simbolo:'Al', nome:'Alumínio',  z:13, alvo:10, cor:'#BFA6A6' },
-        { simbolo:'N',  nome:'Nitrogênio',z:7,  alvo:10, cor:'#3050F8' } ]
+      [ { simbolo:'Na', nome:'Sódio',     z:11, alvo:10, cor:'#AB5CF2', familia:'1A' },
+        { simbolo:'Cl', nome:'Cloro',     z:17, alvo:18, cor:'#26D926', familia:'7A' } ],
+      [ { simbolo:'Mg', nome:'Magnésio',  z:12, alvo:10, cor:'#8AFF00', familia:'2A' },
+        { simbolo:'O',  nome:'Oxigênio',  z:8,  alvo:10, cor:'#FF0D0D', familia:'6A' } ],
+      [ { simbolo:'Ca', nome:'Cálcio',    z:20, alvo:18, cor:'#3DFF00', familia:'2A' },
+        { simbolo:'S',  nome:'Enxofre',   z:16, alvo:18, cor:'#FFFF30', familia:'6A' } ],
+      [ { simbolo:'K',  nome:'Potássio',  z:19, alvo:18, cor:'#8F40D4', familia:'1A' },
+        { simbolo:'F',  nome:'Flúor',     z:9,  alvo:10, cor:'#90E050', familia:'7A' } ],
+      [ { simbolo:'Al', nome:'Alumínio',  z:13, alvo:10, cor:'#BFA6A6', familia:'3A' },
+        { simbolo:'N',  nome:'Nitrogênio',z:7,  alvo:10, cor:'#3050F8', familia:'5A' } ]
     ],
 
     /* quantos elétrons têm de passar da esquerda para a direita */
