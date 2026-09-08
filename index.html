@@ -498,11 +498,12 @@ h1 em{font-style:normal;color:var(--amber)}
   pointer-events:none;
   filter:drop-shadow(0 4px 14px rgba(3,12,22,.6));
 }
+/* tamanho, posição, brilho e ordem vêm do JS: dependem da
+   profundidade de cada esferinha no amontoado */
 .nucleon{
   position:absolute;top:50%;left:50%;border-radius:50%;
-  width:var(--nd);height:var(--nd);
-  margin:calc(var(--nd) / -2) 0 0 calc(var(--nd) / -2);
   background:radial-gradient(circle at 34% 28%,#FFD9B0 0%,#E08A47 42%,#A9541F 100%);
+  box-shadow:0 1px 3px rgba(60,20,0,.55);
 }
 .nucleon.n{   /* o nêutron, mais pálido que o próton */
   background:radial-gradient(circle at 34% 28%,#E8E2DA 0%,#B2A79C 45%,#6E655C 100%);
@@ -1676,25 +1677,50 @@ const TAMANHO_PAR   = 180;      /* cada um do par */
    camada K viravam parte do amontoado. */
 const FRACOES = [.46, .72, .98, .98];
 
-/* O amontoado do núcleo: um ponto no meio, seis em volta e mais
-   seis nas quinas — treze esferinhas numa colmeia. As posições são
-   fixas, para o núcleo não tremer a cada redesenho. */
-const NUCLEONS = [
-  [0,0],
-  [1,0],[.5,.866],[-.5,.866],[-1,0],[-.5,-.866],[.5,-.866],
-  [1.5,.866],[0,1.732],[-1.5,.866],[-1.5,-.866],[0,-1.732],[1.5,-.866]
-];
+/* ---------- o amontoado do núcleo ----------
+   Treze esferinhas empacotadas EM VOLUME, não num plano: uma no
+   meio e doze nos vértices de um icosaedro, que é como doze bolas
+   iguais se arrumam em torno de uma décima terceira.
+
+   O 3D é fingido na projeção: guarda-se o z de cada uma para
+   decidir três coisas na hora de desenhar — quem fica maior (a da
+   frente), quem fica mais clara, e quem tapa quem. Sem isso as
+   esferas ficam lado a lado como azulejos, que era o problema.
+
+   As posições são fixas e o giro também, para o núcleo não tremer
+   a cada redesenho. */
+const NUCLEONS = (() => {
+  const f = 1.6180339887, n = Math.hypot(1, f);
+  const pontos = [[0,1,f],[0,1,-f],[0,-1,f],[0,-1,-f],
+                  [1,f,0],[1,-f,0],[-1,f,0],[-1,-f,0],
+                  [f,0,1],[f,0,-1],[-f,0,1],[-f,0,-1]]
+                 .map(([x,y,z]) => [x/n, y/n, z/n]);
+  pontos.push([0,0,0]);                      /* a do meio */
+  /* um giro qualquer, só para a silhueta não sair simétrica demais */
+  const a = .55, b = .95;
+  const gira = ([x,y,z]) => {
+    const y1 = y*Math.cos(a) - z*Math.sin(a), z1 = y*Math.sin(a) + z*Math.cos(a);
+    return [x*Math.cos(b) + z1*Math.sin(b), y1, -x*Math.sin(b) + z1*Math.cos(b)];
+  };
+  /* de trás para a frente: quem vem depois cobre quem veio antes */
+  return pontos.map(gira).sort((p, q) => p[2] - q[2]);
+})();
 
 function desenhaRutherford(lw, ex, total, novo, tamanho){
   const bola = lw.querySelector('.lw-bola');
   if (!bola.dataset.pronto){
-    const nd = tamanho * .059;                    /* lado da esferinha */
-    bola.style.setProperty('--nd', nd.toFixed(1) + 'px');
-    NUCLEONS.forEach(([x,y], i) => {
+    const nd = tamanho * .075;                    /* lado da esferinha */
+    const raio = nd * .92;                        /* leve sobreposição */
+    NUCLEONS.forEach(([x,y,z], i) => {
       const n = document.createElement('i');
       n.className = 'nucleon' + (i % 3 === 1 ? ' n' : '');
-      n.style.marginLeft = (x * nd * .95 - nd/2).toFixed(1) + 'px';
-      n.style.marginTop  = (y * nd * .95 - nd/2).toFixed(1) + 'px';
+      /* perto do olho, maior e mais clara */
+      const s = nd * (1 + z * .20);
+      n.style.width  = n.style.height = s.toFixed(1) + 'px';
+      n.style.marginLeft = (x * raio - s/2).toFixed(1) + 'px';
+      n.style.marginTop  = (y * raio - s/2).toFixed(1) + 'px';
+      n.style.zIndex = i;                         /* a lista já vem ordenada */
+      n.style.filter = 'brightness(' + (.6 + .4 * (z + 1) / 2).toFixed(2) + ')';
       bola.appendChild(n);
     });
     bola.dataset.pronto = '1';
