@@ -446,6 +446,10 @@ h1 em{font-style:normal;color:var(--amber)}
 .mesa{
   position:relative;width:100%;
   height:clamp(200px,38vh,340px);
+  /* o conteúdo é centrado por flex: assim cabe um átomo só (a
+     questão 7) ou o par lado a lado (a 8), sem cada uma inventar
+     o próprio jeito de se colocar no meio */
+  display:flex;align-items:center;justify-content:center;gap:clamp(20px,5vw,64px);
   border-radius:20px;overflow:hidden;
   background:
     radial-gradient(ellipse 60% 70% at 50% 45%,rgba(18,49,75,.55),rgba(7,22,38,0) 72%),
@@ -464,24 +468,32 @@ h1 em{font-style:normal;color:var(--amber)}
    VER em qual camada isso aconteceu, e a camada some ou nasce
    inteira quando é o caso. */
 .lw{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:186px;height:186px;
+  position:relative;flex:none;
+  width:var(--atomo,186px);height:var(--atomo,186px);
   cursor:grab;touch-action:none;
   animation:lwEntra .34s cubic-bezier(.2,1.4,.4,1);
 }
+/* no par os dois átomos são um pouco menores, para caberem lado a
+   lado com folga de sobra entre eles — é por essa folga que o
+   elétron viaja */
+.mesa.par .lw{--atomo:164px}
 .mesa.travada .lw{cursor:default}
-@keyframes lwEntra{from{transform:translate(-50%,-50%) scale(.7);opacity:0}
-                   to  {transform:translate(-50%,-50%) scale(1);  opacity:1}}
+@keyframes lwEntra{from{transform:scale(.7);opacity:0}
+                   to  {transform:scale(1);  opacity:1}}
 
 /* o núcleo: a mesma esfera CPK de antes, agora no centro do átomo */
+/* núcleo e símbolo acompanham o tamanho do átomo, para o desenho
+   ficar igual quer ele esteja sozinho, quer em par */
 .lw-bola{
   position:absolute;top:50%;left:50%;
-  width:46px;height:46px;margin:-23px 0 0 -23px;
+  width:calc(var(--atomo,186px) * .247);height:calc(var(--atomo,186px) * .247);
+  margin:calc(var(--atomo,186px) * -.1235) 0 0 calc(var(--atomo,186px) * -.1235);
   border-radius:50%;display:grid;place-items:center;pointer-events:none;
   box-shadow:0 6px 20px rgba(3,12,22,.6);
 }
 .lw-sim{
-  font-family:var(--mono);font-weight:500;font-size:19px;line-height:1;
+  font-family:var(--mono);font-weight:500;line-height:1;
+  font-size:calc(var(--atomo,186px) * .102);
   color:#FFFFFF;text-shadow:0 2px 8px rgba(4,12,20,.8);
 }
 
@@ -500,18 +512,28 @@ h1 em{font-style:normal;color:var(--amber)}
   margin:-5.5px 0 0 -5.5px;border-radius:50%;
   background:var(--amber);box-shadow:0 0 10px rgba(240,180,74,.85);
   transform:rotate(var(--a)) translateY(calc(var(--d) / -2));
-  animation:eNasce .26s cubic-bezier(.2,1.5,.4,1);
+  animation:eNasceAnel .26s cubic-bezier(.2,1.5,.4,1);
+}
+/* O nascimento precisa repetir o rotate e o translate: um keyframe
+   que só diga scale() substitui o transform inteiro, e o elétron
+   passa a animação toda em cima do núcleo antes de saltar ao anel. */
+@keyframes eNasceAnel{
+  from{transform:rotate(var(--a)) translateY(calc(var(--d) / -2)) scale(0);opacity:0}
+  to  {transform:rotate(var(--a)) translateY(calc(var(--d) / -2)) scale(1);opacity:1}
 }
 /* o último a entrar pisca, para o olho achar onde ele caiu */
-.e-r.novo{animation:eNasce .26s cubic-bezier(.2,1.5,.4,1), eAcende 1s ease-out .26s}
+.e-r.novo{animation:eNasceAnel .26s cubic-bezier(.2,1.5,.4,1), eAcende 1s ease-out .26s}
 @keyframes eAcende{
   0%,100%{box-shadow:0 0 10px rgba(240,180,74,.85)}
   35%    {box-shadow:0 0 22px 6px rgba(255,235,180,1)}
 }
 
-/* a carga fica na quina de cima, fora das camadas */
+/* A carga é pousada na diagonal de cima da camada MAIS EXTERNA, e
+   quem calcula onde é o JS — porque a camada de fora muda quando o
+   átomo perde elétrons, e uma posição fixa na quina da caixa ficaria
+   boiando longe do desenho. */
 .lw-carga{
-  position:absolute;top:-4px;right:-6px;
+  position:absolute;transform:translate(-50%,-50%);
   font-family:var(--mono);font-weight:600;font-size:22px;line-height:1;
   color:#FFCE72;text-shadow:0 2px 10px rgba(4,12,20,.9);
   pointer-events:none;animation:cargaBate .42s cubic-bezier(.2,1.5,.4,1);
@@ -600,9 +622,9 @@ h1 em{font-style:normal;color:var(--amber)}
 /* o átomo recusa: quatro elétrons para cada lado é o limite */
 .lw.nega{animation:lwNega .3s ease}
 @keyframes lwNega{
-  0%,100%{transform:translate(-50%,-50%)}
-  25%    {transform:translate(calc(-50% - 6px),-50%)}
-  75%    {transform:translate(calc(-50% + 6px),-50%)}
+  0%,100%{transform:none}
+  25%    {transform:translateX(-6px)}
+  75%    {transform:translateX(6px)}
 }
 
 .mesa .instrucao{
@@ -1609,6 +1631,74 @@ function corDoTexto(hex){
   return brilho > 150 ? '#0B1F32' : '#FFFFFF';
 }
 
+/* ------------------------------------------------------------
+   O ÁTOMO DE RUTHERFORD, DESENHADO
+
+   Serve às duas questões que o usam: a de estabilizar um átomo
+   sozinho e a de passar elétron de um para o outro. Os anéis são
+   frações do tamanho da caixa, então o mesmo desenho serve grande
+   (um átomo só) e menor (o par lado a lado).
+   ------------------------------------------------------------ */
+const TAMANHO_ATOMO = 186;      /* o átomo sozinho */
+const TAMANHO_PAR   = 164;      /* cada um do par */
+const FRACOES = [.42, .71, .99, .99];
+
+function desenhaRutherford(lw, ex, total, novo, tamanho){
+  const bola = lw.querySelector('.lw-bola');
+  const sim  = lw.querySelector('.lw-sim');
+  bola.style.background = esferaBg(ex.cor);
+  sim.textContent = ex.simbolo;
+  sim.style.color = corDoTexto(ex.cor);
+  sim.style.textShadow = corDoTexto(ex.cor) === '#FFFFFF'
+    ? '0 2px 8px rgba(4,12,20,.8)' : 'none';
+
+  lw.querySelectorAll('.camada, .lw-carga').forEach(x => x.remove());
+
+  /* uma camada por nível, os elétrons repartidos em volta dela.
+     Como o desenho é refeito a cada mudança, a camada que ganha ou
+     perde o elétron muda na hora, à vista do aluno. */
+  const camadas = camadasDe(total);
+  camadas.forEach((quantos, i) => {
+    const d = (FRACOES[i] || FRACOES[FRACOES.length - 1]) * tamanho;
+    const anel = document.createElement('span');
+    anel.className = 'camada';
+    anel.style.setProperty('--d', d.toFixed(1) + 'px');
+    for (let k = 0; k < quantos; k++){
+      const e = document.createElement('i');
+      e.className = 'e-r';
+      /* começa no topo e distribui a volta inteira por igual */
+      e.style.setProperty('--a', (-90 + k * 360 / quantos).toFixed(1) + 'deg');
+      /* o que acabou de chegar é o último da camada de fora */
+      if (novo && i === camadas.length - 1 && k === quantos - 1){
+        e.classList.add('novo');
+      }
+      anel.appendChild(e);
+    }
+    lw.appendChild(anel);
+  });
+
+  /* a carga não conta elétrons: diz o que o átomo virou, e é o que
+     se escreve à mão no caderno */
+  const carga = ex.z - total;             /* saiu elétron = carga positiva */
+  if (carga !== 0){
+    const c = document.createElement('span');
+    c.className = 'lw-carga' + (carga < 0 ? ' neg' : '');
+    const n = Math.abs(carga);
+    c.textContent = (n > 1 ? n : '') + (carga > 0 ? '+' : '−');
+    /* Na diagonal de cima, um pouco PARA FORA da camada externa —
+       ou junto do núcleo, se o átomo perdeu todas (o H⁺ é assim).
+       Fora do anel porque em cima dele ela cairia sobre um elétron:
+       com oito na camada, um deles fica justamente na diagonal. */
+    const fora = camadas.length
+      ? (FRACOES[camadas.length - 1] || FRACOES[FRACOES.length - 1]) * tamanho
+      : tamanho * .3;
+    const r = (fora / 2 + 13) * 0.707;
+    c.style.left = (tamanho / 2 + r).toFixed(0) + 'px';
+    c.style.top  = (tamanho / 2 - r).toFixed(0) + 'px';
+    lw.appendChild(c);
+  }
+}
+
 /* a esfera do elemento: luz no canto de cima à esquerda, cor CPK */
 function esferaBg(hex){
   const n = parseInt(hex.slice(1), 16);
@@ -1707,52 +1797,8 @@ function escolherLewis(corpo, api, q){
 
   /* ---------- desenhar ---------- */
   /* os diâmetros dos anéis, do de dentro para fora */
-  const DIAMETROS = [78, 132, 184, 184];
-
   function desenhaAtomo(ultimoEntrou){
-    const ex = exemplos[face];
-    bola.style.background = esferaBg(ex.cor);
-    const sim = bloco.querySelector('.lw-sim');
-    sim.textContent = ex.simbolo;
-    sim.style.color = corDoTexto(ex.cor);
-    sim.style.textShadow = corDoTexto(ex.cor) === '#FFFFFF'
-      ? '0 2px 8px rgba(4,12,20,.8)' : 'none';
-
-    lw.querySelectorAll('.camada, .lw-carga').forEach(x => x.remove());
-
-    /* uma camada por nível, os elétrons repartidos em volta dela.
-       Como o desenho é refeito a cada mudança, a camada que ganha
-       ou perde o elétron muda na hora, à vista do aluno. */
-    const camadas = camadasDe(atual);
-    camadas.forEach((quantos, i) => {
-      const d = DIAMETROS[i] || DIAMETROS[DIAMETROS.length - 1];
-      const anel = document.createElement('span');
-      anel.className = 'camada';
-      anel.style.setProperty('--d', d + 'px');
-      for (let k = 0; k < quantos; k++){
-        const e = document.createElement('i');
-        e.className = 'e-r';
-        /* começa no topo e distribui a volta inteira por igual */
-        e.style.setProperty('--a', (-90 + k * 360 / quantos).toFixed(1) + 'deg');
-        /* o que acabou de chegar é o último da camada de fora */
-        if (ultimoEntrou && i === camadas.length - 1 && k === quantos - 1){
-          e.classList.add('novo');
-        }
-        anel.appendChild(e);
-      }
-      lw.appendChild(anel);
-    });
-
-    /* a carga não conta elétrons: diz o que o átomo virou, e é o
-       que se escreve à mão no caderno */
-    const carga = ex.z - atual;             /* saiu elétron = carga positiva */
-    if (carga !== 0){
-      const c = document.createElement('span');
-      c.className = 'lw-carga' + (carga < 0 ? ' neg' : '');
-      const n = Math.abs(carga);
-      c.textContent = (n > 1 ? n : '') + (carga > 0 ? '+' : '−');
-      lw.appendChild(c);
-    }
+    desenhaRutherford(lw, exemplos[face], atual, ultimoEntrou, TAMANHO_ATOMO);
   }
 
   /* o efeito que confirma que a ação valeu: um anel que sai do átomo
@@ -1960,6 +2006,277 @@ function escolherLewis(corpo, api, q){
   pintar();
 }
 
+/* ------------------------------------------------------------
+   A TRANSFERÊNCIA — dois átomos, um elétron viajando
+
+   Mesmo gesto da mesa anterior, com uma diferença que muda tudo:
+   aqui o elétron não nasce nem se desfaz. Ele SAI de um átomo e
+   PRECISA chegar ao outro. Largado no vazio, volta para onde
+   estava — é transferência, e transferência conserva carga.
+
+   O que se guarda é um número só: quantos elétrons passaram da
+   esquerda para a direita. Negativo se foram no sentido contrário,
+   o que deixa o aluno desfazer sem sair da questão.
+   ------------------------------------------------------------ */
+function escolherTransferencia(corpo, api, q){
+  const pares = q.pares;
+  const guardadas = api.resposta();
+  const letras = ['a','b','c','d','e','f','g','h'];
+  const feitos = Array.isArray(guardadas) ? guardadas.slice()
+                                          : pares.map(() => null);
+
+  let face = feitos.findIndex(r => r === null);
+  if (face < 0) face = pares.length - 1;
+  let t = feitos[face] !== null ? feitos[face] : 0;   /* elétrons já passados */
+
+  const TROCA_MAX = 4;
+
+  const bloco = document.createElement('div');
+  bloco.className = 'comportamento';
+  bloco.innerHTML =
+    '<div class="lado-cubo">' +
+      '<div class="cena"><div class="cubo"></div></div>' +
+      '<div class="passos" role="group" aria-label="Par da vez"></div>' +
+      '<p class="obs">Arraste o elétron de quem precisa perder até quem ' +
+      'precisa ganhar. Solte fora dos átomos para devolvê-lo.</p>' +
+    '</div>' +
+    '<div class="mesa par">' +
+      '<div class="lw esq"><div class="lw-bola"><span class="lw-sim"></span></div></div>' +
+      '<div class="lw dir"><div class="lw-bola"><span class="lw-sim"></span></div></div>' +
+    '</div>';
+  corpo.appendChild(bloco);
+
+  const cubo   = bloco.querySelector('.cubo');
+  const mesa   = bloco.querySelector('.mesa');
+  const passos = bloco.querySelector('.passos');
+  const lados  = [bloco.querySelector('.lw.esq'), bloco.querySelector('.lw.dir')];
+  let giro = -90 * face;
+
+  /* o cubo dos exemplos, igual ao das outras: carrossel de quatro
+     faces servindo quantos exemplos houver */
+  const faces = [];
+  for (let i = 0; i < 4; i++){
+    const f = document.createElement('div');
+    f.className = 'face f' + i;
+    f.innerHTML = '<span class="letra"></span>' +
+                  '<div class="face-ex"><span class="ex-r">Exemplo</span>' +
+                  '<span class="ex-n"></span></div>';
+    faces.push(f);
+    cubo.appendChild(f);
+  }
+  const faceFisica = n => ((n % 4) + 4) % 4;
+  function escreveFace(n){
+    const f = faces[faceFisica(n)];
+    f.querySelector('.letra').textContent = letras[n] + ')';
+    f.querySelector('.ex-n').textContent  = n + 1;
+  }
+  escreveFace(face);
+  cubo.style.transform = 'rotateY(' + giro + 'deg)';
+
+  pares.forEach((par, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = letras[i];
+    b.disabled = !api.entregue();
+    b.setAttribute('aria-label',
+      'Exemplo ' + letras[i] + ', ' + par[0].simbolo + ' e ' + par[1].simbolo);
+    b.addEventListener('click', () => irPara(i));
+    passos.appendChild(b);
+  });
+
+  /* quantos elétrons cada um tem AGORA, contando o que já passou */
+  const totalDe = (lado, extra) => {
+    const par = pares[face];
+    const passou = t + (extra || 0);
+    return lado === 0 ? par[0].z - passou : par[1].z + passou;
+  };
+
+  function desenhaTudo(novoEm){
+    pares[face].forEach((ex, i) => {
+      desenhaRutherford(lados[i], ex, totalDe(i), novoEm === i, TAMANHO_PAR);
+    });
+  }
+
+  function onda(lado, tipo){
+    const o = document.createElement('i');
+    o.className = 'onda ' + tipo;
+    const r = lados[lado].getBoundingClientRect(), rm = mesa.getBoundingClientRect();
+    o.style.left = (r.left + r.width/2 - rm.left).toFixed(0) + 'px';
+    o.style.top  = (r.top  + r.height/2 - rm.top ).toFixed(0) + 'px';
+    mesa.appendChild(o);
+    setTimeout(() => o.remove(), 640);
+    const b = lados[lado].querySelector('.lw-bola');
+    b.classList.remove('bate'); void b.offsetWidth; b.classList.add('bate');
+  }
+  function nega(lado){
+    const el = lados[lado];
+    el.classList.remove('nega'); void el.offsetWidth; el.classList.add('nega');
+  }
+
+  function passar(quantos, deLado){
+    t += quantos;
+    feitos[face] = t;
+    api.responder(feitos.slice(), feitos.every((r,k) => r === q.certo(k)));
+    desenhaTudo(deLado === 0 ? 1 : 0);
+    onda(deLado, 'sai');
+    onda(deLado === 0 ? 1 : 0, 'entra');
+    pintar();
+  }
+
+  function pintar(){
+    [...passos.children].forEach((b,i) => {
+      b.classList.toggle('feito', feitos[i] !== null);
+      b.classList.toggle('atual', i === face);
+    });
+    api.atualizarBotao();
+  }
+
+  function irPara(n){
+    escreveFace(n);
+    giro += (n - face) * -90;
+    cubo.style.transform = 'rotateY(' + giro + 'deg)';
+    face = n;
+    t = feitos[n] !== null ? feitos[n] : 0;
+    desenhaTudo();
+    marcarRevisao();
+    pintar();
+  }
+
+  /* ---------- o gesto ---------- */
+  const ponto = e => {
+    const r = mesa.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  };
+  const centroDe = lado => {
+    const r = lados[lado].getBoundingClientRect(), rm = mesa.getBoundingClientRect();
+    return { x: r.left + r.width/2 - rm.left, y: r.top + r.height/2 - rm.top };
+  };
+  const sobre = (lado, e) => {
+    const r = lados[lado].getBoundingClientRect();
+    const cx = r.left + r.width/2, cy = r.top + r.height/2;
+    return Math.hypot(e.clientX - cx, e.clientY - cy) < r.width/2;
+  };
+  function criaEletron(x, y){
+    const el = document.createElement('i');
+    el.className = 'eletron';
+    el.style.left = x.toFixed(0) + 'px';
+    el.style.top  = y.toFixed(0) + 'px';
+    el.innerHTML = '<b></b><s></s>';
+    mesa.appendChild(el);
+    return el;
+  }
+  function faisca(x, y, v){
+    const i = document.createElement('i');
+    i.className = 'rastro-e';
+    i.style.setProperty('--s', (8 + Math.min(12, v * .5)).toFixed(0) + 'px');
+    i.style.left = x.toFixed(0) + 'px';
+    i.style.top  = y.toFixed(0) + 'px';
+    mesa.appendChild(i);
+    setTimeout(() => i.remove(), 480);
+  }
+
+  let g = null;
+
+  mesa.addEventListener('pointerdown', e => {
+    if (api.entregue() || g) return;
+    const lado = sobre(0, e) ? 0 : (sobre(1, e) ? 1 : -1);
+    if (lado < 0) return;                       /* só se puxa de um átomo */
+
+    /* o sentido em que este átomo doaria: da esquerda é +1 */
+    const rumo = lado === 0 ? 1 : -1;
+    if (Math.abs(t + rumo) > TROCA_MAX){ nega(lado); return; }
+    if (totalDe(lado) <= 0){ nega(lado); return; }   /* não há o que doar */
+
+    g = { id:e.pointerId, lado, rumo, el:null, x:e.clientX, y:e.clientY };
+    try { mesa.setPointerCapture(e.pointerId); } catch(_){}
+    e.preventDefault();
+  });
+
+  mesa.addEventListener('pointermove', e => {
+    if (!g || e.pointerId !== g.id) return;
+    const p = ponto(e);
+
+    if (!g.el){
+      /* o elétron só se destaca depois de um puxão claro */
+      if (Math.hypot(e.clientX - g.x, e.clientY - g.y) < 18) return;
+      const c = centroDe(g.lado);
+      g.el = criaEletron(c.x, c.y);
+      /* enquanto viaja, ele já não conta para o átomo de origem */
+      desenhaRutherford(lados[g.lado], pares[face][g.lado],
+                        totalDe(g.lado) - 1, false, TAMANHO_PAR);
+    }
+    if (g.lx !== undefined){
+      const v = Math.hypot(p.x - g.lx, p.y - g.ly);
+      if (v > 6){ faisca(g.lx, g.ly, v); g.lx = p.x; g.ly = p.y; }
+    } else { g.lx = p.x; g.ly = p.y; }
+    g.el.style.left = p.x.toFixed(0) + 'px';
+    g.el.style.top  = p.y.toFixed(0) + 'px';
+  });
+
+  function solta(e){
+    if (!g || (e && e.pointerId !== g.id)) return;
+    const h = g; g = null;
+    if (!h.el) return;                       /* toque seco: nada mudou */
+
+    const destino = h.lado === 0 ? 1 : 0;
+    if (e && sobre(destino, e)){
+      /* chegou do outro lado: a transferência vale */
+      const c = centroDe(destino);
+      h.el.style.setProperty('--tx',
+        (c.x - parseFloat(h.el.style.left)).toFixed(0) + 'px');
+      h.el.style.setProperty('--ty',
+        (c.y - parseFloat(h.el.style.top)).toFixed(0) + 'px');
+      h.el.classList.add('entra');
+      passar(h.rumo, h.lado);
+    } else {
+      /* largado no vazio ou de volta na origem: o elétron VOLTA.
+         Aqui ele não pode sumir — carga não se perde no caminho. */
+      const c = centroDe(h.lado);
+      h.el.style.setProperty('--tx',
+        (c.x - parseFloat(h.el.style.left)).toFixed(0) + 'px');
+      h.el.style.setProperty('--ty',
+        (c.y - parseFloat(h.el.style.top)).toFixed(0) + 'px');
+      h.el.classList.add('entra');
+      desenhaTudo();
+    }
+    setTimeout(() => h.el.remove(), 460);
+  }
+  mesa.addEventListener('pointerup', solta);
+  mesa.addEventListener('pointercancel', solta);
+
+  function marcarRevisao(){
+    if (!api.entregue()) return;
+    mesa.classList.add('travada');
+    const ok = feitos[face] === q.certo(face);
+    mesa.classList.toggle('certa', ok);
+    mesa.classList.toggle('errada', !ok);
+  }
+
+  desenhaTudo();
+  marcarRevisao();
+
+  if (api.entregue()){
+    api.retorno(q.comentario(feitos), feitos.every((r,k) => r === q.certo(k)));
+  } else {
+    api.aoAvancar(
+      () => {
+        /* confirmar guarda o arranjo como está, mesmo que seja zero */
+        if (feitos[face] === null){
+          feitos[face] = t;
+          api.responder(feitos.slice(), feitos.every((r,k) => r === q.certo(k)));
+        }
+        if (face < pares.length - 1){ irPara(face + 1); return true; }
+        return false;
+      },
+      /* o botão fica sempre à vista: o aluno confirma quando ACHA
+         que está certo, e não quando o programa deixa */
+      () => face < pares.length - 1 ? 'Confirmar' : null
+    );
+  }
+
+  pintar();
+}
+
 /* o comentário do gabarito, quando a questão é de escolher entre
    itens: cada item explica a si mesmo, e o branco tem sua linha */
 function comentarioDeEscolha(itens, resposta, emBranco){
@@ -1973,7 +2290,7 @@ const QUESTOES = [
      QUESTÃO 1 — reconhecer o retrato de G. N. Lewis.
      ========================================================= */
   {
-    valor: 1,          /* questão de alternativa: 1,0 */
+    valor: 0.5,        /* um item: 0,5 */
     tipo: 'história da química',
     titulo: 'Quem é Lewis?',
     enunciado: 'Um dos maiores expoentes no desenvolvimento do que sabemos hoje ' +
@@ -2029,7 +2346,7 @@ const QUESTOES = [
      do que se observa, e a 3 é a explicação que o postulado pede.
      ========================================================= */
   {
-    valor: 1,          /* questão de alternativa: 1,0 */
+    valor: 0.5,        /* um item: 0,5 */
     tipo: 'postulado de Dalton',
     titulo: 'Por que os átomos se combinam?',
     enunciado: 'Uma das premissas mais importantes sobre ligações químicas foi proposta ' +
@@ -2083,7 +2400,7 @@ const QUESTOES = [
      turma que não se combina com nada.
      ========================================================= */
   {
-    valor: 1,          /* questão de alternativa: 1,0 */
+    valor: 0.5,        /* um item: 0,5 */
     tipo: 'história da química',
     titulo: 'Quem é Ramsay?',
     enunciado: 'Um dos cientistas mais brilhantes de sua época, William Ramsay, se mostrou ' +
@@ -2142,7 +2459,7 @@ const QUESTOES = [
      cheio de moléculas, e que só o do gás nobre tem átomo solto.
      ========================================================= */
   {
-    valor: 1,          /* questão de alternativa: 1,0 */
+    valor: 0.5,        /* um item: 0,5 */
     tipo: 'gases nobres',
     titulo: 'O cilindro de átomos isolados',
     enunciado: 'Ramsay, citado antes, se opôs à ideia de que todas as substâncias são ' +
@@ -2203,7 +2520,7 @@ const QUESTOES = [
      — senão a questão viraria decoreba de nome.
      ========================================================= */
   {
-    valor: 1,          /* questão de alternativa: 1,0 */
+    valor: 0.5,        /* um item: 0,5 */
     tipo: 'teoria do octeto',
     titulo: 'O segredo dos gases nobres',
     enunciado: 'Os gases nobres vivem sozinhos, um átomo de cada vez, e mesmo assim são ' +
@@ -2411,6 +2728,81 @@ const QUESTOES = [
       return 'Você acertou <b>' + acertos + ' de ' + this.exemplos.length +
              '</b> átomos.' + linhas;
     }
+  },
+
+  /* =========================================================
+     QUESTÃO 8 — a ligação iônica, feita à mão.
+
+     Aqui as duas questões anteriores se encontram: um átomo só
+     fica estável às custas do outro, e o elétron que sai de um é
+     exatamente o que falta ao seu par.
+
+     Os pares FECHAM: o que um precisa doar é o que o outro precisa
+     receber. Um par que não fecha — cálcio com um flúor só, por
+     exemplo — deixaria um elétron sem dono, e a tarefa que a
+     questão pede ("até que ambos adquiram a estabilidade") não
+     teria resposta.
+     ========================================================= */
+  {
+    valor: 2.5,        /* cinco pares a 0,5 cada */
+    pontos(feitos){
+      const lista = Array.isArray(feitos) ? feitos : [];
+      const certos = this.pares.filter((par,k) => lista[k] === this.certo(k)).length;
+      return certos * (this.valor / this.pares.length);
+    },
+    tipo: 'ligação iônica',
+    titulo: 'Passe o elétron de um para o outro',
+    enunciado: 'Observe os pares de átomos a seguir. Usando o que você aprendeu sobre ' +
+               'ligações químicas, pegue o elétron de quem precisa perder e leve até quem ' +
+               'precisa ganhar, até que os dois fiquem estáveis.',
+
+    /* z = elétrons do átomo neutro; alvo = os do gás nobre mais
+       próximo. O da esquerda é sempre quem doa. */
+    pares: [
+      [ { simbolo:'Na', nome:'Sódio',     z:11, alvo:10, cor:'#AB5CF2' },
+        { simbolo:'Cl', nome:'Cloro',     z:17, alvo:18, cor:'#26D926' } ],
+      [ { simbolo:'Mg', nome:'Magnésio',  z:12, alvo:10, cor:'#8AFF00' },
+        { simbolo:'O',  nome:'Oxigênio',  z:8,  alvo:10, cor:'#FF0D0D' } ],
+      [ { simbolo:'Ca', nome:'Cálcio',    z:20, alvo:18, cor:'#3DFF00' },
+        { simbolo:'S',  nome:'Enxofre',   z:16, alvo:18, cor:'#FFFF30' } ],
+      [ { simbolo:'K',  nome:'Potássio',  z:19, alvo:18, cor:'#8F40D4' },
+        { simbolo:'F',  nome:'Flúor',     z:9,  alvo:10, cor:'#90E050' } ],
+      [ { simbolo:'Al', nome:'Alumínio',  z:13, alvo:10, cor:'#BFA6A6' },
+        { simbolo:'N',  nome:'Nitrogênio',z:7,  alvo:10, cor:'#3050F8' } ]
+    ],
+
+    /* quantos elétrons têm de passar da esquerda para a direita */
+    certo(k){
+      const par = this.pares[k];
+      return par[0].z - par[0].alvo;
+    },
+
+    montar(corpo, api){ escolherTransferencia(corpo, api, this); },
+
+    comentario(feitos){
+      const letras = ['a','b','c','d','e'];
+      const lista = Array.isArray(feitos) ? feitos : this.pares.map(() => null);
+      const linhas = this.pares.map((par,k) => {
+        const n = this.certo(k);
+        const dado = lista[k];
+        const marca = dado === null || dado === undefined ? '<span class="nao">–</span>'
+                    : (dado === n ? '<span class="ok">✓</span>'
+                                  : '<span class="nao">✕</span>');
+        const carga = n > 1 ? n : '';
+        return '<br>' + marca + ' <b>' + letras[k] + ') ' + par[0].simbolo + ' e ' +
+               par[1].simbolo + '</b> — ' + (n === 1 ? 'passa <b>1 elétron</b>'
+                                                     : 'passam <b>' + n + ' elétrons</b>') +
+               ': o ' + par[0].nome.toLowerCase() + ' fica ' + par[0].simbolo + carga + '⁺ ' +
+               'e o ' + par[1].nome.toLowerCase() + ' fica ' + par[1].simbolo + carga + '⁻, ' +
+               'os dois com a camada de fora completa.';
+      }).join('');
+      const acertos = this.pares.filter((par,k) => lista[k] === this.certo(k)).length;
+      return 'Você acertou <b>' + acertos + ' de ' + this.pares.length + '</b> pares.' +
+             linhas +
+             '<br><br>Repare que em todos eles o número de elétrons que um perde é ' +
+             'exatamente o que o outro ganha. É isso que mantém a conta fechada — e é ' +
+             'por isso que a fórmula do sal é NaCl, com um de cada.';
+    }
   }
 
 ];
@@ -2478,10 +2870,10 @@ function enviarNota(dados){
 /* ============================================================
    A NOTA
 
-   A prova vale 10, e o peso segue o trabalho: cada questão de
-   alternativa vale 1,0, e cada átomo das questões de vários itens
-   vale 0,5 — 2,0 na do cubo, que tem quatro, e 3,0 na de
-   Rutherford, que tem seis. Cinco vezes um, mais dois, mais três.
+   A prova vale 10, repartidos por ITEM: cada coisa que o aluno tem
+   de acertar vale 0,5. São vinte — cinco questões de alternativa,
+   quatro átomos no cubo, seis na mesa de Rutherford e cinco pares
+   na transferência. Vinte meios fazem dez.
 
    Nas questões de vários itens a nota é PARTIDA: quem acerta cinco
    dos seis átomos leva 2,5, e não zero. Era o que faltava para a
