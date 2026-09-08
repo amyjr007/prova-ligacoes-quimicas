@@ -689,6 +689,11 @@ h1 em{font-style:normal;color:var(--amber)}
   display:grid;grid-template-columns:auto minmax(0,1fr);
   gap:14px 28px;align-items:start;
 }
+/* A questão do octeto mostra o ÁTOMO na face do cubo, então ali
+   ele é grande; nas outras a face só numera o exemplo, e um cubo
+   grande para isso seria desperdício de tela. */
+.com-atomo .lado-cubo{--cubo:132px;width:252px}
+.com-atomo .obs{max-width:248px}
 .lado-cubo{
   --cubo:86px;    /* o lado do cubo mora aqui: a profundidade das
                      faces é calculada a partir dele, e numa janela
@@ -710,18 +715,23 @@ h1 em{font-style:normal;color:var(--amber)}
 .face.f1{transform:rotateY(90deg)  translateZ(calc(var(--cubo)/2))}
 .face.f2{transform:rotateY(180deg) translateZ(calc(var(--cubo)/2))}
 .face.f3{transform:rotateY(270deg) translateZ(calc(var(--cubo)/2))}
+/* tudo o que se escreve na face é medido em fração do cubo: assim
+   o tamanho dele é um botão só, e as letras acompanham */
 .face .letra{
   position:absolute;top:6px;left:8px;z-index:1;
-  font-family:var(--mono);font-size:9.5px;color:var(--paper-far);
+  font-family:var(--mono);font-size:calc(var(--cubo) * .11);color:var(--paper-far);
 }
 .face .atomo{
   width:100%;height:100%;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:0;
   background:none;border:0;border-radius:16px;color:inherit;font:inherit;cursor:pointer;
 }
-.face .z{font-family:var(--mono);font-size:9.5px;color:var(--paper-far)}
+.face .z{
+  font-family:var(--mono);font-size:calc(var(--cubo) * .11);color:var(--paper-far);
+}
 .face .simbolo{
-  font-family:var(--display);font-weight:700;font-size:30px;line-height:1.1;
+  font-family:var(--display);font-weight:700;line-height:1.1;
+  font-size:calc(var(--cubo) * .35);
   letter-spacing:-.02em;color:var(--paper);transition:color .2s;
 }
 .face .atomo:hover .simbolo{color:var(--aqua)}
@@ -734,12 +744,12 @@ h1 em{font-style:normal;color:var(--amber)}
   align-items:center;justify-content:center;gap:2px;
 }
 .ex-r{
-  font-family:var(--mono);font-size:8px;letter-spacing:.18em;
+  font-family:var(--mono);font-size:calc(var(--cubo) * .093);letter-spacing:.18em;
   text-transform:uppercase;color:var(--paper-far);
 }
 .ex-n{
-  font-family:var(--display);font-weight:700;font-size:30px;line-height:1;
-  color:var(--paper);
+  font-family:var(--display);font-weight:700;line-height:1;
+  font-size:calc(var(--cubo) * .35);color:var(--paper);
 }
 
 /* as quatro letras embaixo do cubo: dizem onde ele está e deixam
@@ -772,11 +782,11 @@ h1 em{font-style:normal;color:var(--amber)}
   animation:entra .22s ease both;
 }
 .subniveis .s{
-  font-family:var(--display);font-weight:700;font-size:17px;line-height:1;
+  font-family:var(--display);font-weight:700;font-size:22px;line-height:1;
   color:var(--amber);flex:none;
 }
 .subniveis .p{
-  font-family:var(--mono);font-size:13px;letter-spacing:.02em;color:var(--paper);
+  font-family:var(--mono);font-size:16.5px;letter-spacing:.02em;color:var(--paper);
 }
 .subniveis.lado{margin-right:12px}
 
@@ -922,13 +932,37 @@ h1 em{font-style:normal;color:var(--amber)}
   .retrato-op img{aspect-ratio:auto;height:clamp(150px,30vh,300px)}
 }
 
-/* O rodapé da prova tem uma coisa só: confirmar. Sem "anterior",
-   sem "pular", sem atalhos escritos — porque não há para onde ir
-   além de para a frente, e só se vai tendo escolhido algo. O
-   botão nem existe na tela até haver uma resposta marcada. */
+/* O rodapé da prova: confirmar à direita, voltar à esquerda. Não
+   há "pular" — só se avança tendo escolhido algo, e o botão de
+   confirmar nem existe na tela até haver resposta marcada. Voltar
+   serve para CONFERIR: a questão já confirmada reaparece como
+   estava, para ler, mas fechada para mudanças. */
 .navegacao{
-  flex:none;display:flex;justify-content:flex-end;align-items:center;
+  flex:none;display:flex;justify-content:space-between;align-items:center;gap:12px;
   min-height:56px;padding-top:14px;border-top:1px solid rgba(69,199,176,.14);
+}
+.navegacao .cresce{flex:1}
+
+/* a questão já confirmada: dá para ler, não dá para mexer */
+#palco.travada .alt,
+#palco.travada .gas,
+#palco.travada .retrato-op{cursor:default}
+#palco.travada .alt:hover,
+#palco.travada .gas:hover,
+#palco.travada .retrato-op:hover{
+  transform:none;border-color:rgba(69,199,176,.22);
+}
+/* numa questão fechada as teclas não fazem nada: o número apaga
+   junto, para não prometer o que não cumpre */
+#palco.travada .tecla{opacity:.3}
+.aviso-travada{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--paper-far);
+}
+.aviso-travada::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--aqua-dim);flex:none;
 }
 
 /* A mesma economia da capa, aplicada à prova: numa janela baixa
@@ -1083,8 +1117,8 @@ kbd{
            descobrir isso só depois de errar -->
       <p class="chamada">
         Cada questão trabalha um tipo de interação diferente.
-        Leia com calma: <strong>depois que confirmar, não será
-        possível mudar a resposta</strong>.
+        Leia com calma: <strong>depois que confirmar, a resposta não
+        muda</strong> — mas dá para voltar e conferir antes de entregar.
       </p>
 
       <div class="equipe">
@@ -1187,6 +1221,8 @@ kbd{
   <section id="palco" aria-live="polite"></section>
 
   <div class="navegacao">
+    <button id="voltar" class="botao discreto" type="button" hidden>Voltar</button>
+    <span class="cresce"></span>
     <button id="avancar" class="botao" type="button" hidden>Confirmar</button>
   </div>
 
@@ -1213,6 +1249,7 @@ kbd{
       <dt>Aluno</dt>   <dd id="fim-nome"></dd>
       <dt>Turma</dt>   <dd id="fim-turma"></dd>
       <dt>Turno</dt>   <dd id="fim-turno"></dd>
+      <dt>Prova</dt>   <dd id="fim-tipo"></dd>
       <dt>Entrega</dt> <dd id="fim-data"></dd>
     </dl>
   </div>
@@ -1316,7 +1353,7 @@ function escolherRetrato(corpo, api, q){
     img.style.objectPosition = r.foco;
     b.querySelector('.legenda').textContent = 'Imagem ' + (i+1);
     b.addEventListener('click', () => {
-      if (api.entregue()) return;          // entregue, não se mexe mais
+      if (api.travada()) return;          // entregue, não se mexe mais
       api.responder(i, r.certa);
       marcar(i);
     });
@@ -1367,7 +1404,7 @@ function escolherAlternativa(corpo, api, q){
     b.querySelector('.frase').textContent = o.texto;
     if (o.detalhe) b.querySelector('.detalhe').textContent = o.detalhe;
     b.addEventListener('click', () => {
-      if (api.entregue()) return;
+      if (api.travada()) return;
       api.responder(i, o.certa);
       marcar(i);
     });
@@ -1419,7 +1456,7 @@ function escolherGas(corpo, api, q){
     b.querySelector('.simbolo').textContent = g.simbolo;
     b.querySelector('.nome').textContent    = g.nome;
     b.addEventListener('click', () => {
-      if (api.entregue()) return;
+      if (api.travada()) return;
       api.responder(i, g.certa);
       marcar(i);
     });
@@ -1471,7 +1508,9 @@ function escolherComportamento(corpo, api, q){
   let giro = -90 * face;
 
   const bloco = document.createElement('div');
-  bloco.className = 'comportamento';
+  /* 'com-atomo' diz que a face do cubo mostra o elemento, e não só
+     o número do exemplo: ali o cubo é maior */
+  bloco.className = 'comportamento com-atomo';
   bloco.innerHTML =
     '<div class="lado-cubo">' +
       '<div class="cena"><div class="cubo"></div></div>' +
@@ -1535,7 +1574,7 @@ function escolherComportamento(corpo, api, q){
     const b = document.createElement('button');
     b.type = 'button';
     b.textContent = letras[i];
-    b.disabled = !api.entregue();
+    b.disabled = !api.travada();
     b.setAttribute('aria-label', 'Átomo ' + letras[i] + ', ' + a.nome);
     b.addEventListener('click', () => irPara(i));
     passos.appendChild(b);
@@ -1558,7 +1597,7 @@ function escolherComportamento(corpo, api, q){
                     '<span class="corpo-alt"><span class="frase"></span></span>';
       b.querySelector('.frase').textContent = texto;
       b.addEventListener('click', () => {
-        if (api.entregue()) return;
+        if (api.travada()) return;
         respostas[face] = i;
         api.responder(respostas.slice(), respostas.every((r,k) => r === atomos[k].certa));
         pintar();
@@ -1566,6 +1605,9 @@ function escolherComportamento(corpo, api, q){
       botoes.push(b);
       lista.appendChild(b);
     });
+    /* 'revisada' pinta certo e errado, então é só depois de entregue.
+       O fechamento de uma questão confirmada é outra coisa, e quem
+       cuida dele é a classe travada do palco. */
     lista.classList.toggle('revisada', api.entregue());
   }
 
@@ -1609,7 +1651,8 @@ function escolherComportamento(corpo, api, q){
   if (api.entregue()){
     api.retorno(q.comentario(respostas),
                 respostas.every((r,k) => r === atomos[k].certa));
-  } else {
+  }
+  if (!api.travada()){
     /* o "Confirmar" gira o cubo enquanto houver átomo; só no
        último ele volta a ser o botão de sair da questão */
     api.aoAvancar(
@@ -1862,7 +1905,7 @@ function escolherLewis(corpo, api, q){
     const b = document.createElement('button');
     b.type = 'button';
     b.textContent = letras[i];
-    b.disabled = !api.entregue();
+    b.disabled = !api.travada();
     b.setAttribute('aria-label', 'Exemplo ' + letras[i] + ', ' + ex.nome);
     b.addEventListener('click', () => irPara(i));
     passos.appendChild(b);
@@ -1967,7 +2010,7 @@ function escolherLewis(corpo, api, q){
   let g = null;   /* o que o dedo está segurando */
 
   mesa.addEventListener('pointerdown', e => {
-    if (api.entregue() || g) return;
+    if (api.travada() || g) return;
 
     if (noAtomo(e)){
       /* dedo no símbolo: puxar arranca. Só vira elétron depois do
@@ -2061,7 +2104,8 @@ function escolherLewis(corpo, api, q){
   if (api.entregue()){
     api.retorno(q.comentario(feitos),
                 feitos.every((r,k) => r === exemplos[k].alvo));
-  } else {
+  }
+  if (!api.travada()){
     api.aoAvancar(
       () => {
         /* confirmar guarda o desenho como está — inclusive o do gás
@@ -2150,7 +2194,7 @@ function escolherTransferencia(corpo, api, q){
     const b = document.createElement('button');
     b.type = 'button';
     b.textContent = letras[i];
-    b.disabled = !api.entregue();
+    b.disabled = !api.travada();
     b.setAttribute('aria-label',
       'Exemplo ' + letras[i] + ', ' + par[0].simbolo + ' e ' + par[1].simbolo);
     b.addEventListener('click', () => irPara(i));
@@ -2251,7 +2295,7 @@ function escolherTransferencia(corpo, api, q){
   let g = null;
 
   mesa.addEventListener('pointerdown', e => {
-    if (api.entregue() || g) return;
+    if (api.travada() || g) return;
     const lado = sobre(0, e) ? 0 : (sobre(1, e) ? 1 : -1);
     if (lado < 0) return;                       /* só se puxa de um átomo */
 
@@ -2330,7 +2374,8 @@ function escolherTransferencia(corpo, api, q){
 
   if (api.entregue()){
     api.retorno(q.comentario(feitos), feitos.every((r,k) => r === q.certo(k)));
-  } else {
+  }
+  if (!api.travada()){
     api.aoAvancar(
       () => {
         /* confirmar guarda o arranjo como está, mesmo que seja zero */
@@ -2389,7 +2434,7 @@ const QUESTOES = [
         certa: false,
         texto_gabarito:
           'Esse é <b>John Dalton</b>, um século antes: o átomo como esfera maciça e ' +
-          'indivisível, sem elétron nenhum para compartilhar. Lewis é a <b>imagem 1</b>.'
+          'indivisível, sem elétron nenhum para compartilhar. O certo é o retrato de <b>Lewis</b>.'
       },
       {
         arquivo: 'imagens/rutherford.jpg',
@@ -2399,14 +2444,14 @@ const QUESTOES = [
         texto_gabarito:
           'Esse é <b>Ernest Rutherford</b>, o do núcleo — ele mostrou onde fica a carga ' +
           'positiva, mas quem explicou a ligação pelo par de elétrons foi Lewis, a ' +
-          '<b>imagem 1</b>.'
+          'o retrato de <b>Lewis</b>.'
       }
     ],
 
     montar(corpo, api){ escolherRetrato(corpo, api, this); },
     comentario(resposta){
       return comentarioDeEscolha(this.retratos, resposta,
-        'Ficou em branco. Lewis é a <b>imagem 1</b> — foi ele quem, em 1916, propôs a ' +
+        'Ficou em branco. O certo era o retrato de <b>Lewis</b> — foi ele quem, em 1916, propôs a ' +
         'ligação como um par de elétrons compartilhado.');
     }
   },
@@ -2436,7 +2481,7 @@ const QUESTOES = [
           'Quase — e é por isso que essa engana. A frase descreve o ponto de partida, mas não ' +
           'explica o postulado: Dalton fala do que os átomos <b>fazem</b> (combinam-se) e do ' +
           'que ganham com isso. E nem todo átomo isolado é instável — os gases nobres estão ' +
-          'aí, inteiros e sozinhos. A resposta é a <b>3</b>.'
+          'aí, inteiros e sozinhos. A resposta é <b>átomos se combinam para atingir a estabilidade</b>.'
       },
       {
         texto: 'A maioria dos átomos consegue existir isoladamente.',
@@ -2444,7 +2489,7 @@ const QUESTOES = [
         texto_gabarito:
           'É o contrário do que se observa. Se a maioria vivesse bem sozinha, não haveria ' +
           'substância composta nenhuma — e é justamente disso que o livro de Dalton trata. ' +
-          'Isolados na natureza, só mesmo os gases nobres. A resposta é a <b>3</b>.'
+          'Isolados na natureza, só mesmo os gases nobres. A resposta é <b>átomos se combinam para atingir a estabilidade</b>.'
       },
       {
         texto: 'Átomos se combinam para atingir a estabilidade.',
@@ -2460,7 +2505,7 @@ const QUESTOES = [
     montar(corpo, api){ escolherAlternativa(corpo, api, this); },
     comentario(resposta){
       return comentarioDeEscolha(this.opcoes, resposta,
-        'Ficou em branco. A resposta é a <b>3</b>: combinados, os átomos chegam a um arranjo ' +
+        'Ficou em branco. A resposta é <b>átomos se combinam para atingir a estabilidade</b>: combinados, eles chegam a um arranjo ' +
         'de menor energia — mais estável do que separados.');
     }
   },
@@ -2490,7 +2535,7 @@ const QUESTOES = [
           'Esse é <b>J. J. Thomson</b>, o do elétron (1897) e do modelo do pudim de passas. ' +
           'Ele não foi contra Dalton — pelo contrário: ao mostrar que o átomo tinha peças ' +
           'dentro, deu a Lewis a peça que faltava para explicar a ligação. Ramsay é a ' +
-          '<b>imagem 3</b>, o de barba.'
+          'o retrato do <b>de barba</b>.'
       },
       {
         arquivo: 'imagens/Richard-Feynman.webp',
@@ -2499,7 +2544,7 @@ const QUESTOES = [
         certa: false,
         texto_gabarito:
           'Esse é <b>Richard Feynman</b>, físico americano — e de outro tempo: ele nasceu em ' +
-          '1918, dois anos <b>depois</b> da morte de Ramsay. Ramsay é a <b>imagem 3</b>.'
+          '1918, dois anos <b>depois</b> da morte de Ramsay. O certo é o retrato do <b>de barba</b>.'
       },
       {
         arquivo: 'imagens/William_Ramsay.jpg',
@@ -2518,7 +2563,7 @@ const QUESTOES = [
     montar(corpo, api){ escolherRetrato(corpo, api, this); },
     comentario(resposta){
       return comentarioDeEscolha(this.retratos, resposta,
-        'Ficou em branco. Ramsay é a <b>imagem 3</b> — o descobridor dos gases nobres, ' +
+        'Ficou em branco. Ramsay é o <b>de barba</b> — o descobridor dos gases nobres, ' +
         'os átomos que não se combinam com nada.');
     }
   },
@@ -2535,7 +2580,7 @@ const QUESTOES = [
     valor: 0.5,        /* um item: 0,5 */
     tipo: 'gases nobres',
     titulo: 'O cilindro de átomos isolados',
-    enunciado: 'Ramsay, citado antes, se opôs à ideia de que todas as substâncias são ' +
+    enunciado: 'William Ramsay se opôs à ideia de que todas as substâncias são ' +
                'formadas por átomos combinados porque tinha no laboratório substâncias ' +
                'formadas por átomos isolados. Qual destes gases é uma dessas substâncias?',
 
@@ -2606,9 +2651,9 @@ const QUESTOES = [
         detalhe: 'Toda matéria é feita de átomos: bolinhas maciças, que não se pode dividir.',
         certa: false,
         texto_gabarito:
-          'Essa é a teoria da <b>questão 2</b> — ela diz <b>do que</b> a matéria é feita, não ' +
+          'Essa é a teoria de <b>Dalton</b> — ela diz <b>do que</b> a matéria é feita, não ' +
           '<b>por que</b> os átomos se ligam. E, para Dalton, o átomo era maciço e sem ' +
-          'elétrons: nem havia como explicar a estabilidade por eles. A resposta é a <b>2</b>.'
+          'elétrons: nem havia como explicar a estabilidade por eles. A resposta é a <b>Teoria do Octeto</b>.'
       },
       {
         texto: 'Teoria do Octeto',
@@ -2620,7 +2665,7 @@ const QUESTOES = [
           'elétrons na última camada</b>, exatamente o que os gases nobres já têm sem ' +
           'precisar de ninguém. Todos os outros correm atrás desse oito — doando, recebendo ' +
           'ou compartilhando elétrons —, e é por isso que se ligam. Quem organizou a ideia ' +
-          'foi Lewis, em 1916, o mesmo da questão 1. (Há exceções: o hidrogênio, por ' +
+          'foi Lewis, em 1916 — o mesmo do retrato. (Há exceções: o hidrogênio, por ' +
           'exemplo, se contenta com dois.)'
       },
       {
@@ -2630,7 +2675,7 @@ const QUESTOES = [
         texto_gabarito:
           'Rutherford mostrou <b>onde ficam</b> o núcleo e os elétrons — a planta do átomo, ' +
           'não a explicação da estabilidade. Foi um degrau necessário, mas quem responde à ' +
-          'pergunta é a <b>Teoria do Octeto</b>, alternativa <b>2</b>.'
+          'pergunta é a <b>Teoria do Octeto</b>.'
       },
       {
         texto: 'Lei da Conservação das Massas',
@@ -2639,14 +2684,14 @@ const QUESTOES = [
         texto_gabarito:
           'Essa é a lei de Lavoisier, sobre a <b>massa</b> nas reações: o que entra é igual ao ' +
           'que sai. Verdadeira, mas de outro assunto — não fala de elétrons nem de ' +
-          'estabilidade. A resposta é a <b>2</b>.'
+          'estabilidade. A resposta é a <b>Teoria do Octeto</b>.'
       }
     ],
 
     montar(corpo, api){ escolherAlternativa(corpo, api, this); },
     comentario(resposta){
       return comentarioDeEscolha(this.opcoes, resposta,
-        'Ficou em branco. É a <b>Teoria do Octeto</b>, alternativa 2: o átomo fica estável ' +
+        'Ficou em branco. É a <b>Teoria do Octeto</b>: o átomo fica estável ' +
         'com oito elétrons na última camada — o que os gases nobres já têm de nascença.');
     }
   },
@@ -2654,7 +2699,7 @@ const QUESTOES = [
   /* =========================================================
      QUESTÃO 6 — o octeto aplicado, quatro vezes.
 
-     Aqui a teoria da questão 5 vira ferramenta. São quatro
+     Aqui a Teoria do Octeto vira ferramenta. São quatro
      perguntas iguais, uma por átomo, e por isso um cubo: a
      pergunta fica parada e o sujeito é que gira.
 
@@ -2971,6 +3016,98 @@ function numero(n){
   return (Math.round(n * 10) / 10).toFixed(1).replace('.', ',');
 }
 
+/* ============================================================
+   OS TRÊS TIPOS DE PROVA
+
+   Cada aluno pega um tipo — A, B ou C — sorteado quando começa. O
+   que muda entre eles é a ORDEM das questões e a ordem das
+   alternativas dentro de cada uma. O conteúdo é o mesmo, e a nota
+   também: quem senta ao lado não vê a mesma tela.
+
+   O sorteio nasce de uma SEMENTE guardada junto com as respostas.
+   Isso importa: se a ordem fosse sorteada a cada abertura, o aluno
+   que recarregasse a página encontraria as respostas dele
+   apontando para as alternativas erradas. Com a semente guardada,
+   a mesma prova se remonta igual.
+
+   As três ordens deixam as questões de arrastar por último: são as
+   longas, e começar por elas seria começar pelo fim.
+   ============================================================ */
+const TIPOS = {
+  A: [0,1,2,3,4, 5,6,7],
+  B: [2,4,0,3,1, 5,7,6],
+  C: [3,0,4,1,2, 6,5,7]
+};
+
+/* gerador com semente: a mesma semente devolve sempre os mesmos
+   sorteios, que é o que permite remontar a prova ao recarregar */
+function sorteador(semente){
+  let s = semente | 0;
+  return function(){
+    s = s + 0x6D2B79F5 | 0;
+    let t = Math.imul(s ^ s >>> 15, 1 | s);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function embaralha(lista, rnd){
+  for (let i = lista.length - 1; i > 0; i--){
+    const j = Math.floor(rnd() * (i + 1));
+    const t = lista[i]; lista[i] = lista[j]; lista[j] = t;
+  }
+  return lista;
+}
+
+/* As listas são embaralhadas NO LUGAR, então uma segunda chamada
+   partiria do já embaralhado e a mesma semente daria outra prova.
+   Guardar a ordem de origem e repô-la antes de cada sorteio faz
+   arrumarProva() poder ser chamada quantas vezes for. */
+const ORIGINAIS = new WeakMap();
+function repoeOrdem(lista){
+  if (!ORIGINAIS.has(lista)) ORIGINAIS.set(lista, lista.slice());
+  const base = ORIGINAIS.get(lista);
+  lista.length = 0;
+  base.forEach(x => lista.push(x));
+}
+
+/* A ordem em que as questões aparecem nesta prova. Fica aqui, e não
+   dentro de QUESTOES, para o gabarito e a nota continuarem falando
+   da mesma questão qualquer que seja o tipo. */
+let ORDEM = QUESTOES.map((q,i) => i);
+let TIPO  = 'A';
+
+/* a questão que está na posição i DESTA prova */
+const questaoDe = i => QUESTOES[ORDEM[i]];
+
+function arrumarProva(semente){
+  const rnd = sorteador(semente);
+  const letras = Object.keys(TIPOS);
+  TIPO  = letras[Math.floor(rnd() * letras.length)];
+  ORDEM = TIPOS[TIPO].slice();
+
+  /* as alternativas também trocam de lugar. Onde o certo é uma
+     marca no próprio item, embaralhar basta; onde é um índice
+     guardado à parte, o índice é refeito depois da troca. */
+  ['opcoes','retratos','gases'].forEach(campo => {
+    QUESTOES.forEach(q => {
+      if (!q[campo]) return;
+      repoeOrdem(q[campo]);
+      embaralha(q[campo], rnd);
+    });
+  });
+  QUESTOES.forEach(q => {
+    if (!q.atomos) return;
+    q.atomos.forEach(a => {
+      if (!a.opcoes) return;
+      if (a.certaBase === undefined) a.certaBase = a.certa;
+      repoeOrdem(a.opcoes);
+      const texto = a.opcoes[a.certaBase];
+      embaralha(a.opcoes, rnd);
+      a.certa = a.opcoes.indexOf(texto);
+    });
+  });
+}
+
 /* ---------- estado ---------- */
 const CHAVE = 'prova-ligacoes-v1';
 const estado = {
@@ -3076,12 +3213,25 @@ const regua = $('#regua');
 let interceptaAvanco = null;
 let interceptaRotulo = null;
 
+/* ---------- o que já foi confirmado ----------
+   Confirmar fecha a questão: dali em diante ela pode ser LIDA de
+   novo, com o botão Voltar, mas não mudada. É a diferença entre
+   conferir e refazer. */
+function jaConfirmada(i){
+  return Array.isArray(estado.confirmadas) && estado.confirmadas.indexOf(i) >= 0;
+}
+function marcarConfirmada(i){
+  if (!Array.isArray(estado.confirmadas)) estado.confirmadas = [];
+  if (estado.confirmadas.indexOf(i) < 0){ estado.confirmadas.push(i); salvar(); }
+}
+
 /* O cabeçalho e a régua. Fica separado porque quem entrega, sai e
    volta para revisar chega ao resultado sem passar pela prova —
    e a moldura precisa estar montada do mesmo jeito. */
 function prepararProva(){
   $('#topo-nome').textContent  = estado.aluno.nome;
-  $('#topo-turma').textContent = estado.aluno.turma + ' · ' + estado.aluno.turno;
+  $('#topo-turma').textContent =
+    estado.aluno.turma + ' · ' + estado.aluno.turno + ' · tipo ' + TIPO;
   $('#topo-total').textContent = QUESTOES.length;
   montarRegua();
 }
@@ -3120,10 +3270,12 @@ function atualizarRegua(){
 
 function desenhar(){
   const i = estado.indice;
-  const q = QUESTOES[i];
+  const q = questaoDe(i);
 
   palco.innerHTML = '';
   interceptaAvanco = interceptaRotulo = null;
+  /* questão já confirmada abre fechada: dá para ler, não para mexer */
+  palco.classList.toggle('travada', !estado.entregue && jaConfirmada(i));
 
   /* o cabeçalho é sempre igual — a questão cuida só do miolo */
   const cabeca = document.createElement('div');
@@ -3157,6 +3309,9 @@ function desenhar(){
     },
     respondida(){ return i in estado.respostas; },
     entregue(){  return !!estado.entregue; },   /* true só na revisão */
+    /* fechada para mexer: ou a prova acabou, ou esta questão já foi
+       confirmada e o aluno só voltou para conferir */
+    travada(){ return !!estado.entregue || jaConfirmada(i); },
     /* para questões com etapas internas: 'fn' devolve true se
        tratou o "Confirmar" sozinha, e aí a prova não sai daqui;
        'rotulo' devolve o que o botão deve dizer (ou null para
@@ -3175,6 +3330,14 @@ function desenhar(){
   };
 
   q.montar(corpo, api);
+
+  /* quem voltou para conferir precisa saber por que nada responde */
+  if (!estado.entregue && jaConfirmada(i)){
+    const aviso = document.createElement('div');
+    aviso.className = 'aviso-travada';
+    aviso.textContent = 'Questão já confirmada — você pode conferir, mas não mudar';
+    palco.appendChild(aviso);
+  }
 
   $('#topo-atual').textContent = i + 1;
   atualizarRegua();
@@ -3204,17 +3367,29 @@ function atualizarNavegacao(){
     rotulo = pedido;      mostrar = true;
   } else if (estado.entregue){
     rotulo = ultima ? 'Voltar ao resultado' : 'Próxima'; mostrar = true;
+  } else if (jaConfirmada(i)){
+    /* já confirmada: o aluno só está de passagem, conferindo */
+    rotulo = ultima ? 'Entregar' : 'Avançar';            mostrar = true;
   } else {
     rotulo = ultima ? 'Entregar' : 'Confirmar';          mostrar = respondida;
   }
 
   av.textContent = rotulo;
   av.hidden = !mostrar;
+
+  /* voltar existe desde a segunda questão, e some no resultado */
+  $('#voltar').hidden = (i === 0);
 }
+
+$('#voltar').addEventListener('click', () => {
+  if (estado.indice > 0){ estado.indice--; salvar(); desenhar(); }
+});
 
 $('#avancar').addEventListener('click', () => {
   /* a questão atual pode querer o clique para si */
   if (interceptaAvanco && interceptaAvanco()) return;
+  /* sair de uma questão é confirmá-la: daqui ela só se lê */
+  if (!estado.entregue) marcarConfirmada(estado.indice);
   if (estado.indice < QUESTOES.length - 1){
     estado.indice++; salvar(); desenhar();
   } else if (estado.entregue){
@@ -3248,7 +3423,7 @@ function entregar(){
 function montarResultado(){
   const total   = QUESTOES.length;
   const acertos = Object.values(estado.respostas).filter(r => r.acertou).length;
-  const ganhos  = QUESTOES.map((q,i) => pontosDe(q, estado.respostas[i]));
+  const ganhos  = ORDEM.map((n,i) => pontosDe(QUESTOES[n], estado.respostas[i]));
   const nota    = ganhos.reduce((a,b) => a + b, 0);
 
   prepararProva();   /* deixa a revisão pronta para quando ele clicar */
@@ -3260,6 +3435,7 @@ function montarResultado(){
   $('#fim-nome').textContent    = estado.aluno.nome;
   $('#fim-turma').textContent   = estado.aluno.turma;
   $('#fim-turno').textContent   = estado.aluno.turno;
+  $('#fim-tipo').textContent    = 'tipo ' + TIPO;
   $('#fim-data').textContent    = new Date().toLocaleString('pt-BR', {
     day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'
   });
@@ -3270,7 +3446,8 @@ function montarResultado(){
      parte que ensina. */
   const mapa = $('#fim-mapa');
   mapa.innerHTML = '';
-  QUESTOES.forEach((q,i) => {
+  ORDEM.forEach((n,i) => {
+    const q  = QUESTOES[n];
     const r  = estado.respostas[i];
     const pt = ganhos[i];
     /* três estados, não dois: nas questões de vários itens dá para
@@ -3314,8 +3491,8 @@ function cuidarDoEnvio(nota, acertos, total){
 
   /* o detalhe leva os pontos de cada questão, não só certo e errado:
      é o que deixa você ver onde a turma tropeçou */
-  const detalhe = QUESTOES.map((q,i) =>
-    (i+1) + ':' + numero(pontosDe(q, estado.respostas[i]))
+  const detalhe = 'Tipo ' + TIPO + '  ' + ORDEM.map((n,i) =>
+    (i+1) + ':' + numero(pontosDe(QUESTOES[n], estado.respostas[i]))
   ).join('  ');
 
   linha.className = 'envio indo';
@@ -3400,16 +3577,25 @@ $('#outro-aluno').addEventListener('click', () => {
 
 (function inicio(){
   const antigo = recuperar();
+
+  /* A semente decide o tipo da prova e a ordem das alternativas.
+     Vem guardada se a prova já começou — assim recarregar a página
+     devolve exatamente a mesma prova, com as respostas apontando
+     para as alternativas certas. */
+  estado.semente = (antigo && antigo.semente) ||
+                   (Date.now() ^ Math.floor(Math.random() * 0x7FFFFFFF));
+  arrumarProva(estado.semente);
+
   if (!antigo || !antigo.aluno || !antigo.aluno.nome) return;
 
   ficha.nome.value  = antigo.aluno.nome;
   ficha.turma.value = antigo.aluno.turma || '';
   ficha.turno.value = antigo.aluno.turno || '';
-  estado.aluno     = antigo.aluno;
-  estado.respostas = antigo.respostas || {};
-  estado.indice    = antigo.indice || 0;
-
-  estado.entregue  = !!antigo.entregue;
+  estado.aluno       = antigo.aluno;
+  estado.respostas   = antigo.respostas || {};
+  estado.indice      = antigo.indice || 0;
+  estado.confirmadas = antigo.confirmadas || [];
+  estado.entregue    = !!antigo.entregue;
 
   if (Object.keys(estado.respostas).length){
     $('#comecar').textContent = estado.entregue ? 'Ver o resultado' : 'Continuar';
