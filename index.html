@@ -709,6 +709,60 @@ h1 em{font-style:normal;color:var(--amber)}
 @keyframes eRastro{from{opacity:.85;transform:scale(1)}
                    to  {opacity:0;  transform:scale(.3)}}
 
+/* ---------- por dentro das substâncias ----------
+   À esquerda, a substância no recipiente em que ela é guardada — o
+   gás no cilindro, o líquido no béquer, o sólido iônico no frasco de
+   reagente, o metal em barra. Tocar nela abre uma janela só do tamanho
+   dela: a visão submicroscópica, desenhada a partir dos modelos do app
+   da aula. À direita, os três tipos de composto. */
+.composto{
+  display:grid;grid-template-columns:auto minmax(0,1fr);
+  gap:12px 40px;align-items:center;
+}
+.lado-vaso{display:flex;flex-direction:column;align-items:center;gap:10px;width:250px}
+.vaso-card{display:flex;flex-direction:column;align-items:center;gap:7px;position:relative}
+.vaso{
+  position:relative;display:block;padding:0;border:0;background:none;color:inherit;font:inherit;
+  width:clamp(150px,26vh,200px);aspect-ratio:200 / 260;border-radius:18px;cursor:zoom-in;
+}
+.vaso > svg{position:absolute;inset:0;width:100%;height:100%;transition:opacity .35s ease,transform .3s ease}
+.vaso:hover > svg{transform:scale(1.03)}
+.vaso:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+/* a janela: nasce um ponto onde o dedo tocou e se abre em círculo
+   até cobrir o recipiente inteiro — e só ele */
+.micro-janela{
+  position:absolute;inset:0;border-radius:18px;overflow:hidden;
+  clip-path:circle(0% at var(--cx,50%) var(--cy,50%));
+  transition:clip-path .55s cubic-bezier(.3,.7,.2,1);
+}
+.micro-janela::after{
+  content:'';position:absolute;inset:0;border-radius:18px;pointer-events:none;
+  box-shadow:inset 0 0 0 2px rgba(69,199,176,.55),inset 0 0 34px rgba(3,12,22,.85);
+}
+.micro{position:absolute;inset:0;width:100%;height:100%;display:block}
+.vaso-card.aberto .vaso{cursor:zoom-out}
+.vaso-card.aberto .micro-janela{clip-path:circle(85% at var(--cx,50%) var(--cy,50%))}
+.vaso-card.aberto .vaso > svg{opacity:.2}
+.vaso-nome{
+  font-family:var(--display);font-weight:600;font-size:16px;line-height:1.15;
+  color:var(--paper);text-align:center;
+}
+.vaso-lupa{
+  display:inline-flex;align-items:center;gap:7px;padding:6px 13px;border-radius:999px;
+  cursor:pointer;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--aqua);
+  background:rgba(69,199,176,.08);border:1px solid rgba(69,199,176,.32);
+  transition:background .2s,color .2s,border-color .2s;
+}
+.vaso-lupa svg{width:13px;height:13px;flex:none}
+.vaso-lupa:hover{border-color:var(--aqua)}
+.vaso-lupa:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.vaso-card.aberto .vaso-lupa{background:var(--aqua);color:#062018;border-color:var(--aqua)}
+.composto .alternativas{max-width:none}
+@media (max-width:760px){
+  .composto{grid-template-columns:1fr;justify-items:center}
+}
+
 /* ---------- a fonte de elétrons ----------
    A mesma ampola do slide 7 da aula: um tubo de descarga, que é de
    onde o elétron veio na história de verdade — foi num tubo assim,
@@ -2657,6 +2711,511 @@ function escolherLewis(corpo, api, q){
    esquerda para a direita. Negativo se foram no sentido contrário,
    o que deixa o aluno desfazer sem sair da questão.
    ------------------------------------------------------------ */
+/* ------------------------------------------------------------
+   A VISÃO SUBMICROSCÓPICA
+
+   Os modelos são os do app da aula, com os mesmos números:
+   · as moléculas saem da tabela de geometria de lá (a água com os
+     hidrogênios enterrados no oxigênio, o gás carbônico reto);
+   · o retículo iônico é o sal-gema — ânion e cátion alternados nas
+     três direções —, com as cores e os raios do NaCl e do MgO;
+   · o metal é o cúbico de corpo centrado do ferro, só cátions, e o
+     mar de elétrons vagando entre eles, de ninguém.
+
+   É um desenho 3D de bolso: cada esfera tem posição no espaço, a cena
+   é girada, projetada com perspectiva e pintada de trás para a frente.
+   O motor da aula faz muito mais (desmontar, dissolver, arrancar íon);
+   aqui basta olhar, e o que se olha tem de ser o mesmo modelo.
+   ------------------------------------------------------------ */
+const MICRO_MOL = {
+  /* MOLGEO.h2o da aula, centrado e em escala: O com os dois H colados */
+  h2o: [ { d:[0,-4.5,0],     r:11.7, cor:'#FF0D0D' },
+         { d:[-11.4,4.3,0],  r:6.8,  cor:'#FFFFFF' },
+         { d:[11.4,4.3,0],   r:6.8,  cor:'#FFFFFF' } ],
+  /* MOLGEO.co2 da aula: O=C=O em linha */
+  co2: [ { d:[0,0,0],        r:9,    cor:'#909090' },
+         { d:[-16.2,0,0],    r:10.8, cor:'#FF0D0D' },
+         { d:[16.2,0,0],     r:10.8, cor:'#FF0D0D' } ]
+};
+
+function tomDe(hex, f){
+  const n = parseInt(hex.slice(1), 16);
+  return 'rgb(' + [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v =>
+    Math.round(f > 0 ? v + (255 - v) * f : v * (1 + f))).join(',') + ')';
+}
+
+function montaCena(spec){
+  const esfera = (x, y, z, r, cor, sinal) =>
+    ({ p:[x, y, z], r, cor, sinal: sinal || '', claro: tomDe(cor, .55), escuro: tomDe(cor, -.6) });
+
+  /* --- sal-gema: 4x4x4, a soma par é o ânion, como na aula --- */
+  if (spec.tipo === 'ionico'){
+    const n = 4, e = 54, h = (n - 1) / 2, itens = [];
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) for (let k = 0; k < n; k++){
+      const q = (i + j + k) % 2 === 0 ? spec.anion : spec.cation;
+      itens.push(esfera((i - h) * e, (j - h) * e, (k - h) * e, q.r, q.cor, q.sinal));
+    }
+    return { itens, eletrons: [], gira: true, B: h * e + spec.anion.r };
+  }
+
+  /* o mar de elétrons: cada um vagueia, troca de rumo aos poucos e
+     rebate nas bordas — ninguém é de ninguém */
+  const mar = (qtd, B) => Array.from({ length: qtd }, () => {
+    const d = [Math.random() - .5, Math.random() - .5, Math.random() - .5];
+    const L = Math.hypot(d[0], d[1], d[2]) || 1;
+    return { p: [(Math.random() * 2 - 1) * B, (Math.random() * 2 - 1) * B, (Math.random() * 2 - 1) * B],
+             v: d.map(x => x / L) };
+  });
+  const andaMar = (els, B, dt, vel) => els.forEach(el => {
+    for (let k = 0; k < 3; k++) el.v[k] += (Math.random() - .5) * .25;
+    const L = Math.hypot(el.v[0], el.v[1], el.v[2]) || 1;
+    for (let k = 0; k < 3; k++){
+      el.v[k] /= L;
+      el.p[k] += el.v[k] * vel * dt;
+      if (el.p[k] >  B){ el.p[k] =  B; el.v[k] = -Math.abs(el.v[k]); }
+      if (el.p[k] < -B){ el.p[k] = -B; el.v[k] =  Math.abs(el.v[k]); }
+    }
+  });
+
+  /* --- metal sólido: cúbico de corpo centrado, redeMetal da aula --- */
+  if (spec.tipo === 'metal'){
+    const cubos = 2, e = 64, h = cubos / 2, itens = [];
+    for (let i = 0; i <= cubos; i++) for (let j = 0; j <= cubos; j++) for (let k = 0; k <= cubos; k++)
+      itens.push(esfera((i - h) * e, (j - h) * e, (k - h) * e, 14, spec.cor, '+'));
+    for (let i = 0; i < cubos; i++) for (let j = 0; j < cubos; j++) for (let k = 0; k < cubos; k++)
+      itens.push(esfera((i + .5 - h) * e, (j + .5 - h) * e, (k + .5 - h) * e, 14, spec.cor, '+'));
+    const B = h * e + 14;
+    const eletrons = mar(80, B);
+    return { itens, eletrons, gira: true, B,
+             anda(dt){ andaMar(eletrons, B, dt, .05); } };
+  }
+
+  /* --- metal líquido: os mesmos cátions e o mesmo mar, sem ordem --- */
+  if (spec.tipo === 'metal-liquido'){
+    const B = 70, r = 13, itens = [], casas = [];
+    for (let t = 0; itens.length < 34 && t < 4000; t++){
+      const c = [0, 1, 2].map(() => (Math.random() * 2 - 1) * (B - r));
+      if (casas.some(o => Math.hypot(o[0] - c[0], o[1] - c[1], o[2] - c[2]) < 2 * r + 2)) continue;
+      casas.push(c);
+      const it = esfera(c[0], c[1], c[2], r, spec.cor, '+');
+      it.casa = c.slice(); it.fase = Math.random() * 6.28;
+      itens.push(it);
+    }
+    const eletrons = mar(70, B);
+    return { itens, eletrons, gira: false, B,
+      anda(dt){
+        const t = performance.now() / 1000;
+        itens.forEach(it => {
+          /* o líquido não para: cada cátion ronda a própria casa, e a
+             casa inteira desliza devagar */
+          for (let k = 0; k < 3; k++){
+            it.casa[k] += Math.sin(t * .4 + it.fase + k) * .006 * dt;
+            it.casa[k] = Math.max(-B + r, Math.min(B - r, it.casa[k]));
+            it.p[k] = it.casa[k] + Math.sin(t * 2.1 + it.fase * (k + 1)) * 3;
+          }
+        });
+        andaMar(eletrons, B, dt, .05);
+      } };
+  }
+
+  /* --- moléculas soltas: cada uma anda, gira e se afasta das outras --- */
+  const modelo = MICRO_MOL[spec.mol] || MICRO_MOL.h2o;
+  const B = spec.B, dmin = spec.dmin, mols = [];
+  for (let t = 0; mols.length < spec.n && t < 5000; t++){
+    const c = [0, 1, 2].map(() => (Math.random() * 2 - 1) * (B - 16));
+    if (mols.some(m => Math.hypot(m.c[0] - c[0], m.c[1] - c[1], m.c[2] - c[2]) < dmin)) continue;
+    const d = [Math.random() - .5, Math.random() - .5, Math.random() - .5];
+    const L = Math.hypot(d[0], d[1], d[2]) || 1;
+    mols.push({ c, v: d.map(x => x / L * spec.vel),
+                ang: [Math.random() * 6.28, Math.random() * 6.28],
+                w: [(Math.random() - .5) * .003, (Math.random() - .5) * .003],
+                at: modelo.map(a => esfera(0, 0, 0, a.r, a.cor, '')) });
+  }
+  const itens = [].concat(...mols.map(m => m.at));
+  const posiciona = () => mols.forEach(m => {
+    const ca = Math.cos(m.ang[0]), sa = Math.sin(m.ang[0]);
+    const cb = Math.cos(m.ang[1]), sb = Math.sin(m.ang[1]);
+    modelo.forEach((a, i) => {
+      const [x, y, z] = a.d;
+      const y1 = y * ca - z * sa, z1 = y * sa + z * ca;
+      const x2 = x * cb + z1 * sb, z2 = -x * sb + z1 * cb;
+      m.at[i].p = [m.c[0] + x2, m.c[1] + y1, m.c[2] + z2];
+    });
+  });
+  posiciona();
+  return { itens, eletrons: [], gira: false, B,
+    anda(dt){
+      mols.forEach(m => {
+        for (let k = 0; k < 3; k++){
+          m.v[k] += (Math.random() - .5) * spec.vel * .08;
+        }
+        const L = Math.hypot(m.v[0], m.v[1], m.v[2]) || 1;
+        for (let k = 0; k < 3; k++){
+          m.v[k] = m.v[k] / L * spec.vel;
+          m.c[k] += m.v[k] * dt;
+          const lim = B - 14;
+          if (m.c[k] >  lim){ m.c[k] =  lim; m.v[k] = -Math.abs(m.v[k]); }
+          if (m.c[k] < -lim){ m.c[k] = -lim; m.v[k] =  Math.abs(m.v[k]); }
+        }
+        m.ang[0] += m.w[0] * dt; m.ang[1] += m.w[1] * dt;
+      });
+      /* uma molécula não atravessa a outra: perto demais, se empurram */
+      for (let a = 0; a < mols.length; a++) for (let b = a + 1; b < mols.length; b++){
+        const A = mols[a].c, C = mols[b].c;
+        const dx = C[0] - A[0], dy = C[1] - A[1], dz = C[2] - A[2];
+        const dd = Math.hypot(dx, dy, dz) || .001;
+        if (dd < dmin * .8){
+          const f = (dmin * .8 - dd) / 2 / dd;
+          A[0] -= dx * f; A[1] -= dy * f; A[2] -= dz * f;
+          C[0] += dx * f; C[1] += dy * f; C[2] += dz * f;
+        }
+      }
+      posiciona();
+    } };
+}
+
+function ligaMicro(canvas, spec){
+  const ctx = canvas.getContext('2d');
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const W = canvas.clientWidth || 190, H = canvas.clientHeight || 247;
+  canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const cena = montaCena(spec);
+  const TILT = .42;
+  let ang = .62, t0 = performance.now(), vivo = true, raf = 0;
+
+  function desenha(){
+    const bg = ctx.createRadialGradient(W / 2, H * .42, 8, W / 2, H / 2, Math.max(W, H) * .75);
+    bg.addColorStop(0, '#16354F'); bg.addColorStop(1, '#050E18');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+    /* girando, a quina do cubo passa pela frente e sai mais longe que a
+       face: a folga tem de caber a diagonal, senão o retículo é cortado */
+    const B = cena.B, k = Math.min(W, H) / (2 * B * (cena.gira ? 1.5 : 1.1)), D = B * 5;
+    const ca = Math.cos(ang), sa = Math.sin(ang), ct = Math.cos(TILT), st = Math.sin(TILT);
+    const proj = ([x, y, z]) => {
+      if (cena.gira){
+        const x1 = x * ca + z * sa, z1 = -x * sa + z * ca;
+        const y2 = y * ct - z1 * st, z2 = y * st + z1 * ct;
+        x = x1; y = y2; z = z2;
+      }
+      const s = D / (D + z);
+      return { X: W / 2 + x * s * k, Y: H / 2 + y * s * k, Z: z, s };
+    };
+    const lista = cena.itens.map(it => Object.assign(proj(it.p), { it }))
+      .concat(cena.eletrons.map(el => Object.assign(proj(el.p), { el })));
+    lista.sort((a, b) => b.Z - a.Z);          /* de trás para a frente */
+
+    lista.forEach(o => {
+      /* os de trás um pouco apagados: é a névoa que dá a profundidade */
+      const perto = 1 - Math.max(0, Math.min(1, (o.Z + B) / (2 * B)));
+      ctx.globalAlpha = .55 + .45 * perto;
+      if (o.el){
+        const R = 3 * o.s * k;
+        ctx.fillStyle = 'rgba(143,216,255,.22)';
+        ctx.beginPath(); ctx.arc(o.X, o.Y, R * 2.6, 0, 6.2832); ctx.fill();
+        ctx.fillStyle = '#D6F3FF';
+        ctx.beginPath(); ctx.arc(o.X, o.Y, R, 0, 6.2832); ctx.fill();
+        return;
+      }
+      const it = o.it, R = it.r * o.s * k;
+      const g = ctx.createRadialGradient(o.X - R * .35, o.Y - R * .4, R * .08, o.X, o.Y, R);
+      g.addColorStop(0, it.claro); g.addColorStop(.45, it.cor); g.addColorStop(1, it.escuro);
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(o.X, o.Y, R, 0, 6.2832); ctx.fill();
+      if (it.sinal && R > 6.5){
+        ctx.font = '600 ' + (R * (it.sinal.length > 1 ? .72 : 1.05)).toFixed(1) + 'px "IBM Plex Mono", monospace';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = 'rgba(0,0,0,.35)';
+        ctx.fillText(it.sinal, o.X + .8, o.Y + 1.4);
+        ctx.fillStyle = 'rgba(255,255,255,.92)';
+        ctx.fillText(it.sinal, o.X, o.Y + .6);
+      }
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  function quadro(agora){
+    if (!vivo || !canvas.isConnected) return;
+    const dt = Math.min(50, agora - t0); t0 = agora;
+    if (cena.anda) cena.anda(dt);
+    if (cena.gira) ang += dt * .00032;
+    desenha();
+    raf = requestAnimationFrame(quadro);
+  }
+  if (REDUZ_MOVIMENTO) desenha();           /* parado, mas à vista */
+  else raf = requestAnimationFrame(quadro);
+  return { para(){ vivo = false; cancelAnimationFrame(raf); } };
+}
+
+/* ---------- os recipientes, no palco 200 x 260 da aula ---------- */
+let VASO_N = 0;
+function formulaVaso(txt, cx, y, size){
+  let desceu = 0;
+  const partes = String(txt).split(/(\d+)/).filter(x => x !== '').map(x => {
+    if (!/^\d+$/.test(x)){
+      const volta = desceu ? ' dy="' + (-desceu) + '"' : '';
+      desceu = 0;
+      return '<tspan' + volta + '>' + x + '</tspan>';
+    }
+    desceu = Math.round(size * .26);
+    return '<tspan font-size="' + Math.round(size * .68) + '" dy="' + desceu + '">' + x + '</tspan>';
+  }).join('');
+  return '<text x="' + cx + '" y="' + y + '" text-anchor="middle" fill="#16232E" ' +
+         'font-family="Space Grotesk, sans-serif" font-size="' + size + '" font-weight="700">' +
+         partes + '</text>';
+}
+function nomeVaso(nome, cx, y, larg){
+  const tam = 14;
+  const cabe = Math.min(larg, nome.length * tam * .56);
+  return '<text x="' + cx + '" y="' + y + '" text-anchor="middle" fill="#16232E" ' +
+         'font-family="IBM Plex Sans, sans-serif" font-size="' + tam + '" font-weight="600" ' +
+         'textLength="' + cabe.toFixed(0) + '" lengthAdjust="spacingAndGlyphs">' + nome + '</text>';
+}
+
+function VASO_SVG(e){
+  const id = 'vs' + (++VASO_N);
+  let arte = '';
+  if (e.vaso === 'cilindro'){
+    /* o CYLINDER da aula: volante, corpo na cor do gás, sombra cilíndrica */
+    const corpo = 'M46 92 C46 56 154 56 154 92 L154 232 Q154 248 138 248 L62 248 Q46 248 46 232 Z';
+    arte =
+      '<defs><linearGradient id="' + id + 'sh" x1="0" y1="0" x2="1" y2="0">' +
+        '<stop offset="0" stop-color="#000" stop-opacity=".32"/>' +
+        '<stop offset=".2" stop-color="#fff" stop-opacity=".5"/>' +
+        '<stop offset=".55" stop-color="#fff" stop-opacity="0"/>' +
+        '<stop offset="1" stop-color="#000" stop-opacity=".44"/></linearGradient></defs>' +
+      '<circle cx="100" cy="16" r="13" fill="none" stroke="#93A0AB" stroke-width="6"/>' +
+      '<rect x="92" y="20" width="16" height="18" fill="#7C8994"/>' +
+      '<rect x="76" y="34" width="48" height="16" rx="4" fill="#68757F"/>' +
+      '<path d="' + corpo + '" fill="' + e.cor + '"/>' +
+      '<path d="' + corpo + '" fill="url(#' + id + 'sh)"/>' +
+      '<path d="' + corpo + '" fill="none" stroke="#5F6B76" stroke-width="2"/>' +
+      '<rect x="46" y="106" width="108" height="6" fill="#5F6B76" opacity=".45"/>' +
+      '<rect x="52" y="128" width="96" height="72" rx="3" fill="#F2F6F8" opacity=".95"/>' +
+      nomeVaso(e.nome, 100, 152, 84) + formulaVaso(e.formula, 100, 188, 26) +
+      '<rect x="42" y="242" width="116" height="14" rx="5" fill="#5F6B76"/>';
+  } else if (e.vaso === 'bequer'){
+    /* o BEAKER da aula: paredes retas, bico, graduação e o líquido */
+    const corpo = 'M50 56 L50 228 Q50 246 72 246 L128 246 Q150 246 150 228 L150 56 Z';
+    arte =
+      '<defs><linearGradient id="' + id + 'sh" x1="0" y1="0" x2="1" y2="0">' +
+        '<stop offset="0" stop-color="#000" stop-opacity=".30"/>' +
+        '<stop offset=".18" stop-color="#fff" stop-opacity=".40"/>' +
+        '<stop offset=".55" stop-color="#fff" stop-opacity="0"/>' +
+        '<stop offset="1" stop-color="#000" stop-opacity=".42"/></linearGradient>' +
+        '<clipPath id="' + id + 'in"><path d="' + corpo + '"/></clipPath></defs>' +
+      '<path d="M148 50 L170 40 L172 50 L152 62 Z" fill="#C9DAE4" opacity=".55"/>' +
+      '<g clip-path="url(#' + id + 'in)">' +
+        '<rect x="40" y="104" width="120" height="150" fill="' + e.cor + '"/>' +
+        '<rect x="40" y="104" width="120" height="150" fill="url(#' + id + 'sh)" opacity=".45"/>' +
+        '<ellipse cx="100" cy="104" rx="50" ry="7.5" fill="' + e.luz + '" opacity=".8"/>' +
+      '</g>' +
+      '<path d="' + corpo + '" fill="url(#' + id + 'sh)" opacity=".5"/>' +
+      '<path d="' + corpo + '" fill="none" stroke="#B9CBD6" stroke-opacity=".72" stroke-width="2.4"/>' +
+      '<ellipse cx="100" cy="56" rx="50" ry="8" fill="none" stroke="#D6E8F0" stroke-opacity=".72" stroke-width="2.4"/>' +
+      [80, 96, 120].map(y => '<path d="M60 ' + y + ' H84" stroke="#E8F1F5" stroke-opacity=".38" stroke-width="2"/>').join('') +
+      '<rect x="54" y="150" width="92" height="66" rx="3" fill="#F2F6F8" opacity=".95"/>' +
+      nomeVaso(e.nome, 100, 172, 80) + formulaVaso(e.formula, 100, 204, 24);
+  } else if (e.vaso === 'frasco'){
+    /* frasco de reagente: tampa, vidro, e o sólido em cristais no fundo */
+    const vidro = 'M58 50 Q40 58 40 82 L40 228 Q40 246 58 246 L142 246 Q160 246 160 228 L160 82 Q160 58 142 50 Z';
+    let cristais = '';
+    let sem = 7;
+    const rnd = () => { sem = (sem * 9301 + 49297) % 233280; return sem / 233280; };
+    for (let i = 0; i < 70; i++){
+      const x = 50 + rnd() * 100, y = 188 + rnd() * 50, t = 3 + rnd() * 5, a = rnd() * 90;
+      cristais += '<rect x="' + (x - t / 2).toFixed(1) + '" y="' + (y - t / 2).toFixed(1) +
+        '" width="' + t.toFixed(1) + '" height="' + t.toFixed(1) + '" fill="' +
+        (rnd() > .5 ? '#F4F7F9' : '#C9D5DD') + '" transform="rotate(' + a.toFixed(0) + ' ' +
+        x.toFixed(1) + ' ' + y.toFixed(1) + ')"/>';
+    }
+    arte =
+      '<defs><clipPath id="' + id + 'in"><path d="' + vidro + '"/></clipPath></defs>' +
+      '<rect x="60" y="14" width="80" height="28" rx="6" fill="#2F3D49"/>' +
+      '<rect x="66" y="38" width="68" height="12" fill="#223039"/>' +
+      '<path d="' + vidro + '" fill="rgba(214,232,242,.10)"/>' +
+      '<g clip-path="url(#' + id + 'in)">' +
+        '<path d="M40 200 Q70 184 100 190 Q130 182 160 198 L160 250 L40 250 Z" fill="#DDE6EC"/>' +
+        cristais + '</g>' +
+      '<path d="' + vidro + '" fill="none" stroke="#B9CBD6" stroke-opacity=".72" stroke-width="2.4"/>' +
+      '<rect x="50" y="92" width="100" height="70" rx="4" fill="#F2F6F8" opacity=".95"/>' +
+      nomeVaso(e.nome, 100, 116, 88) + formulaVaso(e.formula, 100, 150, 24) +
+      '<path d="M52 176 L52 226" stroke="#fff" stroke-opacity=".3" stroke-width="5" stroke-linecap="round"/>';
+  } else {
+    /* barra de metal: frente, topo e lado, com o brilho de metal */
+    arte =
+      '<defs><linearGradient id="' + id + 'fr" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="' + tomDe(e.cor, .35) + '"/>' +
+        '<stop offset=".5" stop-color="' + e.cor + '"/>' +
+        '<stop offset="1" stop-color="' + tomDe(e.cor, -.45) + '"/></linearGradient></defs>' +
+      '<ellipse cx="100" cy="216" rx="86" ry="10" fill="#000" opacity=".35"/>' +
+      '<path d="M62 104 L162 104 L154 124 L46 124 Z" fill="' + tomDe(e.cor, .5) + '"/>' +
+      '<path d="M162 104 L184 184 L176 206 L154 124 Z" fill="' + tomDe(e.cor, -.5) + '"/>' +
+      '<path d="M46 124 L154 124 L176 206 L24 206 Z" fill="url(#' + id + 'fr)"/>' +
+      '<path d="M58 132 L70 132" stroke="#fff" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/>' +
+      '<rect x="60" y="138" width="80" height="56" rx="3" fill="#F2F6F8" opacity=".95"/>' +
+      nomeVaso(e.nome, 100, 158, 70) + formulaVaso(e.formula, 100, 186, 22);
+  }
+  return '<svg viewBox="0 0 200 260" aria-hidden="true">' + arte + '</svg>';
+}
+
+/* ------------------------------------------------------------
+   A QUESTÃO: que tipo de composto é este?
+   Mesmo esquema das questões de cubo: um exemplo por vez, e o
+   Confirmar vira o recipiente e as alternativas para o próximo.
+   A resposta de cada exemplo é guardada pelo NOME do tipo, e não
+   pela posição do botão — as alternativas mudam de ordem de uma
+   prova para a outra.
+   ------------------------------------------------------------ */
+const LUPA_SVG = '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="6.8" cy="6.8" r="4.6" ' +
+  'fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10.3 10.3 L14 14" ' +
+  'stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+
+function escolherComposto(corpo, api, q){
+  const exemplos = q.exemplos;
+  const guardadas = api.resposta();
+  const respostas = Array.isArray(guardadas) ? guardadas.slice() : exemplos.map(() => null);
+  const letras = ['a','b','c','d','e','f','g','h'];
+  const tudoCerto = () => respostas.every((r, k) => r === exemplos[k].certa);
+
+  let face = respostas.findIndex(r => r === null);
+  if (face < 0) face = exemplos.length - 1;
+
+  const bloco = document.createElement('div');
+  bloco.className = 'composto';
+  bloco.innerHTML =
+    '<div class="lado-vaso">' +
+      '<div class="vaso-card"></div>' +
+      '<div class="passos" role="group" aria-label="Substância da vez"></div>' +
+    '</div>' +
+    '<div class="alt-palco"><div class="alternativas"></div></div>';
+  corpo.appendChild(bloco);
+  const card   = bloco.querySelector('.vaso-card');
+  const lista  = bloco.querySelector('.alternativas');
+  const passos = bloco.querySelector('.passos');
+  let micro = null;
+
+  function fechaMicro(){
+    card.classList.remove('aberto');
+    if (micro){ micro.para(); micro = null; }
+  }
+
+  function desenhaExemplo(){
+    fechaMicro();
+    const e = exemplos[face];
+    card.innerHTML =
+      '<button type="button" class="vaso">' + VASO_SVG(e) +
+        '<div class="micro-janela"><canvas class="micro"></canvas></div></button>' +
+      '<div class="vaso-nome"></div>' +
+      '<button type="button" class="vaso-lupa">' + LUPA_SVG + '<span>visão submicroscópica</span></button>';
+    card.querySelector('.vaso-nome').textContent = e.nome;
+    const vaso = card.querySelector('.vaso');
+    vaso.setAttribute('aria-label', 'Ver a visão submicroscópica: ' + e.nome);
+
+    const alterna = (cx, cy) => {
+      if (card.classList.contains('aberto')){
+        card.classList.remove('aberto');
+        const m = micro;
+        setTimeout(() => {                 /* para o desenho quando a janela fechou */
+          if (!card.classList.contains('aberto') && micro === m && m){ m.para(); micro = null; }
+        }, 600);
+        return;
+      }
+      card.style.setProperty('--cx', cx);
+      card.style.setProperty('--cy', cy);
+      if (!micro) micro = ligaMicro(card.querySelector('.micro'), e.micro);
+      card.classList.add('aberto');
+    };
+    vaso.addEventListener('click', ev => {
+      const r = vaso.getBoundingClientRect();
+      /* a janela nasce no ponto tocado; pelo teclado, no meio */
+      const dentro = ev.clientX || ev.clientY;
+      alterna(dentro ? ((ev.clientX - r.left) / r.width * 100).toFixed(0) + '%' : '50%',
+              dentro ? ((ev.clientY - r.top) / r.height * 100).toFixed(0) + '%' : '50%');
+    });
+    card.querySelector('.vaso-lupa').addEventListener('click', () => alterna('50%', '50%'));
+  }
+
+  const botoes = [];
+  function montarAlternativas(){
+    lista.innerHTML = '';
+    botoes.length = 0;
+    q.opcoes.forEach((o, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'alt';
+      b.dataset.tecla = String(i + 1);
+      b.innerHTML = '<span class="tecla" aria-hidden="true">' + (i + 1) + '</span>' +
+                    '<span class="corpo-alt"><span class="frase"></span></span>';
+      b.querySelector('.frase').textContent = o.texto;
+      b.addEventListener('click', () => {
+        if (api.travada()) return;
+        respostas[face] = o.id;
+        api.responder(respostas.slice(), tudoCerto());
+        pintar();
+      });
+      botoes.push(b);
+      lista.appendChild(b);
+    });
+    lista.classList.toggle('revisada', api.entregue());
+    pintar();
+  }
+
+  function pintar(){
+    [...passos.children].forEach((b, i) => {
+      b.classList.toggle('feito', respostas[i] !== null);
+      b.classList.toggle('atual', i === face);
+    });
+    botoes.forEach((b, i) => {
+      const id = q.opcoes[i].id;
+      b.classList.toggle('escolhida', !api.entregue() && respostas[face] === id);
+      b.classList.remove('certa', 'marcada-errada');
+      if (api.entregue()){
+        if (id === exemplos[face].certa) b.classList.add('certa');
+        else if (id === respostas[face]) b.classList.add('marcada-errada');
+      }
+    });
+    api.atualizarBotao();
+  }
+
+  function irPara(n){
+    const sentido = n > face ? 1 : -1;
+    fechaMicro();                          /* o que gira é o recipiente, fechado */
+    face = n;
+    giraPecas([card, lista], sentido, () => { desenhaExemplo(); montarAlternativas(); });
+    pintar();
+  }
+
+  exemplos.forEach((e, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = letras[i];
+    b.disabled = !api.travada();
+    b.setAttribute('aria-label', 'Substância ' + letras[i] + ', ' + e.nome);
+    b.addEventListener('click', () => irPara(i));
+    passos.appendChild(b);
+  });
+
+  if (api.entregue()) api.retorno(q.comentario(respostas), tudoCerto());
+  if (!api.travada()){
+    api.aoAvancar(
+      () => {
+        if (face < exemplos.length - 1){ irPara(face + 1); return true; }
+        return false;
+      },
+      () => {
+        if (respostas[face] === null) return false;   /* sem escolha, sem botão */
+        if (face < exemplos.length - 1) return 'Confirmar';
+        return null;
+      }
+    );
+  }
+
+  desenhaExemplo();
+  montarAlternativas();
+}
+
 function escolherTransferencia(corpo, api, q){
   const pares = q.pares;
   const guardadas = api.resposta();
@@ -3331,7 +3890,7 @@ const QUESTOES = [
      pergunta, não a instrução.
      ========================================================= */
   {
-    valor: 3,          /* seis átomos a 0,5 cada */
+    valor: 1.5,        /* seis átomos a 0,25 cada */
     pontos(feitos){
       const lista = Array.isArray(feitos) ? feitos : [];
       const certos = this.exemplos.filter((ex,k) => lista[k] === ex.alvo).length;
@@ -3467,6 +4026,95 @@ const QUESTOES = [
              'exatamente o que o outro ganha. É isso que mantém a conta fechada — e é ' +
              'por isso que a fórmula do sal é NaCl, com um de cada.';
     }
+  },
+
+  /* =========================================================
+     QUESTÃO 9 — por dentro das substâncias.
+
+     Seis substâncias, duas de cada tipo, e duas armadilhas de
+     propósito: o mercúrio é LÍQUIDO e é metálico, e o gás carbônico
+     vem num cilindro de metal e é molecular. Quem decidir pelo
+     recipiente ou pelo estado físico erra; quem abre a visão
+     submicroscópica e olha o que existe lá dentro acerta.
+     ========================================================= */
+  {
+    valor: 1.5,        /* seis substâncias a 0,25 cada */
+    pontos(respostas){
+      const lista = Array.isArray(respostas) ? respostas : [];
+      const certos = this.exemplos.filter((e,k) => lista[k] === e.certa).length;
+      return certos * (this.valor / this.exemplos.length);
+    },
+    tipo: 'tipos de composto',
+    titulo: 'Por dentro das substâncias',
+    enunciado: 'Observe a visão submicroscópica das substâncias abaixo. Marque o tipo de ' +
+               'composto de cada exemplo, com base no que você aprendeu em sala.',
+
+    /* a ordem dos botões muda de uma prova para a outra; a resposta
+       é guardada pelo id, então isso não atrapalha */
+    opcoes: [
+      { id:'metalico',  texto:'Composto metálico'  },
+      { id:'ionico',    texto:'Composto iônico'    },
+      { id:'molecular', texto:'Composto molecular' }
+    ],
+
+    exemplos: [
+      { nome:'Água', formula:'H2O', vaso:'bequer', cor:'#3F8FC4', luz:'#9ED3EE',
+        certa:'molecular',
+        micro:{ tipo:'molecular', mol:'h2o', n:16, vel:.012, B:62, dmin:24 },
+        porque:'são moléculas de H₂O, cada uma com os átomos presos por ligação ' +
+               'covalente, bem juntas porque é líquido' },
+      { nome:'Gás carbônico', formula:'CO2', vaso:'cilindro', cor:'#7D8A95',
+        certa:'molecular',
+        micro:{ tipo:'molecular', mol:'co2', n:7, vel:.05, B:66, dmin:40 },
+        porque:'são moléculas de CO₂ soltas e afastadas — é gás. O cilindro é de metal, ' +
+               'mas o que está dentro dele não é' },
+      { nome:'Cloreto de sódio', formula:'NaCl', vaso:'frasco',
+        certa:'ionico',
+        micro:{ tipo:'ionico',
+                anion:  { cor:'#26D926', r:21, sinal:'−' },
+                cation: { cor:'#AB5CF2', r:12, sinal:'+' } },
+        porque:'são íons Na⁺ e Cl⁻ alternados num retículo que se repete em todas as ' +
+               'direções, sem molécula nenhuma' },
+      { nome:'Ferro', formula:'Fe', vaso:'lingote', cor:'#8E98A3',
+        certa:'metalico',
+        micro:{ tipo:'metal', cor:'#E06633' },
+        porque:'são cátions de ferro arrumados num retículo, envolvidos por um mar de ' +
+               'elétrons livres que não pertencem a nenhum deles' },
+      { nome:'Mercúrio', formula:'Hg', vaso:'bequer', cor:'#AEB8C2', luz:'#EEF3F7',
+        certa:'metalico',
+        micro:{ tipo:'metal-liquido', cor:'#B8B8D0' },
+        porque:'é líquido e mesmo assim não é feito de moléculas: são cátions de mercúrio ' +
+               'num mar de elétrons, como em qualquer metal' },
+      { nome:'Óxido de magnésio', formula:'MgO', vaso:'frasco',
+        certa:'ionico',
+        micro:{ tipo:'ionico',
+                anion:  { cor:'#FF0D0D', r:16, sinal:'2−' },
+                cation: { cor:'#8AFF00', r:9,  sinal:'2+' } },
+        porque:'são íons Mg²⁺ e O²⁻ num retículo — a mesma arrumação do sal de cozinha, ' +
+               'com cargas maiores' }
+    ],
+
+    montar(corpo, api){ escolherComposto(corpo, api, this); },
+
+    comentario(respostas){
+      const letras = ['a','b','c','d','e','f'];
+      const lista = Array.isArray(respostas) ? respostas : this.exemplos.map(() => null);
+      const nomeTipo = id => ((this.opcoes.find(o => o.id === id) || {}).texto || '').toLowerCase();
+      const linhas = this.exemplos.map((e, k) => {
+        const dado = lista[k];
+        const marca = dado === null || dado === undefined ? '<span class="nao">–</span>'
+                    : (dado === e.certa ? '<span class="ok">✓</span>'
+                                        : '<span class="nao">✕</span>');
+        return '<br>' + marca + ' <b>' + letras[k] + ') ' + e.nome + '</b> — ' +
+               nomeTipo(e.certa) + ': ' + e.porque + '.';
+      }).join('');
+      const acertos = this.exemplos.filter((e, k) => lista[k] === e.certa).length;
+      return 'Você acertou <b>' + acertos + ' de ' + this.exemplos.length + '</b> substâncias.' +
+             linhas +
+             '<br><br>Repare no mercúrio e no gás carbônico: nem o estado físico nem o ' +
+             'recipiente dizem o tipo de composto. O que decide é o que existe lá dentro — ' +
+             'moléculas, íons num retículo, ou cátions num mar de elétrons.';
+    }
   }
 
 ];
@@ -3534,10 +4182,13 @@ function enviarNota(dados){
 /* ============================================================
    A NOTA
 
-   A prova vale 10, repartidos por ITEM: cada coisa que o aluno tem
-   de acertar vale 0,5. São vinte — cinco questões de alternativa,
-   quatro átomos no cubo, seis na mesa de Rutherford e cinco pares
-   na transferência. Vinte meios fazem dez.
+   A prova vale 10, repartidos assim:
+     · cinco questões de alternativa ........ 0,5 cada  = 2,5
+     · o octeto, quatro átomos .............. 0,5 cada  = 2,0
+     · a mesa de Rutherford, seis átomos .... 0,25 cada = 1,5
+     · a transferência, cinco pares ......... 0,5 cada  = 2,5
+     · os tipos de composto, seis substâncias 0,25 cada = 1,5
+                                                          10,0
 
    Nas questões de vários itens a nota é PARTIDA: quem acerta cinco
    dos seis átomos leva 2,5, e não zero. Era o que faltava para a
@@ -3559,7 +4210,10 @@ function pontosDe(q, resposta){
 
 /* 7 vira "7,0" e 2.5 vira "2,5": vírgula, como se escreve no diário */
 function numero(n){
-  return (Math.round(n * 10) / 10).toFixed(1).replace('.', ',');
+  /* com itens de 0,25 a nota pode ter duas casas: 7,25 não pode virar 7,3 */
+  const c = Math.round(n * 100) / 100;
+  const umaCasa = Math.abs(Math.round(c * 10) - c * 10) < 1e-9;
+  return (umaCasa ? c.toFixed(1) : c.toFixed(2)).replace('.', ',');
 }
 
 /* ============================================================
@@ -3580,9 +4234,9 @@ function numero(n){
    longas, e começar por elas seria começar pelo fim.
    ============================================================ */
 const TIPOS = {
-  A: [0,1,2,3,4, 5,6,7],
-  B: [2,4,0,3,1, 5,7,6],
-  C: [3,0,4,1,2, 6,5,7]
+  A: [0,1,2,3,4, 8,5,6,7],
+  B: [2,4,0,3,1, 5,8,7,6],
+  C: [3,0,4,1,2, 6,5,8,7]
 };
 
 /* gerador com semente: a mesma semente devolve sempre os mesmos
@@ -3847,7 +4501,9 @@ function giraPecas(pecas, sentido, refaz){
     const pai = pc.parentElement;
     const f = pc.cloneNode(true);
     f.removeAttribute('id');
-    f.querySelectorAll('[id]').forEach(x => x.removeAttribute('id'));
+    /* ids de SVG ficam: são as referências dos degradês e recortes,
+       e sem elas o recipiente que gira sairia sem cor */
+    f.querySelectorAll('[id]').forEach(x => { if (!x.closest('svg')) x.removeAttribute('id'); });
     /* a cópia não responde ao teclado: as teclas 1–5 são da peça nova */
     f.querySelectorAll('[data-tecla]').forEach(x => x.removeAttribute('data-tecla'));
     f.setAttribute('aria-hidden', 'true');
