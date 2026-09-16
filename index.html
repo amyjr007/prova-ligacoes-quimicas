@@ -3415,7 +3415,8 @@ const QUESTOES = [
                'precisa ganhar, até que os dois fiquem estáveis.',
 
     /* z = elétrons do átomo neutro; alvo = os do gás nobre mais
-       próximo. O da esquerda é sempre quem doa. */
+       próximo. Quem doa pode ficar de qualquer lado: a ordem de cada
+       par é sorteada junto com o tipo da prova. */
     pares: [
       [ { simbolo:'Na', nome:'Sódio',     z:11, alvo:10, cor:'#AB5CF2', familia:'1A' },
         { simbolo:'Cl', nome:'Cloro',     z:17, alvo:18, cor:'#26D926', familia:'7A' } ],
@@ -3429,7 +3430,8 @@ const QUESTOES = [
         { simbolo:'N',  nome:'Nitrogênio',z:7,  alvo:10, cor:'#3050F8', familia:'5A' } ]
     ],
 
-    /* quantos elétrons têm de passar da esquerda para a direita */
+    /* quantos elétrons têm de passar da esquerda para a direita —
+       NEGATIVO quando quem doa está à direita e o fluxo é o inverso */
     certo(k){
       const par = this.pares[k];
       return par[0].z - par[0].alvo;
@@ -3446,12 +3448,16 @@ const QUESTOES = [
         const marca = dado === null || dado === undefined ? '<span class="nao">–</span>'
                     : (dado === n ? '<span class="ok">✓</span>'
                                   : '<span class="nao">✕</span>');
-        const carga = n > 1 ? n : '';
+        /* quem doa é quem tem elétron sobrando, esteja do lado que for */
+        const [doa, recebe] = n > 0 ? [par[0], par[1]] : [par[1], par[0]];
+        const q = Math.abs(n);
+        const carga = q > 1 ? q : '';
         return '<br>' + marca + ' <b>' + letras[k] + ') ' + par[0].simbolo + ' e ' +
-               par[1].simbolo + '</b> — ' + (n === 1 ? 'passa <b>1 elétron</b>'
-                                                     : 'passam <b>' + n + ' elétrons</b>') +
-               ': o ' + par[0].nome.toLowerCase() + ' fica ' + par[0].simbolo + carga + '⁺ ' +
-               'e o ' + par[1].nome.toLowerCase() + ' fica ' + par[1].simbolo + carga + '⁻, ' +
+               par[1].simbolo + '</b> — ' + (q === 1 ? 'passa <b>1 elétron</b>'
+                                                     : 'passam <b>' + q + ' elétrons</b>') +
+               ' do ' + doa.nome.toLowerCase() + ' para o ' + recebe.nome.toLowerCase() +
+               ': o ' + doa.nome.toLowerCase() + ' fica ' + doa.simbolo + carga + '⁺ ' +
+               'e o ' + recebe.nome.toLowerCase() + ' fica ' + recebe.simbolo + carga + '⁻, ' +
                'os dois com a camada de fora completa.';
       }).join('');
       const acertos = this.pares.filter((par,k) => lista[k] === this.certo(k)).length;
@@ -3628,6 +3634,14 @@ function arrumarProva(semente){
   /* as alternativas também trocam de lugar. Onde o certo é uma
      marca no próprio item, embaralhar basta; onde é um índice
      guardado à parte, o índice é refeito depois da troca. */
+  /* em cada par da transferência, quem fica à esquerda também é
+     sorteado: com o cátion sempre na frente, o aluno aprenderia a
+     arrastar da esquerda para a direita sem pensar em quem doa */
+  QUESTOES.forEach(q => {
+    if (!q.pares) return;
+    q.pares.forEach(par => { repoeOrdem(par); embaralha(par, rnd); });
+  });
+
   ['opcoes','retratos','gases'].forEach(campo => {
     QUESTOES.forEach(q => {
       if (!q[campo]) return;
