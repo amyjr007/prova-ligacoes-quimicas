@@ -372,6 +372,69 @@ h1 em{font-style:normal;color:var(--amber)}
 }
 @keyframes entra{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
+/* ---------- a troca de questão: um cubo girando ----------
+   A questão que sai é uma face do cubo e a que entra é a vizinha.
+   Avançando, o cubo gira para a esquerda; voltando, para a direita —
+   o sentido do giro diz ao aluno para que lado da prova ele andou.
+
+   A face que sai é uma cópia do palco, posta por cima dele enquanto
+   gira; a que entra é o próprio palco, já com a questão nova. */
+.prova{position:relative}
+.prova.girando{perspective:1400px;overflow:hidden}
+.palco-fantasma{
+  position:absolute;z-index:2;pointer-events:none;
+  display:flex;flex-direction:column;
+  backface-visibility:hidden;
+}
+#palco.entra-frente{
+  transform-origin:0% 50%;backface-visibility:hidden;
+  animation:cuboEntraFrente .7s both ease-in;
+}
+.palco-fantasma.sai-frente{transform-origin:100% 50%;animation:cuboSaiFrente .7s both ease-in}
+#palco.entra-tras{
+  transform-origin:100% 50%;backface-visibility:hidden;
+  animation:cuboEntraTras .7s both ease-in;
+}
+.palco-fantasma.sai-tras{transform-origin:0% 50%;animation:cuboSaiTras .7s both ease-in}
+/* ---------- a peça que gira junto com o cubo dos exemplos ----------
+   As alternativas da questão do octeto e o átomo da mesa: quando o
+   cubo vira para o próximo exemplo, eles viram também, no mesmo
+   sentido. A peça velha é copiada por cima e gira para fora; a nova
+   entra girando do outro lado. */
+.alt-palco{position:relative;--prof:-120px}
+.alt-palco.girando{perspective:1100px;overflow:hidden}
+.mesa{--prof:-110px}
+.mesa.girando{perspective:900px}
+.gira-fantasma{pointer-events:none;z-index:3;backface-visibility:hidden}
+.gira-sai-frente{transform-origin:100% 50%;animation:cuboSaiFrente .75s both ease-in !important}
+.gira-sai-tras  {transform-origin:0% 50%;  animation:cuboSaiTras   .75s both ease-in !important}
+.gira-entra-frente{transform-origin:0% 50%;  backface-visibility:hidden;
+                   animation:cuboEntraFrente .75s both ease-in !important}
+.gira-entra-tras  {transform-origin:100% 50%;backface-visibility:hidden;
+                   animation:cuboEntraTras   .75s both ease-in !important}
+@keyframes cuboSaiFrente{
+  50% {animation-timing-function:ease-out;
+       transform:translateX(-50%) translateZ(var(--prof,-220px)) rotateY(-45deg)}
+  100%{opacity:.3;transform:translateX(-100%) rotateY(-90deg)}
+}
+@keyframes cuboEntraFrente{
+  0%  {opacity:.3;transform:translateX(100%) rotateY(90deg)}
+  50% {animation-timing-function:ease-out;
+       transform:translateX(50%) translateZ(var(--prof,-220px)) rotateY(45deg)}
+  100%{opacity:1;transform:none}
+}
+@keyframes cuboSaiTras{
+  50% {animation-timing-function:ease-out;
+       transform:translateX(50%) translateZ(var(--prof,-220px)) rotateY(45deg)}
+  100%{opacity:.3;transform:translateX(100%) rotateY(90deg)}
+}
+@keyframes cuboEntraTras{
+  0%  {opacity:.3;transform:translateX(-100%) rotateY(-90deg)}
+  50% {animation-timing-function:ease-out;
+       transform:translateX(-50%) translateZ(var(--prof,-220px)) rotateY(-45deg)}
+  100%{opacity:1;transform:none}
+}
+
 /* o enunciado, escrito uma vez aqui para toda questão herdar */
 .q-cabeca{display:flex;flex-direction:column;gap:10px}
 .q-numero{
@@ -509,11 +572,15 @@ h1 em{font-style:normal;color:var(--amber)}
    profundidade de cada esferinha no amontoado */
 .nucleon{
   position:absolute;top:50%;left:50%;border-radius:50%;
+  display:grid;place-items:center;
   background:radial-gradient(circle at 34% 28%,#FFD9B0 0%,#E08A47 42%,#A9541F 100%);
   box-shadow:0 1px 3px rgba(60,20,0,.55);
 }
-.nucleon.n{   /* o nêutron, mais pálido que o próton */
-  background:radial-gradient(circle at 34% 28%,#E8E2DA 0%,#B2A79C 45%,#6E655C 100%);
+/* o sinal do próton, do tamanho que a esferinha deixar */
+.nucleon::after{
+  content:'+';font-family:var(--mono);font-weight:600;line-height:1;
+  font-size:var(--pf,8px);color:rgba(255,255,255,.78);
+  text-shadow:0 1px 2px rgba(60,20,0,.6);
 }
 /* O símbolo sai de dentro do núcleo e vira legenda embaixo do
    átomo — em cima das esferinhas ele não se leria. Debaixo dele, a
@@ -1049,6 +1116,10 @@ h1 em{font-style:normal;color:var(--amber)}
      gás nobre: aperta um pouco mais, só ela */
   .comportamento{gap:10px 26px}
   .comportamento .alt{padding:9px 14px;font-size:15px}
+  /* a do octeto tem cinco alternativas: mais justas, para o rodapé caber */
+  .com-atomo .alt{padding:6px 14px}
+  .com-atomo .alternativas{gap:5px}
+  .com-atomo .rodape-q{margin-top:-4px}
   .comportamento .alternativas{gap:6px}
   .lado-cubo{gap:8px}   /* o cubo já é pequeno; aqui só o respiro */
   .obs{font-size:11px}
@@ -1585,7 +1656,7 @@ function escolherComportamento(corpo, api, q){
       'distribuição eletrônica.</p>' +
       '<div class="subniveis" id="sub-atomo" hidden></div>' +
     '</div>' +
-    '<div class="alternativas"></div>' +
+    '<div class="alt-palco"><div class="alternativas"></div></div>' +
     '<div class="rodape-q">' +
       '<div class="subniveis lado" id="sub-nobre" hidden></div>' +
       '<button type="button" class="botao discreto pequeno nobre">Gás nobre</button>' +
@@ -1617,8 +1688,9 @@ function escolherComportamento(corpo, api, q){
   atomos.forEach((a, i) => {
     const f = document.createElement('div');
     f.className = 'face f' + i;      /* a posição da face é do CSS */
+    /* sem a letra na face: em cima do símbolo ela atrapalhava a
+       leitura, e quem diz em que átomo estamos são as letras de baixo */
     f.innerHTML =
-      '<span class="letra">' + letras[i] + ')</span>' +
       '<button type="button" class="atomo">' +
         '<span class="simbolo"></span><span class="z"></span>' +
       '</button>';
@@ -1685,12 +1757,14 @@ function escolherComportamento(corpo, api, q){
   });
 
   function irPara(n){
+    const sentido = n > face ? 1 : -1;
     giro += (n - face) * -90;
     face = n;
     cubo.style.transform = 'rotateY(' + giro + 'deg)';
     /* o que estava aberto era do átomo anterior */
     subAtomo.hidden = subNobre.hidden = true;
-    montarAlternativas();
+    /* as alternativas viram junto com o cubo: são do átomo novo */
+    giraPecas([lista], sentido, montarAlternativas);
     pintar();
   }
 
@@ -1798,22 +1872,50 @@ const FRACOES = [.46, .72, .98, .98];
 
    As posições são fixas e o giro também, para o núcleo não tremer
    a cada redesenho. */
-const NUCLEONS = (() => {
-  const f = 1.6180339887, n = Math.hypot(1, f);
-  const pontos = [[0,1,f],[0,1,-f],[0,-1,f],[0,-1,-f],
-                  [1,f,0],[1,-f,0],[-1,f,0],[-1,-f,0],
-                  [f,0,1],[f,0,-1],[-f,0,1],[-f,0,-1]]
-                 .map(([x,y,z]) => [x/n, y/n, z/n]);
-  pontos.push([0,0,0]);                      /* a do meio */
-  /* um giro qualquer, só para a silhueta não sair simétrica demais */
-  const a = .55, b = .95;
-  const gira = ([x,y,z]) => {
-    const y1 = y*Math.cos(a) - z*Math.sin(a), z1 = y*Math.sin(a) + z*Math.cos(a);
-    return [x*Math.cos(b) + z1*Math.sin(b), y1, -x*Math.sin(b) + z1*Math.cos(b)];
-  };
+/* O NÚCLEO É SÓ PRÓTONS, E NA CONTA CERTA ATÉ DOZE.
+   Os nêutrons saíram: nesta prova o que importa do núcleo é a carga,
+   e a carga é o número de prótons — o mesmo número atômico que o
+   aluno lê embaixo do símbolo. O hidrogênio mostra um, o magnésio doze.
+
+   Acima de doze a conta vira símbolo: treze esferinhas, sempre. O
+   cloro com dezessete bolas num círculo de quarenta pixels vira
+   mingau, e contar prótons não é o que a questão pede.
+
+   Os prótons ocupam as posições de um icosaedro com uma bola no meio,
+   que é como doze esferas se arrumam em volta de uma décima terceira.
+   Para n menor, entram o do meio e os n−1 vértices mais próximos de
+   um vértice de partida — assim qualquer quantidade sai compacta. */
+const PROTONS_REAIS = 12;
+const PROTONS_SIMBOLO = 13;
+const NUCLEO_GIRO = { a: .55, b: .95 };
+const giraNucleo = ([x,y,z]) => {
+  const { a, b } = NUCLEO_GIRO;
+  const y1 = y*Math.cos(a) - z*Math.sin(a), z1 = y*Math.sin(a) + z*Math.cos(a);
+  return [x*Math.cos(b) + z1*Math.sin(b), y1, -x*Math.sin(b) + z1*Math.cos(b)];
+};
+const ARRANJOS = {};
+function arranjoDoNucleo(z){
+  const n = z > PROTONS_REAIS ? PROTONS_SIMBOLO : Math.max(1, z);
+  if (ARRANJOS[n]) return ARRANJOS[n];
+  const f = 1.6180339887, k = Math.hypot(1, f);
+  const vert = [[0,1,f],[0,1,-f],[0,-1,f],[0,-1,-f],
+                [1,f,0],[1,-f,0],[-1,f,0],[-1,-f,0],
+                [f,0,1],[f,0,-1],[-f,0,1],[-f,0,-1]]
+               .map(([x,y,zz]) => [x/k, y/k, zz/k]);
+  /* o vértice de partida é o que, depois do giro, fica mais DE LADO
+     para o olho: com dois prótons, um atrás do outro pareceria um só */
+  const deLado = v => { const r = giraNucleo(v); return Math.hypot(r[0], r[1]); };
+  const v0 = vert.reduce((m, v) => deLado(v) > deLado(m) ? v : m, vert[0]);
+  const perto = v => Math.hypot(v[0]-v0[0], v[1]-v0[1], v[2]-v0[2]);
+  const ordem = vert.slice().sort((u, w) => perto(u) - perto(w));
+  let pts = [[0,0,0]].concat(ordem).slice(0, n);
+  /* recentra: o amontoado fica no meio da caixa, qualquer que seja n */
+  const c = [0,1,2].map(e => pts.reduce((t, q) => t + q[e], 0) / pts.length);
+  pts = pts.map(q => giraNucleo([q[0]-c[0], q[1]-c[1], q[2]-c[2]]));
   /* de trás para a frente: quem vem depois cobre quem veio antes */
-  return pontos.map(gira).sort((p, q) => p[2] - q[2]);
-})();
+  ARRANJOS[n] = pts.sort((u, w) => u[2] - w[2]);
+  return ARRANJOS[n];
+}
 
 /* ------------------------------------------------------------
    A ELETROSFERA QUE SE REARRUMA
@@ -2036,22 +2138,29 @@ function pontoNaMesa(el, mesa){
 
 function desenhaRutherford(lw, ex, total, novo, tamanho){
   const bola = lw.querySelector('.lw-bola');
-  if (!bola.dataset.pronto){
-    const nd = tamanho * .075;                    /* lado da esferinha */
+  /* o núcleo depende do elemento: refeito só quando ele muda */
+  const chave = ex.z + '@' + tamanho;
+  if (bola.dataset.nucleo !== chave){
+    bola.innerHTML = '';
+    const pts = arranjoDoNucleo(ex.z);
+    /* quanto mais prótons, menor cada esferinha: um só é grande, doze
+       cabem no mesmo lugar sem transbordar */
+    const nd = tamanho * Math.max(.066, .105 - .003 * (pts.length - 1));
     const raio = nd * .92;                        /* leve sobreposição */
-    NUCLEONS.forEach(([x,y,z], i) => {
+    pts.forEach(([x,y,z], i) => {
       const n = document.createElement('i');
-      n.className = 'nucleon' + (i % 3 === 1 ? ' n' : '');
+      n.className = 'nucleon';
       /* perto do olho, maior e mais clara */
-      const s = nd * (1 + z * .20);
-      n.style.width  = n.style.height = s.toFixed(1) + 'px';
-      n.style.marginLeft = (x * raio - s/2).toFixed(1) + 'px';
-      n.style.marginTop  = (y * raio - s/2).toFixed(1) + 'px';
+      const sz = nd * (1 + z * .20);
+      n.style.width  = n.style.height = sz.toFixed(1) + 'px';
+      n.style.marginLeft = (x * raio - sz/2).toFixed(1) + 'px';
+      n.style.marginTop  = (y * raio - sz/2).toFixed(1) + 'px';
+      n.style.setProperty('--pf', (sz * .62).toFixed(1) + 'px');
       n.style.zIndex = i;                         /* a lista já vem ordenada */
       n.style.filter = 'brightness(' + (.6 + .4 * (z + 1) / 2).toFixed(2) + ')';
       bola.appendChild(n);
     });
-    bola.dataset.pronto = '1';
+    bola.dataset.nucleo = chave;
   }
 
   const sim = lw.querySelector('.lw-nome .sim');
@@ -2331,12 +2440,14 @@ function escolherLewis(corpo, api, q){
   }
 
   function irPara(n){
+    const sentido = n > face ? 1 : -1;
     escreveFace(n);                    /* a face que entra já vem certa */
     giro += (n - face) * -90;
     cubo.style.transform = 'rotateY(' + giro + 'deg)';
     face = n;
     atual = feitos[n] !== null ? feitos[n] : exemplos[n].z;
-    desenhaAtomo();
+    /* o átomo vira junto com o cubo, e o do outro lado já é o novo */
+    giraPecas([lw], sentido, () => desenhaAtomo());
     marcarRevisao();
     pintar();
   }
@@ -2660,12 +2771,14 @@ function escolherTransferencia(corpo, api, q){
   }
 
   function irPara(n){
+    const sentido = n > face ? 1 : -1;
     escreveFace(n);
     giro += (n - face) * -90;
     cubo.style.transform = 'rotateY(' + giro + 'deg)';
     face = n;
     t = feitos[n] !== null ? feitos[n] : 0;
-    desenhaTudo();
+    /* o par vira junto com o cubo */
+    giraPecas(lados, sentido, () => desenhaTudo());
     marcarRevisao();
     pintar();
   }
@@ -3140,27 +3253,36 @@ const QUESTOES = [
     enunciado: 'Use a Teoria do Octeto: para ficar estável, o átomo precisa de oito ' +
                'elétrons na última camada. O que cada um destes faz para chegar lá?',
 
-    /* Três alternativas por átomo, e não as mesmas para todos: o
-       número de elétrons muda de um para o outro. O que se cobra
-       é a DIREÇÃO — ganhar ou perder —, mais a recusa da terceira,
-       que é a resposta dos gases nobres e nunca serve aqui.
+    /* Cinco alternativas por átomo, e não as mesmas para todos: o
+       número de elétrons muda de um para o outro. As cinco são:
+       · a certa;
+       · o sentido contrário, com o mesmo número;
+       · "já está estável", a resposta dos gases nobres, que nunca serve;
+       · o CAMINHO LONGO até o octeto — o sódio ganhando sete em vez de
+         perder um. É o erro mais comum: a conta fecha em oito, mas
+         nenhum átomo troca tantos elétrons;
+       · a quantidade errada no sentido certo.
        A certa muda de posição de propósito. */
     atomos: [
       { simbolo:'Na', z:11, nome:'Sódio',    camadas:[2,8,1], nobre:'Ne',
         pauling:'1s² 2s² 2p⁶ 3s¹', certa:1,
-        opcoes:['Ganha 1 elétron','Perde 1 elétron','Não ganha nem perde: já está estável'] },
+        opcoes:['Ganha 1 elétron','Perde 1 elétron','Não ganha nem perde: já está estável',
+                'Ganha 7 elétrons','Perde 2 elétrons'] },
 
       { simbolo:'Mg', z:12, nome:'Magnésio', camadas:[2,8,2], nobre:'Ne',
         pauling:'1s² 2s² 2p⁶ 3s²', certa:0,
-        opcoes:['Perde 2 elétrons','Ganha 2 elétrons','Não ganha nem perde: já está estável'] },
+        opcoes:['Perde 2 elétrons','Ganha 2 elétrons','Não ganha nem perde: já está estável',
+                'Ganha 6 elétrons','Perde 1 elétron'] },
 
       { simbolo:'O',  z:8,  nome:'Oxigênio', camadas:[2,6],   nobre:'Ne',
         pauling:'1s² 2s² 2p⁴', certa:1,
-        opcoes:['Perde 2 elétrons','Ganha 2 elétrons','Não ganha nem perde: já está estável'] },
+        opcoes:['Perde 2 elétrons','Ganha 2 elétrons','Não ganha nem perde: já está estável',
+                'Perde 6 elétrons','Ganha 1 elétron'] },
 
       { simbolo:'Cl', z:17, nome:'Cloro',    camadas:[2,8,7], nobre:'Ar',
         pauling:'1s² 2s² 2p⁶ 3s² 3p⁵', certa:0,
-        opcoes:['Ganha 1 elétron','Perde 1 elétron','Não ganha nem perde: já está estável'] }
+        opcoes:['Ganha 1 elétron','Perde 1 elétron','Não ganha nem perde: já está estável',
+                'Perde 7 elétrons','Ganha 2 elétrons'] }
     ],
 
     nobres: {
@@ -3686,11 +3808,109 @@ function atualizarRegua(){
   });
 }
 
+/* ------------------------------------------------------------
+   O CUBO ENTRE AS QUESTÕES
+   A questão que está no palco vira uma face que gira para fora; a
+   nova entra girando do outro lado. Quem pede movimento reduzido no
+   sistema recebe a troca seca, sem giro.
+   ------------------------------------------------------------ */
+const REDUZ_MOVIMENTO = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* Vira uma ou mais peças no sentido do cubo. Cada peça é copiada por
+   cima de si mesma e a cópia gira para fora; depois refaz() redesenha
+   as peças de verdade com o exemplo novo, e elas entram girando.
+   A cópia é um retrato — sem os ouvintes de toque —, então o que o
+   aluno tocar durante o giro já é a peça nova. */
+function giraPecas(pecas, sentido, refaz){
+  pecas = pecas.filter(pc => pc && pc.isConnected);
+  if (REDUZ_MOVIMENTO || !pecas.length){ refaz(); return; }
+  /* os fantasmas de um giro anterior saem ANTES de nascer qualquer um
+     novo: peças que dividem o mesmo pai (os dois átomos do par) não
+     podem apagar o fantasma uma da outra */
+  new Set(pecas.map(pc => pc.parentElement)).forEach(pai =>
+    pai.querySelectorAll(':scope > .gira-fantasma').forEach(x => x.remove()));
+  const fantasmas = pecas.map(pc => {
+    const pai = pc.parentElement;
+    const f = pc.cloneNode(true);
+    f.removeAttribute('id');
+    f.querySelectorAll('[id]').forEach(x => x.removeAttribute('id'));
+    /* a cópia não responde ao teclado: as teclas 1–5 são da peça nova */
+    f.querySelectorAll('[data-tecla]').forEach(x => x.removeAttribute('data-tecla'));
+    f.setAttribute('aria-hidden', 'true');
+    f.classList.add('gira-fantasma', sentido > 0 ? 'gira-sai-frente' : 'gira-sai-tras');
+    f.style.position = 'absolute';
+    f.style.margin = '0';
+    f.style.left   = pc.offsetLeft + 'px';
+    f.style.top    = pc.offsetTop + 'px';
+    f.style.width  = pc.offsetWidth + 'px';
+    f.style.height = pc.offsetHeight + 'px';
+    pai.appendChild(f);
+    pai.classList.add('girando');
+    return f;
+  });
+  refaz();
+  pecas.forEach((pc, k) => {
+    pc.classList.remove('gira-entra-frente', 'gira-entra-tras');
+    void pc.offsetWidth;                   /* reinicia a animação */
+    pc.classList.add(sentido > 0 ? 'gira-entra-frente' : 'gira-entra-tras');
+    clearTimeout(pc._giroT);
+    const f = fantasmas[k];
+    pc._giroT = setTimeout(() => {
+      f.remove();
+      pc.classList.remove('gira-entra-frente', 'gira-entra-tras');
+      if (pc.parentElement && !pc.parentElement.querySelector(':scope > .gira-fantasma'))
+        pc.parentElement.classList.remove('girando');
+    }, 800);
+  });
+}
+let indiceDesenhado = null;              /* a questão que está no palco */
+
+function viraCubo(sentido){
+  const prova = telas.prova;
+  /* um giro atropelando outro: o fantasma velho sai já */
+  prova.querySelectorAll('.palco-fantasma').forEach(x => x.remove());
+  clearTimeout(viraCubo.t);
+
+  const cs = getComputedStyle(palco);
+  const fantasma = document.createElement('section');
+  fantasma.className = 'palco-fantasma ' + (sentido > 0 ? 'sai-frente' : 'sai-tras');
+  fantasma.setAttribute('aria-hidden', 'true');
+  /* exatamente onde o palco está, com o mesmo respiro por dentro */
+  fantasma.style.top    = palco.offsetTop + 'px';
+  fantasma.style.left   = palco.offsetLeft + 'px';
+  fantasma.style.width  = palco.offsetWidth + 'px';
+  fantasma.style.height = palco.offsetHeight + 'px';
+  fantasma.style.padding = cs.padding;
+  fantasma.style.gap     = cs.rowGap;
+  /* as peças da questão velha MUDAM de lugar, e não são copiadas: o
+     que estiver animando continua animando até o fim do giro */
+  while (palco.firstChild) fantasma.appendChild(palco.firstChild);
+  prova.appendChild(fantasma);
+  prova.classList.add('girando');
+
+  palco.classList.remove('entra-frente', 'entra-tras');
+  void palco.offsetWidth;                /* reinicia a animação */
+  palco.classList.add(sentido > 0 ? 'entra-frente' : 'entra-tras');
+
+  viraCubo.t = setTimeout(() => {
+    fantasma.remove();
+    prova.classList.remove('girando');
+    palco.classList.remove('entra-frente', 'entra-tras');
+  }, 720);
+}
+
 function desenhar(){
   const i = estado.indice;
   const q = questaoDe(i);
 
-  palco.innerHTML = '';
+  const anterior = indiceDesenhado;
+  indiceDesenhado = i;
+  if (anterior !== null && anterior !== i && palco.firstChild &&
+      !telas.prova.hidden && !REDUZ_MOVIMENTO){
+    viraCubo(i > anterior ? 1 : -1);
+  } else {
+    palco.innerHTML = '';
+  }
   interceptaAvanco = interceptaRotulo = null;
   /* questão já confirmada abre fechada: dá para ler, não para mexer */
   palco.classList.toggle('travada', !estado.entregue && jaConfirmada(i));
