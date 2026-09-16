@@ -84,6 +84,13 @@ body::before{
   min-height:100dvh;display:flex;flex-direction:column;
   padding:22px 20px 30px;gap:20px;
 }
+/* Numa tela muito larga — monitor grande, projetor, ou o navegador
+   com zoom reduzido — as duas colunas iam parar nas bordas e a capa
+   virava um título num canto e uma ficha no outro. Com um limite, ela
+   continua sendo uma composição só, centrada. */
+.capa > .escola,
+.capa > .miolo,
+.capa > .pe{width:100%;max-width:1180px;margin-left:auto;margin-right:auto}
 
 /* ---------- o cabeçalho da escola ----------
    Fica no alto, separado por um fio: é identificação, não conteúdo.
@@ -533,8 +540,10 @@ h1 em{font-style:normal;color:var(--amber)}
   width:var(--d);height:var(--d);
   margin:calc(var(--d) / -2) 0 0 calc(var(--d) / -2);
   border:2px dotted rgba(232,241,245,.34);border-radius:50%;
-  pointer-events:none;animation:camadaEntra .32s ease both;
+  pointer-events:none;
 }
+/* só na montagem do zero; no rearranjo quem move o anel é o JS */
+.camada.nasce{animation:camadaEntra .32s ease both}
 @keyframes camadaEntra{from{opacity:0;transform:scale(.85)} to{opacity:1;transform:none}}
 /* o elétron é girado até seu lugar no anel e empurrado até a borda */
 .e-r{
@@ -544,9 +553,11 @@ h1 em{font-style:normal;color:var(--amber)}
   border-radius:50%;
   background:radial-gradient(circle at 34% 30%,#FFE9A8 0%,#F0B44A 45%,#C98A22 100%);
   box-shadow:0 0 12px rgba(240,180,74,.9);
-  transform:rotate(var(--a)) translateY(calc(var(--d) / -2));
-  animation:eNasceAnel .26s cubic-bezier(.2,1.5,.4,1);
+  /* --es é a escala do ponto: o rearranjo a usa para fazer nascer
+     miúdo o que chega e encolher o que sai, sem mexer no lugar dele */
+  transform:rotate(var(--a)) translateY(calc(var(--d) / -2)) scale(var(--es,1));
 }
+.e-r.nasce{animation:eNasceAnel .26s cubic-bezier(.2,1.5,.4,1)}
 /* Os das camadas de dentro ficam apagados. Quem faz ligação é a
    camada de fora, e é para ela que o olho tem de ir sozinho. */
 .e-r.interno{
@@ -561,7 +572,8 @@ h1 em{font-style:normal;color:var(--amber)}
   to  {transform:rotate(var(--a)) translateY(calc(var(--d) / -2)) scale(1);opacity:1}
 }
 /* o último a entrar pisca, para o olho achar onde ele caiu */
-.e-r.novo{animation:eNasceAnel .26s cubic-bezier(.2,1.5,.4,1), eAcende 1s ease-out .26s}
+/* espera o elétron em trânsito pousar antes de piscar */
+.e-r.novo{animation:eAcende 1s ease-out .3s}
 @keyframes eAcende{
   0%,100%{box-shadow:0 0 10px rgba(240,180,74,.85)}
   35%    {box-shadow:0 0 22px 6px rgba(255,235,180,1)}
@@ -629,6 +641,60 @@ h1 em{font-style:normal;color:var(--amber)}
 }
 @keyframes eRastro{from{opacity:.85;transform:scale(1)}
                    to  {opacity:0;  transform:scale(.3)}}
+
+/* ---------- a fonte de elétrons ----------
+   A mesma ampola do slide 7 da aula: um tubo de descarga, que é de
+   onde o elétron veio na história de verdade — foi num tubo assim,
+   com gás rarefeito brilhando, que Thomson achou o primeiro.
+
+   Aqui ela é a torneira e o ralo. O elétron que entra no átomo sai
+   dela; o que sai do átomo vai para ela. Antes ele nascia de um toque
+   demorado no vazio, e o gesto ensinava o contrário da aula: que
+   elétron se inventa apertando o dedo no escuro. */
+.mesa.com-fonte{gap:clamp(48px,9vw,140px)}
+.fonte{
+  --fh:clamp(140px,29vh,196px);          /* altura do vidro */
+  position:relative;flex:none;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  cursor:grab;touch-action:none;
+}
+.mesa.travada .fonte{cursor:default}
+.fonte-vidro{position:relative;height:var(--fh);width:calc(var(--fh) * .769)}
+.fonte-vidro svg{position:absolute;inset:0;width:100%;height:100%}
+/* o gás mora ATRÁS do vidro, no miolo do tubo; o recorte em cápsula é
+   dele, para as partículas baterem na parede */
+.fonte-gas{
+  position:absolute;left:31%;top:16.9%;width:38%;height:66.2%;
+  border-radius:50% / 22.1%;pointer-events:none;
+}
+.fonte-rot{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--aqua);white-space:nowrap;pointer-events:none;
+}
+/* o clarão de quando um elétron sai ou entra: o gás acende por dentro
+   (desenhado na tela) e o tubo joga luz para fora, que é o que chama o
+   olho de quem não estava olhando para ele */
+.fonte.solta .fonte-gas{animation:ampSolta .6s ease-out}
+.fonte.solta .fonte-vidro{animation:ampHalo .6s ease-out}
+@keyframes ampSolta{
+  0%  {filter:brightness(2.6) saturate(1.35)}
+  100%{filter:brightness(1)   saturate(1)}
+}
+@keyframes ampHalo{
+  0%  {filter:drop-shadow(0 0 22px rgba(255,120,80,.95))
+              drop-shadow(0 0 54px rgba(255,60,30,.55))}
+  60% {filter:drop-shadow(0 0 12px rgba(255,120,80,.45))
+              drop-shadow(0 0 30px rgba(255,60,30,.22))}
+  100%{filter:drop-shadow(0 0 0 rgba(255,120,80,0))}
+}
+/* chegando a um átomo, o elétron corre até o LUGAR DELE na camada e
+   pousa ali — não mergulha no núcleo */
+.eletron.pousa{animation:ePousa .36s cubic-bezier(.3,.7,.3,1) forwards}
+@keyframes ePousa{
+  0%  {transform:translate(0,0) scale(1);opacity:1}
+  80% {transform:translate(var(--tx,0px),var(--ty,0px)) scale(.62);opacity:1}
+  100%{transform:translate(var(--tx,0px),var(--ty,0px)) scale(.5);opacity:0}
+}
 
 /* ---------- os efeitos que confirmam a ação ----------
    Sem eles o elétron some e o átomo fica igual: o aluno não sabe se
@@ -1749,6 +1815,225 @@ const NUCLEONS = (() => {
   return pontos.map(gira).sort((p, q) => p[2] - q[2]);
 })();
 
+/* ------------------------------------------------------------
+   A ELETROSFERA QUE SE REARRUMA
+
+   A mesma função do app da aula. Tirar ou pôr um elétron muda a conta
+   da camada de valência, e com ela o espaçamento de TODOS os elétrons
+   que estão nela: sete pontos se repartem de sete em sete, oito de
+   oito em oito. Redesenhar tudo a cada elétron fazia o velho sumir e o
+   novo aparecer pronto — um salto. Ninguém via os elétrons ABRIREM
+   espaço para o que chegou, nem FECHAREM o vão do que saiu, que é
+   justamente o que a camada faz.
+
+   Agora os que ficam caminham até o lugar novo pelo arco mais curto;
+   o que chega nasce miúdo no vão e cresce quando o elétron em trânsito
+   pousa; o que sai se apaga onde estava enquanto os outros se
+   reacomodam. Quando uma camada some inteira — o sódio perdendo a M —,
+   o anel encolhe até o de dentro e se apaga.
+   ------------------------------------------------------------ */
+const REARRUMA_MS = matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 460;
+/* devagar no começo e no fim: é uma acomodação, não um estalo */
+const facilRearrumo = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+const angNorm = a => ((a % 360) + 360) % 360;
+/* o menor caminho de um ângulo a outro, de −180 a +180 */
+function angCurto(de, para){
+  let d = angNorm(para) - angNorm(de);
+  if (d > 180) d -= 360;
+  if (d <= -180) d += 360;
+  return d;
+}
+const leNum = (el, nome) => parseFloat(el.style.getPropertyValue(nome)) || 0;
+
+/* o que cada camada pede: diâmetro, quantos pontos, e o ângulo do
+   primeiro — cada camada girada 22° da de dentro, para os pontos não
+   se empilharem numa coluna só */
+function planoCamadas(total, tamanho){
+  const cam = camadasDe(total);
+  return cam.map((n, i) => ({
+    d: (FRACOES[i] || FRACOES[FRACOES.length - 1]) * tamanho,
+    n, giro: i * 22, val: i === cam.length - 1
+  }));
+}
+const angulosDaCamada = pl => Array.from({ length: pl.n }, (_, k) => pl.giro + k * 360 / pl.n);
+
+/* CASA OS PONTOS QUE FICARAM COM OS LUGARES NOVOS. Os pontos já estão
+   em ordem no anel: casar é só escolher por onde a lista de lugares
+   começa. Vence o começo de menor caminho somado — todos giram para o
+   mesmo lado e ninguém cruza ninguém. O ângulo de chegada vem
+   desenrolado, para a animação cruzar a emenda do círculo sem dar a
+   volta inteira. */
+function casaAngulos(vivos, alvos){
+  const n = alvos.length;
+  if (!n || !vivos.length) return [];
+  const ord = vivos.map(el => ({ el, a: leNum(el, '--a') }))
+                   .sort((x, y) => angNorm(x.a) - angNorm(y.a));
+  let melhor = null;
+  for (let j = 0; j < n; j++){
+    let soma = 0;
+    const par = ord.map((pt, k) => {
+      const kk = (j + k) % n;
+      const d = angCurto(pt.a, alvos[kk]);
+      soma += Math.abs(d);
+      return { el: pt.el, k: kk, de: pt.a, para: pt.a + d };
+    });
+    if (!melhor || soma < melhor.soma) melhor = { soma, par };
+  }
+  return melhor.par;
+}
+
+/* a montagem do zero: anéis e pontos já no lugar, entrando com o pulo */
+function montaEletrosfera(lw, plano){
+  if (lw._anim){ cancelAnimationFrame(lw._reT || 0); lw._anim = null; }
+  lw.querySelectorAll('.camada, .e-r').forEach(x => x.remove());
+  lw._novos = []; lw._saindo = [];
+  plano.forEach((pl, i) => {
+    const anel = document.createElement('span');
+    anel.className = 'camada nasce';
+    anel.style.setProperty('--d', pl.d.toFixed(1) + 'px');
+    lw.appendChild(anel);
+  });
+  plano.forEach((pl, i) => {
+    angulosDaCamada(pl).forEach(a => {
+      const e = document.createElement('i');
+      /* só a camada de fora acende: é a que faz ligação */
+      e.className = 'e-r nasce' + (pl.val ? '' : ' interno');
+      e.dataset.c = i;
+      e.style.setProperty('--d', pl.d.toFixed(1) + 'px');
+      e.style.setProperty('--a', a.toFixed(2) + 'deg');
+      lw.appendChild(e);
+    });
+  });
+}
+
+/* Refaz a eletrosfera SEM redesenhá-la. Guarda em lw._novos e
+   lw._saindo os pontos que acabaram de nascer e de sair: é por eles
+   que o elétron em trânsito sabe PARA ONDE correr e DE ONDE partir —
+   o lugar dele na camada, e nunca o núcleo. */
+function rearrumaEletrosfera(lw, plano){
+  /* uma troca no meio de outra: o que estava morrendo sai agora */
+  if (lw._anim){
+    cancelAnimationFrame(lw._reT || 0);
+    lw._anim.forEach(o => { if (o.morre) o.el.remove(); });
+    lw._anim = null; lw._reT = 0;
+  }
+  const anim = [], novos = [], saindo = [];
+  lw._novos = novos; lw._saindo = saindo;
+  const move = (el, o) => anim.push(Object.assign({ el }, o));
+
+  /* --- os anéis --- */
+  const aneis = [...lw.querySelectorAll('.camada:not(.sumindo)')];
+  plano.forEach((pl, i) => {
+    let el = aneis[i];
+    if (!el){
+      /* camada nova: nasce colada na de dentro e se abre até o raio dela */
+      el = document.createElement('span');
+      el.className = 'camada';
+      el.style.setProperty('--d', (i ? plano[i - 1].d : 0).toFixed(1) + 'px');
+      el.style.opacity = '0';
+      lw.insertBefore(el, lw.querySelector('.e-r'));
+    }
+    el.classList.remove('nasce');
+    move(el, { d0: leNum(el, '--d'), d1: pl.d,
+               o0: parseFloat(el.style.opacity || '1'), o1: 1 });
+  });
+  /* camada que deixou de existir: encolhe para a de dentro e se apaga */
+  aneis.slice(plano.length).forEach(el => {
+    el.classList.add('sumindo');
+    move(el, { d0: leNum(el, '--d'),
+               d1: plano.length ? plano[plano.length - 1].d : 0,
+               o0: 1, o1: 0, morre: true });
+  });
+
+  /* --- os elétrons, camada por camada --- */
+  plano.forEach((pl, i) => {
+    const alvos = angulosDaCamada(pl);
+    const vivos = [...lw.querySelectorAll('.e-r:not(.sumindo)[data-c="' + i + '"]')];
+    /* SOBRANDO: apagam-se onde estão, encolhendo. Não se mexem — quem
+       se reacomoda é quem fica, e é nisso que o olho tem de reparar.
+       Apagam depressa: o elétron em trânsito nasce neste mesmo ponto,
+       e dois pontos juntos pareceriam dois elétrons. */
+    while (vivos.length > pl.n){
+      const el = vivos.pop();
+      el.classList.add('sumindo');
+      el.classList.remove('nasce', 'novo');
+      saindo.push(el);
+      move(el, { e0: 1, e1: .2, o0: 1, o1: 0, ate: .34, morre: true });
+    }
+    /* a camada que virou a de fora acende; a que deixou de ser, apaga */
+    vivos.forEach(el => { el.classList.toggle('interno', !pl.val); el.classList.remove('nasce'); });
+    /* os que ficaram caminham até o lugar novo */
+    const casados = casaAngulos(vivos, alvos);
+    const ocupados = new Set(casados.map(c => c.k));
+    casados.forEach(c => move(c.el, { a0: c.de, a1: c.para,
+                                      d0: leNum(c.el, '--d'), d1: pl.d }));
+    /* CHEGANDO: nasce miúdo no lugar que sobrou e só acende no fim,
+       quando o elétron que vem de fora pousa nele */
+    alvos.forEach((a, k) => {
+      if (ocupados.has(k)) return;
+      const el = document.createElement('i');
+      el.className = 'e-r' + (pl.val ? '' : ' interno');
+      el.dataset.c = i;
+      el.style.setProperty('--d', pl.d.toFixed(1) + 'px');
+      el.style.setProperty('--a', a.toFixed(2) + 'deg');
+      el.style.setProperty('--es', '.2');
+      el.style.opacity = '0';
+      lw.appendChild(el);
+      novos.push(el);
+      move(el, { e0: .2, e1: 1, o0: 0, o1: 1, atraso: .62 });
+    });
+  });
+  /* pontos de camadas que sumiram inteiras — o sódio perdendo a M */
+  lw.querySelectorAll('.e-r:not(.sumindo)').forEach(el => {
+    if (+el.dataset.c < plano.length) return;
+    el.classList.add('sumindo');
+    saindo.push(el);
+    move(el, { e0: 1, e1: .2, o0: 1, o1: 0, ate: .34, morre: true });
+  });
+
+  animaRearrumo(lw, anim);
+}
+
+/* um laço só para a acomodação inteira: todos andam no mesmo compasso,
+   que é o que faz parecer uma camada se reajustando */
+function animaRearrumo(lw, anim){
+  if (!anim.length) return;
+  lw._anim = anim;
+  const t0 = performance.now();
+  const passo = agora => {
+    if (!lw.isConnected){ lw._reT = 0; lw._anim = null; return; }
+    const t = Math.min(1, (agora - t0) / REARRUMA_MS);
+    const f = facilRearrumo(t);
+    anim.forEach(o => {
+      /* o ir e vir é no compasso de todos; acender e apagar podem ter
+         janela própria (atraso, ate) */
+      const ini = o.atraso || 0, fim = o.ate || 1;
+      const fv = (ini || fim < 1)
+        ? facilRearrumo(Math.max(0, Math.min(1, (t - ini) / (fim - ini))))
+        : f;
+      if (o.a1 !== undefined) o.el.style.setProperty('--a', (o.a0 + (o.a1 - o.a0) * f).toFixed(2) + 'deg');
+      if (o.d1 !== undefined) o.el.style.setProperty('--d', (o.d0 + (o.d1 - o.d0) * f).toFixed(1) + 'px');
+      if (o.e1 !== undefined) o.el.style.setProperty('--es', (o.e0 + (o.e1 - o.e0) * fv).toFixed(3));
+      if (o.o1 !== undefined) o.el.style.opacity = (o.o0 + (o.o1 - o.o0) * fv).toFixed(3);
+    });
+    if (t < 1){ lw._reT = requestAnimationFrame(passo); return; }
+    lw._reT = 0; lw._anim = null;
+    anim.forEach(o => {
+      if (o.morre){ o.el.remove(); return; }
+      o.el.style.opacity = '';
+      o.el.style.removeProperty('--es');
+    });
+  };
+  lw._reT = requestAnimationFrame(passo);
+}
+
+/* de onde o elétron sai e onde ele pousa, em coordenadas da mesa */
+function pontoNaMesa(el, mesa){
+  if (!el || !el.isConnected) return null;
+  const r = el.getBoundingClientRect(), rm = mesa.getBoundingClientRect();
+  return { x: r.left + r.width/2 - rm.left, y: r.top + r.height/2 - rm.top };
+}
+
 function desenhaRutherford(lw, ex, total, novo, tamanho){
   const bola = lw.querySelector('.lw-bola');
   if (!bola.dataset.pronto){
@@ -1774,36 +2059,20 @@ function desenhaRutherford(lw, ex, total, novo, tamanho){
   sim.style.color = ex.cor;
   lw.querySelector('.lw-nome .fam').textContent = 'família ' + ex.familia;
 
-  lw.querySelectorAll('.camada, .lw-carga').forEach(x => x.remove());
+  lw.querySelectorAll('.lw-carga').forEach(x => x.remove());
 
-  /* uma camada por nível, os elétrons repartidos em volta dela.
-     Como o desenho é refeito a cada mudança, a camada que ganha ou
-     perde o elétron muda na hora, à vista do aluno. */
+  const plano = planoCamadas(total, tamanho);
+  /* O mesmo átomo com outra conta de elétrons: a eletrosfera se
+     REARRUMA, à vista. Outro átomo (o cubo girou, a questão abriu):
+     aí sim ela se monta do zero. */
+  if (lw._ex === ex && lw.querySelector('.camada, .e-r')){
+    rearrumaEletrosfera(lw, plano);
+    if (novo && lw._novos && lw._novos[0]) lw._novos[0].classList.add('novo');
+  } else {
+    montaEletrosfera(lw, plano);
+  }
+  lw._ex = ex;
   const camadas = camadasDe(total);
-  camadas.forEach((quantos, i) => {
-    const d = (FRACOES[i] || FRACOES[FRACOES.length - 1]) * tamanho;
-    const anel = document.createElement('span');
-    anel.className = 'camada';
-    anel.style.setProperty('--d', d.toFixed(1) + 'px');
-    const deFora = i === camadas.length - 1;
-    for (let k = 0; k < quantos; k++){
-      const e = document.createElement('i');
-      /* só a camada de fora acende: é a que faz ligação */
-      e.className = 'e-r' + (deFora ? '' : ' interno');
-      /* Começa no topo e distribui a volta por igual. Zero grau é o
-         topo porque o rotate gira antes do translateY: quem sai do
-         zero anda para cima, e não para o lado.
-
-         Cada camada entra girada 22° em relação à de dentro: sem
-         isso os elétrons se empilham numa coluna vertical e o
-         desenho vira uma grade, não um átomo. */
-      e.style.setProperty('--a', (i * 22 + k * 360 / quantos).toFixed(1) + 'deg');
-      /* o que acabou de chegar é o último da camada de fora */
-      if (novo && deFora && k === quantos - 1) e.classList.add('novo');
-      anel.appendChild(e);
-    }
-    lw.appendChild(anel);
-  });
 
   /* a carga não conta elétrons: diz o que o átomo virou, e é o que
      se escreve à mão no caderno */
@@ -1827,6 +2096,106 @@ function desenhaRutherford(lw, ex, total, novo, tamanho){
   }
 }
 
+
+/* ------------------------------------------------------------
+   A FONTE DE ELÉTRONS — o desenho e o gás
+   ------------------------------------------------------------ */
+function FONTE_HTML(){
+  const corpo = 'x="60" y="42" width="80" height="176" rx="40"';
+  return '<div class="fonte" aria-label="Fonte de elétrons">' +
+    '<div class="fonte-vidro">' +
+      '<canvas class="fonte-gas" width="152" height="344" aria-hidden="true"></canvas>' +
+      '<svg viewBox="0 0 200 260" aria-hidden="true">' +
+        '<defs><linearGradient id="fonteV" x1="0" y1="0" x2="1" y2="0">' +
+          '<stop offset="0" stop-color="#FFFFFF" stop-opacity=".07"/>' +
+          '<stop offset=".13" stop-color="#FFFFFF" stop-opacity=".52"/>' +
+          '<stop offset=".33" stop-color="#FFFFFF" stop-opacity=".05"/>' +
+          '<stop offset=".70" stop-color="#06131F" stop-opacity=".20"/>' +
+          '<stop offset="1" stop-color="#06131F" stop-opacity=".46"/>' +
+        '</linearGradient></defs>' +
+        /* os eletrodos, um em cada ponta: é entre eles que a descarga passa */
+        '<rect x="84" y="12" width="32" height="13" rx="5" fill="#66727C"/>' +
+        '<rect x="93" y="22" width="14" height="26" fill="#7E8B96"/>' +
+        '<rect x="84" y="235" width="32" height="13" rx="5" fill="#66727C"/>' +
+        '<rect x="93" y="212" width="14" height="26" fill="#7E8B96"/>' +
+        /* o vidro: o brilho comprido de um lado e a sombra do outro */
+        '<rect ' + corpo + ' fill="url(#fonteV)"/>' +
+        '<rect ' + corpo + ' fill="none" stroke="#A9BECC" stroke-width="2.2" stroke-opacity=".6"/>' +
+        '<path d="M76 72 Q69 130 76 188" fill="none" stroke="#FFFFFF" stroke-opacity=".55" stroke-width="5" stroke-linecap="round"/>' +
+        '<path d="M124 86 Q129 130 124 174" fill="none" stroke="#FFFFFF" stroke-opacity=".18" stroke-width="3" stroke-linecap="round"/>' +
+      '</svg>' +
+    '</div>' +
+    '<span class="fonte-rot">fonte de elétrons</span>' +
+  '</div>';
+}
+
+/* O gás do tubo: pontos que nascem, flutuam, batem na parede e somem,
+   mais acesos no eixo, por onde a descarga passa. O SURTO é o que ele
+   faz quando um elétron sai ou entra — as partículas se agitam e o
+   brilho salta. O laço para sozinho quando a questão sai de cena. */
+function ligaFonte(fonte){
+  const cv = fonte.querySelector('.fonte-gas');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  let surto = 0;
+
+  const novo = p => {
+    p.x = .5 + (Math.random() + Math.random() + Math.random() - 1.5) * .30;
+    p.y = Math.random();
+    p.vx = (Math.random() - .5) * .0018;
+    p.vy = (Math.random() - .5) * .0018 - .0004;
+    p.a = 0; p.va = .004 + Math.random() * .009;
+    return p;
+  };
+  const pontos = Array.from({ length: 300 }, () => {
+    const p = novo({}); p.a = Math.random(); return p;
+  });
+
+  function passo(){
+    if (!cv.isConnected) return;
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'lighter';
+    for (const p of pontos){
+      p.a += p.va;
+      if (p.a >= 1) novo(p);
+      p.vx += (Math.random() - .5) * .00014;
+      p.vy += (Math.random() - .5) * .00014;
+      p.x += p.vx * (1 + 5 * surto);
+      p.y += p.vy * (1 + 5 * surto);
+      if (p.x < .03 || p.x > .97){ p.vx = -p.vx; p.x = Math.max(.03, Math.min(.97, p.x)); }
+      if (p.y < .01 || p.y > .99){ p.vy = -p.vy; p.y = Math.max(.01, Math.min(.99, p.y)); }
+      const eixo = 1 - Math.min(1, Math.abs(p.x - .5) / .5);
+      const al = Math.sin(Math.PI * p.a) * (.16 + .42 * eixo) * (1 + 2.6 * surto);
+      const r = (2.1 + 1.4 * eixo) * (1 + .5 * surto);
+      ctx.fillStyle = 'rgba(255,' + (96 + Math.round(70 * eixo)) + ',64,' +
+                      Math.min(1, al).toFixed(3) + ')';
+      ctx.fillRect(p.x * W - r/2, p.y * H - r/2, r, r);
+    }
+    /* a descarga: com surto, o eixo acende de ponta a ponta */
+    if (surto > .012){
+      const qq = Math.min(1, surto);
+      const eixo = ctx.createLinearGradient(0, 0, W, 0);
+      eixo.addColorStop(0,  'rgba(255,90,60,0)');
+      eixo.addColorStop(.5, 'rgba(255,214,178,' + (.5 * qq).toFixed(3) + ')');
+      eixo.addColorStop(1,  'rgba(255,90,60,0)');
+      ctx.fillStyle = eixo;
+      ctx.fillRect(0, 0, W, H);
+    }
+    ctx.globalCompositeOperation = 'source-over';
+    surto = surto > .004 ? surto * .94 : 0;
+    requestAnimationFrame(passo);
+  }
+  requestAnimationFrame(passo);
+
+  return {
+    pulsa(f){
+      surto = Math.min(1.4, surto + (f || .5));
+      fonte.classList.remove('solta');
+      void fonte.offsetWidth;              /* reinicia o clarão */
+      fonte.classList.add('solta');
+    }
+  };
+}
 
 function escolherLewis(corpo, api, q){
   const exemplos = q.exemplos;
@@ -1852,12 +2221,12 @@ function escolherLewis(corpo, api, q){
     '<div class="lado-cubo">' +
       '<div class="cena"><div class="cubo"></div></div>' +
       '<div class="passos" role="group" aria-label="Exemplo da vez"></div>' +
-      '<p class="obs">Segure o dedo no átomo e arraste para fora para tirar ' +
-      'elétrons. Para acrescentar, segure fora do átomo até o elétron ' +
-      'aparecer e solte em cima dele.</p>' +
+      '<p class="obs">Para tirar um elétron, puxe do átomo e solte na fonte. ' +
+      'Para acrescentar, pegue na fonte e solte no átomo.</p>' +
     '</div>' +
-    '<div class="mesa">' +
+    '<div class="mesa com-fonte">' +
       '<div class="lw"><div class="lw-bola"></div><span class="lw-nome"><b class="sim"></b><i class="fam"></i></span></div>' +
+      FONTE_HTML() +
     '</div>';
   corpo.appendChild(bloco);
 
@@ -1866,6 +2235,9 @@ function escolherLewis(corpo, api, q){
   const lw     = bloco.querySelector('.lw');
   const bola   = bloco.querySelector('.lw-bola');
   const passos = bloco.querySelector('.passos');
+  const fonte  = bloco.querySelector('.fonte');
+  const vidro  = bloco.querySelector('.fonte-vidro');
+  const gas    = ligaFonte(fonte);
   let giro = -90 * face;
 
   /* Quanto o aluno pode mexer: até quatro elétrons para cada lado,
@@ -2007,25 +2379,50 @@ function escolherLewis(corpo, api, q){
     setTimeout(() => t.remove(), 480);
   }
 
+  /* ---------- de onde vem e para onde vai ----------
+     A FONTE É O COMEÇO E O FIM DO CAMINHO. Um elétron só nasce nela e
+     só some dentro dela; em nenhum outro lugar a carga aparece ou
+     evapora. Largado no vazio, ele volta para onde estava — o que saiu
+     do átomo volta ao átomo, o que saiu da fonte volta à fonte. */
+  const sobreFonte = e => {
+    const r = vidro.getBoundingClientRect();
+    return e.clientX >= r.left && e.clientX <= r.right &&
+           e.clientY >= r.top  && e.clientY <= r.bottom;
+  };
+  const centroFonte = () => {
+    const r = vidro.getBoundingClientRect(), rm = mesa.getBoundingClientRect();
+    return { x: r.left + r.width/2 - rm.left, y: r.top + r.height/2 - rm.top };
+  };
+  /* de onde o arrancado sai e onde o que chega pousa: o ponto da
+     camada que acabou de esvaziar, e o que acabou de abrir — nunca o
+     núcleo. Quem os marca é o rearranjo da eletrosfera. */
+  const saida = () => pontoNaMesa(lw._saindo && lw._saindo[0], mesa) || centroAtomo();
+  const pouso = () => pontoNaMesa(lw._novos  && lw._novos[0],  mesa) || centroAtomo();
+  function mira(el, alvo){
+    el.style.setProperty('--tx', (alvo.x - parseFloat(el.style.left)).toFixed(0) + 'px');
+    el.style.setProperty('--ty', (alvo.y - parseFloat(el.style.top)).toFixed(0) + 'px');
+  }
+
   let g = null;   /* o que o dedo está segurando */
 
   mesa.addEventListener('pointerdown', e => {
     if (api.travada() || g) return;
+    const ex = exemplos[face];
 
     if (noAtomo(e)){
-      /* dedo no símbolo: puxar arranca. Só vira elétron depois do
+      /* dedo no átomo: puxar arranca. Só vira elétron depois do
          puxão — um toque seco não deve tirar nada sem querer. */
       g = { id:e.pointerId, modo:'tira', el:null, x:e.clientX, y:e.clientY };
+    } else if (sobreFonte(e)){
+      /* dedo na fonte: o elétron nasce LÁ, e não sob o dedo — a
+         distância até o átomo é o que faz do gesto um transporte */
+      if (atual >= maxDe(ex)){ nega(); return; }
+      const c = centroFonte();
+      g = { id:e.pointerId, modo:'traz', el:criaEletron(c.x, c.y),
+            x:e.clientX, y:e.clientY };
+      gas.pulsa(1);                         /* saiu um: a fonte estremece */
     } else {
-      /* no teto: o átomo nega o gesto em vez de ignorá-lo em
-         silêncio, senão parece que a mesa travou */
-      if (atual >= maxDe(exemplos[face])){ nega(); return; }
-      const p = ponto(e);
-      g = { id:e.pointerId, modo:'traz', el:null,
-            x:e.clientX, y:e.clientY, px:p.x, py:p.y };
-      g.t = setTimeout(() => {
-        if (g && g.modo === 'traz' && !g.el) g.el = criaEletron(g.px, g.py);
-      }, 260);
+      return;                               /* o vazio não dá elétron */
     }
     try { mesa.setPointerCapture(e.pointerId); } catch(_){}
     e.preventDefault();
@@ -2035,22 +2432,20 @@ function escolherLewis(corpo, api, q){
     if (!g || e.pointerId !== g.id) return;
     const p = ponto(e);
 
-    if (g.modo === 'traz' && !g.el){
-      /* o dedo treme; só um movimento claro desiste do elétron */
-      g.px = p.x; g.py = p.y;
-      if (Math.hypot(e.clientX - g.x, e.clientY - g.y) > 24){
-        clearTimeout(g.t); g = null;
-      }
-      return;
-    }
     if (g.modo === 'tira' && !g.el){
       if (Math.hypot(e.clientX - g.x, e.clientY - g.y) < 18) return;
       /* no fundo do poço: não sai mais nada, e o puxão deixa de ser gesto */
       if (atual <= minDe(exemplos[face])){ g.modo = 'nada'; nega(); return; }
-      const c = centroAtomo();
-      g.el = criaEletron(c.x, c.y);
-      g.tirou = true;
+      /* A CAMADA PRIMEIRO, O ELÉTRON DEPOIS: ele nasce exatamente no
+         lugar que acabou de esvaziar na órbita. */
       mudar(atual - 1, 'sai');
+      const c = saida();
+      g.el = criaEletron(c.x, c.y);
+      gas.pulsa(.9);
+      /* fica um instante no ponto que esvaziou: o próximo movimento
+         o arrasta dali, com a esteira saindo da própria camada */
+      g.lx = c.x; g.ly = c.y;
+      return;
     }
     if (!g.el) return;
 
@@ -2067,22 +2462,38 @@ function escolherLewis(corpo, api, q){
   function solta(e){
     if (!g || (e && e.pointerId !== g.id)) return;
     const h = g; g = null;
-    clearTimeout(h.t);
     if (!h.el) return;                       /* toque seco: nada aconteceu */
+    const ex = exemplos[face];
 
-    const entra = e && noAtomo(e) && atual < maxDe(exemplos[face]);
-    if (entra){
-      mudar(atual + 1, 'entra');
-      /* mede o caminho que falta até o centro, para ele mergulhar lá */
-      const c = centroAtomo();
-      h.el.style.setProperty('--tx',
-        (c.x - parseFloat(h.el.style.left)).toFixed(0) + 'px');
-      h.el.style.setProperty('--ty',
-        (c.y - parseFloat(h.el.style.top)).toFixed(0) + 'px');
-      h.el.classList.add('entra');
+    if (h.modo === 'traz'){
+      if (e && noAtomo(e) && atual < maxDe(ex)){
+        /* veio da fonte e chegou ao átomo: entra, e pousa no lugar dele */
+        mudar(atual + 1, 'entra');
+        mira(h.el, pouso());
+        h.el.classList.add('pousa');
+        gas.pulsa(.9);
+      } else {
+        /* não foi entregue: volta para dentro da fonte, de onde veio */
+        if (e && noAtomo(e)) nega();         /* chegou ao átomo, mas não cabe */
+        mira(h.el, centroFonte());
+        h.el.classList.add('entra');
+        gas.pulsa(.6);
+      }
     } else {
-      if (e && noAtomo(e)) nega();     /* chegou no átomo, mas não cabe */
-      h.el.classList.add('some');
+      /* modo 'tira': o elétron já saiu da conta do átomo */
+      if (e && sobreFonte(e)){
+        /* largado na fonte: entra no vidro e se apaga lá dentro */
+        mira(h.el, centroFonte());
+        h.el.classList.add('entra');
+        gas.pulsa(.9);
+      } else {
+        /* SOLTO NO VAZIO, O ELÉTRON NÃO SE PERDE: volta para o átomo de
+           onde saiu, e a camada se refaz com ele */
+        mudar(atual + 1, 'entra');
+        mira(h.el, pouso());
+        h.el.classList.add('pousa');
+        gas.pulsa(.3);
+      }
     }
     setTimeout(() => h.el.remove(), 460);
   }
@@ -2316,11 +2727,15 @@ function escolherTransferencia(corpo, api, q){
     if (!g.el){
       /* o elétron só se destaca depois de um puxão claro */
       if (Math.hypot(e.clientX - g.x, e.clientY - g.y) < 18) return;
-      const c = centroDe(g.lado);
-      g.el = criaEletron(c.x, c.y);
-      /* enquanto viaja, ele já não conta para o átomo de origem */
+      /* enquanto viaja, ele já não conta para o átomo de origem: a
+         camada fecha o vão primeiro, e ele nasce no ponto que esvaziou */
       desenhaRutherford(lados[g.lado], pares[face][g.lado],
                         totalDe(g.lado) - 1, false, TAMANHO_PAR);
+      const lw0 = lados[g.lado];
+      const c = pontoNaMesa(lw0._saindo && lw0._saindo[0], mesa) || centroDe(g.lado);
+      g.el = criaEletron(c.x, c.y);
+      g.lx = c.x; g.ly = c.y;
+      return;
     }
     if (g.lx !== undefined){
       const v = Math.hypot(p.x - g.lx, p.y - g.ly);
@@ -2337,24 +2752,27 @@ function escolherTransferencia(corpo, api, q){
 
     const destino = h.lado === 0 ? 1 : 0;
     if (e && sobre(destino, e)){
-      /* chegou do outro lado: a transferência vale */
-      const c = centroDe(destino);
+      /* chegou do outro lado: a transferência vale. A camada de lá
+         abre o vão, e ele pousa exatamente nele. */
+      passar(h.rumo, h.lado);
+      const lw1 = lados[destino];
+      const c = pontoNaMesa(lw1._novos && lw1._novos[0], mesa) || centroDe(destino);
       h.el.style.setProperty('--tx',
         (c.x - parseFloat(h.el.style.left)).toFixed(0) + 'px');
       h.el.style.setProperty('--ty',
         (c.y - parseFloat(h.el.style.top)).toFixed(0) + 'px');
-      h.el.classList.add('entra');
-      passar(h.rumo, h.lado);
+      h.el.classList.add('pousa');
     } else {
       /* largado no vazio ou de volta na origem: o elétron VOLTA.
          Aqui ele não pode sumir — carga não se perde no caminho. */
-      const c = centroDe(h.lado);
+      desenhaTudo();
+      const lw0 = lados[h.lado];
+      const c = pontoNaMesa(lw0._novos && lw0._novos[0], mesa) || centroDe(h.lado);
       h.el.style.setProperty('--tx',
         (c.x - parseFloat(h.el.style.left)).toFixed(0) + 'px');
       h.el.style.setProperty('--ty',
         (c.y - parseFloat(h.el.style.top)).toFixed(0) + 'px');
-      h.el.classList.add('entra');
-      desenhaTudo();
+      h.el.classList.add('pousa');
     }
     setTimeout(() => h.el.remove(), 460);
   }
