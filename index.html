@@ -4550,6 +4550,7 @@ function viraCubo(sentido){
   fantasma.style.left   = palco.offsetLeft + 'px';
   fantasma.style.width  = palco.offsetWidth + 'px';
   fantasma.style.height = palco.offsetHeight + 'px';
+  fantasma.style.zoom = cs.zoom && cs.zoom !== 'normal' ? cs.zoom : '';
   fantasma.style.padding = cs.padding;
   fantasma.style.gap     = cs.rowGap;
   /* as peças da questão velha MUDAM de lugar, e não são copiadas: o
@@ -4573,6 +4574,12 @@ function desenhar(){
   const i = estado.indice;
   const q = questaoDe(i);
 
+  /* O ZOOM DESTA QUESTÃO.
+     Algumas telas pedem letra maior que as outras — depende de quanto
+     desenho elas têm. Cada questão pode trazer o seu 'zoom', e ele vale
+     só para ela. É 'zoom' de verdade, e não uma escala esticada: a
+     página se refaz no tamanho novo, então nada estoura a largura nem
+     sai borrado. */
   const anterior = indiceDesenhado;
   indiceDesenhado = i;
   if (anterior !== null && anterior !== i && palco.firstChild &&
@@ -4581,6 +4588,7 @@ function desenhar(){
   } else {
     palco.innerHTML = '';
   }
+  palco.style.zoom = q.zoom ? String(q.zoom) : '';
   interceptaAvanco = interceptaRotulo = null;
   /* questão já confirmada abre fechada: dá para ler, não para mexer */
   palco.classList.toggle('travada', !estado.entregue && jaConfirmada(i));
