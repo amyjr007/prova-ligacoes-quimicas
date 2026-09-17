@@ -324,52 +324,21 @@ h1 em{font-style:normal;color:var(--amber)}
    2. A PROVA
    O palco onde as questões vão entrar. Cada questão desenha o que
    quiser dentro de #palco — o que está aqui é só a moldura:
-   o topo com o andamento, o palco, e a navegação embaixo.
+   a régua do andamento, o palco, e a navegação embaixo.
    ============================================================ */
-/* A PROVA CABE NA TELA, SEMPRE.
-   Antes a página inteira rolava, e numa questão ampliada o botão de
-   confirmar ia parar abaixo da dobra: o aluno respondia e não via
-   como seguir. Agora a altura é a da tela e quem rola é só o PALCO,
-   no meio — o cabeçalho fica em cima, a barra de confirmar em baixo,
-   e os dois sempre à vista. */
+/* Sem o cabeçalho, a questão herda a faixa de cima e a coluna pode
+   ser mais larga: no Chromebook sobra largura, e era ela que estava
+   sendo desperdiçada enquanto as letras ficavam pequenas. */
 .prova{
-  height:100dvh;display:flex;flex-direction:column;overflow:hidden;
-  padding:16px 18px 20px;gap:14px;max-width:840px;margin:0 auto;
+  min-height:100dvh;display:flex;flex-direction:column;
+  padding:20px 22px 20px;gap:16px;max-width:1060px;margin:0 auto;
 }
-/* Questões com muito desenho pedem a tela inteira: elas dizem
-   'semTopo' e a faixa de identificação sai. A régua de bolinhas
-   fica, e é ela que diz onde o aluno está. */
-.prova.sem-topo .topo{display:none}
-.topo{
-  flex:none;display:flex;align-items:center;gap:12px;
-  padding-bottom:14px;border-bottom:1px solid rgba(69,199,176,.18);
-}
-.topo .marca{
-  flex:none;width:34px;height:34px;border-radius:50%;overflow:hidden;
-  background:#0E2A50;box-shadow:0 0 0 1px rgba(69,199,176,.24);
-}
-.topo .marca img{width:100%;height:100%;object-fit:cover;display:block}
-.topo .identificacao{flex:1;min-width:0;line-height:1.35}
-.topo .nome-aluno{
-  font-size:13px;font-weight:500;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.topo .turma-aluno{
-  font-family:var(--mono);font-size:10px;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--paper-far);
-}
-.topo .contador{
-  flex:none;font-family:var(--mono);font-size:11px;letter-spacing:.14em;
-  color:var(--paper-dim);
-}
-.topo .contador b{color:var(--aqua);font-weight:500}
-
 /* a régua de bolinhas: diz onde o aluno está e quanto falta.
    Não é clicável de propósito — a prova só anda para a frente,
    e um alvo que parece botão mas não volta atrás seria mentira. */
-.regua{flex:none;display:flex;flex-wrap:wrap;gap:7px}
+.regua{flex:none;display:flex;flex-wrap:wrap;gap:8px}
 .regua span{
-  width:11px;height:11px;border-radius:50%;
+  width:12px;height:12px;border-radius:50%;
   border:1px solid rgba(69,199,176,.4);background:transparent;
   transition:background .3s,border-color .3s,transform .3s;
 }
@@ -377,13 +346,9 @@ h1 em{font-style:normal;color:var(--amber)}
 .regua span.atual{background:var(--amber);border-color:var(--amber);transform:scale(1.3)}
 
 #palco{
-  flex:1;min-height:0;display:flex;flex-direction:column;gap:16px;
-  padding:18px 0 6px;animation:entra .32s ease both;
-  overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
-  scrollbar-width:thin;scrollbar-color:rgba(69,199,176,.35) transparent;
+  flex:1;display:flex;flex-direction:column;gap:18px;
+  padding:14px 0 6px;animation:entra .32s ease both;
 }
-#palco::-webkit-scrollbar{width:7px}
-#palco::-webkit-scrollbar-thumb{background:rgba(69,199,176,.35);border-radius:4px}
 @keyframes entra{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
 /* ---------- a troca de questão: um cubo girando ----------
@@ -450,22 +415,23 @@ h1 em{font-style:normal;color:var(--amber)}
 }
 
 /* o enunciado, escrito uma vez aqui para toda questão herdar */
-.q-cabeca{display:flex;flex-direction:column;gap:10px}
+.q-cabeca{display:flex;flex-direction:column;gap:11px}
 .q-numero{
-  font-family:var(--mono);font-size:11px;letter-spacing:.28em;
+  font-family:var(--mono);font-size:12px;letter-spacing:.28em;
   text-transform:uppercase;color:var(--aqua);
 }
 .q-titulo{
   margin:0;font-family:var(--display);font-weight:600;
-  font-size:clamp(21px,5.6vw,29px);line-height:1.18;letter-spacing:-.02em;
+  font-size:clamp(24px,5.6vw,34px);line-height:1.16;letter-spacing:-.02em;
 }
 .q-enunciado{
-  margin:0;font-size:clamp(15px,4vw,17px);line-height:1.6;color:var(--paper-dim);
+  margin:0;font-size:clamp(16px,4vw,19.5px);line-height:1.55;color:var(--paper-dim);
+  max-width:74ch;
 }
 .q-corpo{flex:1}
 /* o veredito que cada questão pode mostrar depois de respondida */
 .q-retorno{
-  padding:14px 16px;border-radius:14px;font-size:14.5px;line-height:1.55;
+  padding:15px 18px;border-radius:14px;font-size:15.5px;line-height:1.55;
   border:1px solid transparent;animation:entra .25s ease both;
 }
 .q-retorno.certo {background:rgba(69,199,176,.12);border-color:var(--aqua-dim)}
@@ -481,12 +447,12 @@ h1 em{font-style:normal;color:var(--amber)}
    Durante a prova, escolher não é acertar: a alternativa marcada
    fica só marcada, e pode trocar até o aluno confirmar. As cores
    de certo e errado só entram na revisão, depois de entregue. */
-.alternativas{display:flex;flex-direction:column;gap:10px;max-width:72ch}
+.alternativas{display:flex;flex-direction:column;gap:11px}
 .alt{
-  display:flex;align-items:flex-start;gap:14px;width:100%;
-  padding:15px 16px;border-radius:14px;text-align:left;cursor:pointer;
+  display:flex;align-items:flex-start;gap:16px;width:100%;
+  padding:16px 20px;border-radius:15px;text-align:left;cursor:pointer;
   background:rgba(18,49,75,.5);border:1px solid rgba(69,199,176,.22);
-  color:inherit;font:inherit;font-size:15.5px;font-weight:300;line-height:1.5;
+  color:inherit;font:inherit;font-size:17px;font-weight:300;line-height:1.45;
   transition:border-color .2s,background .2s,transform .15s;
 }
 .alt:hover{border-color:rgba(69,199,176,.5);transform:translateX(2px)}
@@ -494,11 +460,11 @@ h1 em{font-style:normal;color:var(--amber)}
 /* a alternativa pode ser uma frase só, ou um nome com a explicação
    embaixo — quando o que se escolhe é o nome de uma teoria, dizer
    só o nome seria cobrar decoreba */
-.alt .corpo-alt{display:flex;flex-direction:column;gap:3px;min-width:0}
+.alt .corpo-alt{display:flex;flex-direction:column;gap:4px;min-width:0}
 .alt .frase{font-weight:500}
-.alt .detalhe{font-size:14px;line-height:1.45;color:var(--paper-dim)}
+.alt .detalhe{font-size:15.5px;line-height:1.45;color:var(--paper-dim)}
 .alt .tecla,.gas .tecla{
-  flex:none;width:26px;height:26px;border-radius:8px;
+  flex:none;width:28px;height:28px;border-radius:9px;
   display:grid;place-items:center;margin-top:1px;
   font-family:var(--mono);font-size:12px;
   border:1px solid rgba(69,199,176,.3);color:var(--paper-dim);
@@ -529,7 +495,7 @@ h1 em{font-style:normal;color:var(--amber)}
    os outros elementos, e o gesto parecia falhar. */
 .mesa{
   position:relative;width:100%;
-  height:clamp(200px,38vh,340px);
+  height:clamp(230px,46vh,380px);
   /* o conteúdo é centrado por flex: assim cabe um átomo só (a
      questão 7) ou o par lado a lado (a 8), sem cada uma inventar
      o próprio jeito de se colocar no meio */
@@ -557,7 +523,7 @@ h1 em{font-style:normal;color:var(--amber)}
    inteira quando é o caso. */
 .lw{
   position:relative;flex:none;
-  width:var(--atomo,186px);height:var(--atomo,186px);
+  width:var(--atomo,210px);height:var(--atomo,210px);
   cursor:grab;touch-action:none;
   animation:lwEntra .34s cubic-bezier(.2,1.4,.4,1);
 }
@@ -577,8 +543,8 @@ h1 em{font-style:normal;color:var(--amber)}
    mingau, e o número de núcleons não é o que esta prova pergunta. */
 .lw-bola{
   position:absolute;top:50%;left:50%;
-  width:calc(var(--atomo,186px) * .27);height:calc(var(--atomo,186px) * .27);
-  margin:calc(var(--atomo,186px) * -.135) 0 0 calc(var(--atomo,186px) * -.135);
+  width:calc(var(--atomo,210px) * .27);height:calc(var(--atomo,210px) * .27);
+  margin:calc(var(--atomo,210px) * -.135) 0 0 calc(var(--atomo,210px) * -.135);
   pointer-events:none;
   filter:drop-shadow(0 4px 14px rgba(3,12,22,.6));
 }
@@ -607,11 +573,11 @@ h1 em{font-style:normal;color:var(--amber)}
 }
 .lw-nome .sim{
   font-family:var(--mono);font-weight:500;line-height:1;
-  font-size:calc(var(--atomo,186px) * .092);
+  font-size:calc(var(--atomo,210px) * .092);
 }
 .lw-nome .fam{
   font-style:normal;font-family:var(--mono);line-height:1;
-  font-size:calc(var(--atomo,186px) * .058);
+  font-size:calc(var(--atomo,210px) * .058);
   letter-spacing:.08em;color:var(--paper-far);
 }
 
@@ -629,8 +595,8 @@ h1 em{font-style:normal;color:var(--amber)}
 /* o elétron é girado até seu lugar no anel e empurrado até a borda */
 .e-r{
   position:absolute;top:50%;left:50%;
-  width:calc(var(--atomo,186px) * .057);height:calc(var(--atomo,186px) * .057);
-  margin:calc(var(--atomo,186px) * -.0285) 0 0 calc(var(--atomo,186px) * -.0285);
+  width:calc(var(--atomo,210px) * .057);height:calc(var(--atomo,210px) * .057);
+  margin:calc(var(--atomo,210px) * -.0285) 0 0 calc(var(--atomo,210px) * -.0285);
   border-radius:50%;
   background:radial-gradient(circle at 34% 30%,#FFE9A8 0%,#F0B44A 45%,#C98A22 100%);
   box-shadow:0 0 12px rgba(240,180,74,.9);
@@ -733,11 +699,11 @@ h1 em{font-style:normal;color:var(--amber)}
   display:grid;grid-template-columns:auto minmax(0,1fr);
   gap:12px 40px;align-items:center;
 }
-.lado-vaso{display:flex;flex-direction:column;align-items:center;gap:10px;width:250px}
+.lado-vaso{display:flex;flex-direction:column;align-items:center;gap:10px;width:268px}
 .vaso-card{display:flex;flex-direction:column;align-items:center;gap:7px;position:relative}
 .vaso{
   position:relative;display:block;padding:0;border:0;background:none;color:inherit;font:inherit;
-  width:clamp(150px,26vh,200px);aspect-ratio:200 / 260;border-radius:18px;cursor:zoom-in;
+  width:clamp(160px,29vh,230px);aspect-ratio:200 / 260;border-radius:18px;cursor:zoom-in;
 }
 .vaso > svg{position:absolute;inset:0;width:100%;height:100%;transition:opacity .35s ease,transform .3s ease}
 .vaso:hover > svg{transform:scale(1.03)}
@@ -758,7 +724,7 @@ h1 em{font-style:normal;color:var(--amber)}
 .vaso-card.aberto .micro-janela{clip-path:circle(85% at var(--cx,50%) var(--cy,50%))}
 .vaso-card.aberto .vaso > svg{opacity:.2}
 .vaso-nome{
-  font-family:var(--display);font-weight:600;font-size:16px;line-height:1.15;
+  font-family:var(--display);font-weight:600;font-size:18px;line-height:1.15;
   color:var(--paper);text-align:center;
 }
 .vaso-lupa{
@@ -788,7 +754,7 @@ h1 em{font-style:normal;color:var(--amber)}
    elétron se inventa apertando o dedo no escuro. */
 .mesa.com-fonte{gap:clamp(48px,9vw,140px)}
 .fonte{
-  --fh:clamp(140px,29vh,196px);          /* altura do vidro */
+  --fh:clamp(150px,34vh,218px);          /* altura do vidro */
   position:relative;flex:none;
   display:flex;flex-direction:column;align-items:center;gap:6px;
   cursor:grab;touch-action:none;
@@ -893,10 +859,10 @@ h1 em{font-style:normal;color:var(--amber)}
 /* A questão do octeto mostra o ÁTOMO na face do cubo, então ali
    ele é grande; nas outras a face só numera o exemplo, e um cubo
    grande para isso seria desperdício de tela. */
-.com-atomo .lado-cubo{--cubo:132px;width:252px}
-.com-atomo .obs{max-width:248px}
+.com-atomo .lado-cubo{--cubo:162px;width:270px}
+.com-atomo .obs{max-width:264px}
 .lado-cubo{
-  --cubo:86px;    /* o lado do cubo mora aqui: a profundidade das
+  --cubo:104px;    /* o lado do cubo mora aqui: a profundidade das
                      faces é calculada a partir dele, e numa janela
                      baixa basta mudar este número */
   display:flex;flex-direction:column;align-items:center;gap:10px;width:200px;
@@ -1126,11 +1092,6 @@ h1 em{font-style:normal;color:var(--amber)}
 }
 .retratos.travada .retrato-op .tecla{display:none}
 
-/* Ampliada e sem cabeçalho, a questão de retratos ganha texto grande;
-   as fotos então cedem altura para que a legenda de cada uma — que é o
-   nome da alternativa — não caia abaixo da dobra. */
-.prova.sem-topo .retrato-op img{height:clamp(110px,20vh,250px)}
-
 @media (min-width:560px){
   .retratos{grid-template-columns:repeat(3,1fr);gap:14px}
   /* altura em vh, não proporção: o rosto usa a altura que a janela
@@ -1175,23 +1136,23 @@ h1 em{font-style:normal;color:var(--amber)}
    os respiros encolhem para a questão inteira caber de uma vez.
    O texto não encolhe — quem perde altura é o vazio. */
 @media (max-height:800px){
-  .prova{padding:12px 18px 14px;gap:10px}
-  #palco{padding:12px 0 4px;gap:12px}
-  .q-cabeca{gap:8px}
-  .q-titulo{font-size:clamp(20px,4.2vw,26px)}
+  .prova{padding:14px 20px 14px;gap:12px}
+  #palco{padding:10px 0 4px;gap:14px}
+  .q-cabeca{gap:9px}
+  .q-titulo{font-size:clamp(22px,4.6vw,30px)}
+  .q-enunciado{font-size:clamp(15.5px,3.6vw,18px)}
   .navegacao{padding-top:10px}
-  .topo{padding-bottom:11px}
   /* a questão de quatro alternativas longas é a mais alta da prova:
      é ela que decide estas medidas */
-  .alternativas{gap:7px}
-  .alt{padding:11px 15px}
+  .alternativas{gap:9px}
+  .alt{padding:13px 18px;font-size:16.5px}
   /* a do cubo tem cinco alternativas, e ainda o cubo e o botão do
      gás nobre: aperta um pouco mais, só ela */
   .comportamento{gap:10px 26px}
-  .comportamento .alt{padding:9px 14px;font-size:15px}
+  .comportamento .alt{padding:11px 16px;font-size:16px}
   /* a do octeto tem cinco alternativas: mais justas, para o rodapé caber */
-  .com-atomo .alt{padding:6px 14px}
-  .com-atomo .alternativas{gap:5px}
+  .com-atomo .alt{padding:9px 16px}
+  .com-atomo .alternativas{gap:7px}
   .com-atomo .rodape-q{margin-top:-4px}
   .comportamento .alternativas{gap:6px}
   .lado-cubo{gap:8px}   /* o cubo já é pequeno; aqui só o respiro */
@@ -1415,17 +1376,10 @@ kbd{
      ============================================================ -->
 <main class="tela prova" id="tela-prova" hidden>
 
-  <header class="topo">
-    <div class="marca"><img src="icons/icon-192.png" alt=""></div>
-    <div class="identificacao">
-      <div class="nome-aluno" id="topo-nome"></div>
-      <div class="turma-aluno" id="topo-turma"></div>
-    </div>
-    <div class="contador"><b id="topo-atual">1</b> / <span id="topo-total">0</span></div>
-  </header>
-
-  <!-- só mostra por onde a prova anda; não é para clicar, porque
-       daqui não se volta -->
+  <!-- Sem cabeçalho: numa tela de Chromebook cada faixa a menos é
+       espaço de texto a mais, e o nome do aluno já está na ficha do
+       resultado e no PDF que ele entrega. O que faz falta aqui é
+       saber por onde a prova anda, e isso a régua diz. -->
   <div class="regua" id="regua" aria-hidden="true"></div>
 
   <section id="palco" aria-live="polite"></section>
@@ -1926,7 +1880,7 @@ function camadasDe(total){
    frações do tamanho da caixa, então o mesmo desenho serve grande
    (um átomo só) e menor (o par lado a lado).
    ------------------------------------------------------------ */
-const TAMANHO_ATOMO = 186;      /* o átomo sozinho */
+const TAMANHO_ATOMO = 210;      /* o átomo sozinho */
 const TAMANHO_PAR   = 180;      /* cada um do par */
 /* Diâmetro de cada camada, em fração da caixa. A primeira precisa
    passar bem longe do núcleo: encostada nele, os dois elétrons da
@@ -3519,8 +3473,6 @@ const QUESTOES = [
   {
     valor: 0.5,        /* um item: 0,5 */
     tipo: 'história da química',
-    zoom: 1.35,        /* medido no Chromebook: os retratos pedem tela cheia */
-    semTopo: true,
     titulo: 'Quem é Lewis?',
     enunciado: 'Um dos maiores expoentes no desenvolvimento do que sabemos hoje ' +
                'sobre ligações químicas foi G. N. Lewis. Qual destas imagens ' +
@@ -3631,8 +3583,6 @@ const QUESTOES = [
   {
     valor: 0.5,        /* um item: 0,5 */
     tipo: 'história da química',
-    zoom: 1.35,        /* medido no Chromebook: os retratos pedem tela cheia */
-    semTopo: true,
     titulo: 'Quem é Ramsay?',
     enunciado: 'Um dos cientistas mais brilhantes de sua época, William Ramsay, se mostrou ' +
                'prontamente contra a ideia de que todas as substâncias químicas são formadas ' +
@@ -4460,10 +4410,6 @@ function marcarConfirmada(i){
    volta para revisar chega ao resultado sem passar pela prova —
    e a moldura precisa estar montada do mesmo jeito. */
 function prepararProva(){
-  $('#topo-nome').textContent  = estado.aluno.nome;
-  $('#topo-turma').textContent =
-    estado.aluno.turma + ' · ' + estado.aluno.turno + ' · tipo ' + TIPO;
-  $('#topo-total').textContent = QUESTOES.length;
   montarRegua();
 }
 
@@ -4573,7 +4519,6 @@ function viraCubo(sentido){
   fantasma.style.left   = palco.offsetLeft + 'px';
   fantasma.style.width  = palco.offsetWidth + 'px';
   fantasma.style.height = palco.offsetHeight + 'px';
-  fantasma.style.zoom = cs.zoom && cs.zoom !== 'normal' ? cs.zoom : '';
   fantasma.style.padding = cs.padding;
   fantasma.style.gap     = cs.rowGap;
   /* as peças da questão velha MUDAM de lugar, e não são copiadas: o
@@ -4597,12 +4542,6 @@ function desenhar(){
   const i = estado.indice;
   const q = questaoDe(i);
 
-  /* O ZOOM DESTA QUESTÃO.
-     Algumas telas pedem letra maior que as outras — depende de quanto
-     desenho elas têm. Cada questão pode trazer o seu 'zoom', e ele vale
-     só para ela. É 'zoom' de verdade, e não uma escala esticada: a
-     página se refaz no tamanho novo, então nada estoura a largura nem
-     sai borrado. */
   const anterior = indiceDesenhado;
   indiceDesenhado = i;
   if (anterior !== null && anterior !== i && palco.firstChild &&
@@ -4611,8 +4550,6 @@ function desenhar(){
   } else {
     palco.innerHTML = '';
   }
-  palco.style.zoom = q.zoom ? String(q.zoom) : '';
-  telas.prova.classList.toggle('sem-topo', !!q.semTopo);
   interceptaAvanco = interceptaRotulo = null;
   /* questão já confirmada abre fechada: dá para ler, não para mexer */
   palco.classList.toggle('travada', !estado.entregue && jaConfirmada(i));
@@ -4679,7 +4616,6 @@ function desenhar(){
     palco.appendChild(aviso);
   }
 
-  $('#topo-atual').textContent = i + 1;
   atualizarRegua();
   atualizarNavegacao();
 }
