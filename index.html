@@ -326,10 +326,20 @@ h1 em{font-style:normal;color:var(--amber)}
    quiser dentro de #palco — o que está aqui é só a moldura:
    o topo com o andamento, o palco, e a navegação embaixo.
    ============================================================ */
+/* A PROVA CABE NA TELA, SEMPRE.
+   Antes a página inteira rolava, e numa questão ampliada o botão de
+   confirmar ia parar abaixo da dobra: o aluno respondia e não via
+   como seguir. Agora a altura é a da tela e quem rola é só o PALCO,
+   no meio — o cabeçalho fica em cima, a barra de confirmar em baixo,
+   e os dois sempre à vista. */
 .prova{
-  min-height:100dvh;display:flex;flex-direction:column;
+  height:100dvh;display:flex;flex-direction:column;overflow:hidden;
   padding:16px 18px 20px;gap:14px;max-width:840px;margin:0 auto;
 }
+/* Questões com muito desenho pedem a tela inteira: elas dizem
+   'semTopo' e a faixa de identificação sai. A régua de bolinhas
+   fica, e é ela que diz onde o aluno está. */
+.prova.sem-topo .topo{display:none}
 .topo{
   flex:none;display:flex;align-items:center;gap:12px;
   padding-bottom:14px;border-bottom:1px solid rgba(69,199,176,.18);
@@ -367,9 +377,13 @@ h1 em{font-style:normal;color:var(--amber)}
 .regua span.atual{background:var(--amber);border-color:var(--amber);transform:scale(1.3)}
 
 #palco{
-  flex:1;display:flex;flex-direction:column;gap:16px;
+  flex:1;min-height:0;display:flex;flex-direction:column;gap:16px;
   padding:18px 0 6px;animation:entra .32s ease both;
+  overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
+  scrollbar-width:thin;scrollbar-color:rgba(69,199,176,.35) transparent;
 }
+#palco::-webkit-scrollbar{width:7px}
+#palco::-webkit-scrollbar-thumb{background:rgba(69,199,176,.35);border-radius:4px}
 @keyframes entra{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
 /* ---------- a troca de questão: um cubo girando ----------
@@ -1111,6 +1125,11 @@ h1 em{font-style:normal;color:var(--amber)}
   border:1px solid rgba(69,199,176,.3);backdrop-filter:blur(3px);
 }
 .retratos.travada .retrato-op .tecla{display:none}
+
+/* Ampliada e sem cabeçalho, a questão de retratos ganha texto grande;
+   as fotos então cedem altura para que a legenda de cada uma — que é o
+   nome da alternativa — não caia abaixo da dobra. */
+.prova.sem-topo .retrato-op img{height:clamp(110px,20vh,250px)}
 
 @media (min-width:560px){
   .retratos{grid-template-columns:repeat(3,1fr);gap:14px}
@@ -3500,6 +3519,8 @@ const QUESTOES = [
   {
     valor: 0.5,        /* um item: 0,5 */
     tipo: 'história da química',
+    zoom: 1.35,        /* medido no Chromebook: os retratos pedem tela cheia */
+    semTopo: true,
     titulo: 'Quem é Lewis?',
     enunciado: 'Um dos maiores expoentes no desenvolvimento do que sabemos hoje ' +
                'sobre ligações químicas foi G. N. Lewis. Qual destas imagens ' +
@@ -3610,6 +3631,8 @@ const QUESTOES = [
   {
     valor: 0.5,        /* um item: 0,5 */
     tipo: 'história da química',
+    zoom: 1.35,        /* medido no Chromebook: os retratos pedem tela cheia */
+    semTopo: true,
     titulo: 'Quem é Ramsay?',
     enunciado: 'Um dos cientistas mais brilhantes de sua época, William Ramsay, se mostrou ' +
                'prontamente contra a ideia de que todas as substâncias químicas são formadas ' +
@@ -4589,6 +4612,7 @@ function desenhar(){
     palco.innerHTML = '';
   }
   palco.style.zoom = q.zoom ? String(q.zoom) : '';
+  telas.prova.classList.toggle('sem-topo', !!q.semTopo);
   interceptaAvanco = interceptaRotulo = null;
   /* questão já confirmada abre fechada: dá para ler, não para mexer */
   palco.classList.toggle('travada', !estado.entregue && jaConfirmada(i));
